@@ -14,6 +14,18 @@
   
   
   <!--
+    Repositories
+  -->
+  
+  <repositories>
+    <repository>
+      <id>local-repository</id>
+      <url>file://${basedir}/lib</url>
+    </repository>
+  </repositories>
+  
+  
+  <!--
     Dependencies
   -->
   
@@ -41,13 +53,11 @@
         <artifactId>tomcat-embed-jasper</artifactId>
         <version>7.0.8</version>
     </dependency>
-    <!-- Voor JSP compilatie, zit wel niet in Maven repo
     <dependency>
         <groupId>org.eclipse.jdt.core.compiler</groupId>
         <artifactId>ecj</artifactId>
         <version>3.6</version>
     </dependency>
-    -->
   </dependencies>
   
   
