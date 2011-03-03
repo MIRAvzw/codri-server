@@ -5,6 +5,7 @@ package be.mira.adastra3.server;
  *
  */
 
+import java.io.File;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.LifecycleException;
@@ -13,17 +14,15 @@ import javax.servlet.ServletException;
 public class Main 
 {
     public static void main(String[] args) throws ServletException, LifecycleException {
+        // Initialise and configure tomcat
         Tomcat tomcat = new Tomcat();
         tomcat.setPort(8080);
- 
-        tomcat.setBaseDir(".");
- 
-        // Zonder manuele configuratie: http://www.copperykeenclaws.com/embedding-tomcat-7/
-        Context ctx = tomcat.addWebapp("/examples", "examples");
-        Tomcat.addServlet(ctx, "helloWorldServlet", "be.mira.adastra3.server.website.HelloWorld");
- 
-        ctx.addServletMapping("/helloworld", "helloWorldServlet");
- 
+        
+        // Load the status web application
+        File docBase = new File(".", "webapps/status");
+        tomcat.addWebapp(null, "/status", docBase.getAbsolutePath());
+        
+        // Start the server
         tomcat.start();
         tomcat.getServer().await();
     }
