@@ -6,7 +6,6 @@ package be.mira.adastra3.server;
  */
 
 import java.io.File;
-import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.LifecycleException;
 import javax.servlet.ServletException;
