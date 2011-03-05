@@ -22,6 +22,7 @@ public class EmbeddedTomcat extends Service {
 
     public EmbeddedTomcat() throws ServiceSetupException {
         super();
+        getLogger().debug("Configuring subsystem");
         
         mTomcat = new Tomcat();
 
@@ -47,6 +48,8 @@ public class EmbeddedTomcat extends Service {
     }
 
     public void addWebapp(String iDirectory, String iMountpoint) throws ServiceSetupException {
+        getLogger().debug("Adding webapplication '" + iDirectory + "', mounted on '" + iMountpoint + "'");
+
         File tDocumentRoot = new File(mServerRoot, "webapps/" + iDirectory);
         if (! tDocumentRoot.isDirectory())
             throw new ServiceSetupException("Webapplication root not readable");
@@ -54,6 +57,8 @@ public class EmbeddedTomcat extends Service {
     }
 
     public void run() throws ServiceRunException {
+        getLogger().debug("Starting subsystem");
+
         try {
             mTomcat.start();
         } catch (LifecycleException e) {
@@ -62,6 +67,8 @@ public class EmbeddedTomcat extends Service {
     }
     
     public void stop() throws ServiceRunException {
+        getLogger().debug("Stopping subsystem");
+
         try {
             mTomcat.stop();
         }

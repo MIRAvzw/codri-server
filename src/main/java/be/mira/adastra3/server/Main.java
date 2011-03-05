@@ -1,11 +1,12 @@
 package be.mira.adastra3.server;
 
-import be.mira.adastra3.server.discovery.ServiceDiscoverer;
+import be.mira.adastra3.server.discovery.ServiceDiscovery;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;
 import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.website.EmbeddedTomcat;
 import javax.servlet.ServletException;
 import org.apache.catalina.LifecycleException;
+import org.apache.log4j.Logger;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
 
@@ -25,7 +26,8 @@ public class Main implements SignalHandler {
     //
 
     public void handle(Signal signal) {
-        System.out.println("Signal handler called for signal " + signal);
+        mLogger.info("Received signal " + signal.getName());
+        
         try {
             signalAction(signal);
 
@@ -35,20 +37,19 @@ public class Main implements SignalHandler {
             }
 
         } catch (Exception e) {
-            System.out.println("handle|Signal handler failed, reason " + e.getMessage());
-            e.printStackTrace();
+            mLogger.error("Signal handler for signal " + signal.getName() + " failed", e);
         }
     }
 
     public void signalAction(Signal signal) {
-        System.out.println("Handling " + signal.getName());
+        mLogger.info("Handling signal " + signal.getName());
 
         if (mTomcat != null) {
             try {
                 mTomcat.stop();
                 mTomcat = null;
             } catch (ServiceRunException e) {
-                System.out.println("Could not stop Tomcat");
+                mLogger.error("Could not stop embedded Tomcat subsystem", e);
             }
         }
 
@@ -57,7 +58,7 @@ public class Main implements SignalHandler {
                 mServiceDiscoverer.stop();
                 mServiceDiscoverer = null;
             } catch (ServiceRunException e) {
-                System.out.println("Could not stop service discoverer");
+                mLogger.error("Could not stop service discovery subsystem", e);
             }
         }
 
@@ -70,9 +71,12 @@ public class Main implements SignalHandler {
     //
     
     private static EmbeddedTomcat mTomcat;
-    private static ServiceDiscoverer mServiceDiscoverer;
+    private static ServiceDiscovery mServiceDiscoverer;
+    private static Logger mLogger;
 
     public static SignalHandler install(String signalName) {
+        mLogger.debug("Installing signal handler for SIG " + signalName);
+        
         Signal diagSignal = new Signal(signalName);
         Main instance = new Main();
         instance.oldHandler = Signal.handle(diagSignal, instance);
@@ -84,6 +88,10 @@ public class Main implements SignalHandler {
         // Set-up
         //
 
+        // Logging
+        mLogger = Logger.getLogger(Main.class);
+        mLogger.info("Initializing application");
+
         // Install handlers
         Main.install("TERM");
         Main.install("INT");
@@ -94,17 +102,15 @@ public class Main implements SignalHandler {
             mTomcat = new EmbeddedTomcat();
             mTomcat.addWebapp("status");
         } catch (ServiceSetupException e) {
-            System.err.println(e.getMessage());
-            e.printStackTrace();
+            mLogger.error("Could not configure embedded Tomcat subsystem", e);
             return;
         }
 
         // Configure service discoverer
         try {
-            mServiceDiscoverer = new ServiceDiscoverer();
+            mServiceDiscoverer = new ServiceDiscovery();
         } catch (ServiceSetupException e) {
-            System.err.println(e.getMessage());
-            e.printStackTrace();
+            mLogger.error("Could not configure service discovery subsystem", e);
             return;
         }
 
@@ -113,12 +119,13 @@ public class Main implements SignalHandler {
         // Start
         //
 
+        mLogger.info("Starting subservices");
+
         // Run Tomcat
         try {
             mTomcat.run();
         } catch (ServiceRunException e) {
-            System.err.println(e.getMessage());
-            e.printStackTrace();
+            mLogger.error("Could not start embedded Tomcat subsystem", e);
             return;
         }
 
@@ -136,11 +143,13 @@ public class Main implements SignalHandler {
         // Sleep
         //
 
+        mLogger.info("Entering main loop");
+
         while (true) {
             try {
                 Thread.sleep(50);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+            mLogger.error("Could not start service discovery subsystem", e);
             }
         }
 

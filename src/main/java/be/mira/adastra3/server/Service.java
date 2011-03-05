@@ -30,7 +30,7 @@ public abstract class Service {
         mLogger = Logger.getLogger(this.getClass());
     }
 
-    private Logger getLogger() {
+    protected Logger getLogger() {
         return mLogger;
     }
 
