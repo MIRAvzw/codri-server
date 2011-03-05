@@ -73,6 +73,7 @@ public class ServiceDiscovery extends Service {
         getLogger().debug("Stopping subsystem");
 
         try {
+            mJMDNS.unregisterAllServices();
             mJMDNS.close();
         }
         catch (IOException e) {
