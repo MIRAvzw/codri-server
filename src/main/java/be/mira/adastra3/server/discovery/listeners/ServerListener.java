@@ -2,33 +2,31 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package be.mira.adastra3.server.discovery.listeners;
 
+import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceEvent;
-import javax.jmdns.ServiceListener;
-import org.apache.log4j.Logger;
 
 /**
  *
  * @author tim
  */
-public class ServerListener implements ServiceListener {
-    Logger mLogger = Logger.getLogger(ServiceListener.class);
+public class ServerListener extends AbstractServiceListener {
     public static String ServiceType = "_miraserver._tcp.local.";
 
-    @Override
-    public void serviceAdded(ServiceEvent event) {
-        mLogger.debug("Server addition: " + event.getName() + "." + event.getType());
+    public ServerListener(JmDNS iJMDNS) {
+        super(iJMDNS);
     }
 
-    @Override
-    public void serviceRemoved(ServiceEvent event) {
-        mLogger.debug("Server removal: " + event.getName() + "." + event.getType());
+    public void serviceAddedAction(ServiceEvent event) {
+        getLogger().info("Server addition: " + event.getName() + "." + event.getType());
     }
 
-    @Override
-    public void serviceResolved(ServiceEvent event) {
-        mLogger.debug("Server resolved: " + event.getInfo());
+    public void serviceRemovedAction(ServiceEvent event) {
+        getLogger().info("Server removal: " + event.getName() + "." + event.getType());
+    }
+
+    public void serviceResolvedAction(ServiceEvent event) {
+        getLogger().info("Server resolved: " + event.getInfo());
     }
 }

@@ -5,30 +5,28 @@
 
 package be.mira.adastra3.server.discovery.listeners;
 
+import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceEvent;
-import javax.jmdns.ServiceListener;
-import org.apache.log4j.Logger;
 
 /**
  *
  * @author tim
  */
-public class KioskListener implements ServiceListener {
-    Logger mLogger = Logger.getLogger(KioskListener.class);
+public class KioskListener extends AbstractServiceListener {
     public static String ServiceType = "_mirakiosk._tcp.local.";
-
-    @Override
-    public void serviceAdded(ServiceEvent event) {
-        mLogger.debug("Kiosk addition: " + event.getName() + "." + event.getType());
+    public KioskListener(JmDNS iJMDNS) {
+        super(iJMDNS);
     }
 
-    @Override
-    public void serviceRemoved(ServiceEvent event) {
-        mLogger.debug("Kiosk removal: " + event.getName() + "." + event.getType());
+    public void serviceAddedAction(ServiceEvent event) {
+        getLogger().info("Kiosk addition: " + event.getName() + "." + event.getType());
     }
 
-    @Override
-    public void serviceResolved(ServiceEvent event) {
-        mLogger.debug("Kiosk resolved: " + event.getInfo());
+    public void serviceRemovedAction(ServiceEvent event) {
+        getLogger().info("Kiosk removal: " + event.getName() + "." + event.getType());
+    }
+
+    public void serviceResolvedAction(ServiceEvent event) {
+        getLogger().info("Kiosk resolved: " + event.getInfo());
     }
 }

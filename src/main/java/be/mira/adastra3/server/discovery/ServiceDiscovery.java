@@ -60,8 +60,8 @@ public class ServiceDiscovery extends Service {
         try {
             mJMDNS.registerService(mService);
             
-            mJMDNS.addServiceListener(KioskListener.ServiceType, new KioskListener());
-            mJMDNS.addServiceListener(ServerListener.ServiceType, new ServerListener());
+            mJMDNS.addServiceListener(KioskListener.ServiceType, new KioskListener(mJMDNS));
+            mJMDNS.addServiceListener(ServerListener.ServiceType, new ServerListener(mJMDNS));
             mJMDNS.addServiceTypeListener(new TypeListener());
         }
         catch (IOException e) {

@@ -18,11 +18,15 @@ public class TypeListener implements ServiceTypeListener {
 
     @Override
     public void serviceTypeAdded(ServiceEvent event) {
-        mLogger.debug("Discovered new service type: " + event.getType());
+        synchronized(this) {
+            mLogger.debug("Discovered new service type: " + event.getType());
+        }
     }
     
     @Override
     public void subTypeForServiceTypeAdded(ServiceEvent event) {
-        mLogger.debug("Discovered new service subtype: " + event.getType());
+        synchronized(this) {
+            mLogger.debug("Discovered new service subtype: " + event.getType());
+        }
     }
 }
