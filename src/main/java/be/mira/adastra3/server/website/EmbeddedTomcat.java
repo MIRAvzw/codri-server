@@ -56,8 +56,16 @@ public class EmbeddedTomcat extends Service {
     public void run() throws ServiceRunException {
         try {
             mTomcat.start();
-            mTomcat.getServer().await();
         } catch (LifecycleException e) {
+            throw new ServiceRunException(e);
+        }
+    }
+    
+    public void stop() throws ServiceRunException {
+        try {
+            mTomcat.stop();
+        }
+        catch (LifecycleException e) {
             throw new ServiceRunException(e);
         }
     }

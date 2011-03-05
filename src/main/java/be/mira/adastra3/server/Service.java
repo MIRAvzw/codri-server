@@ -10,6 +10,7 @@ import be.mira.adastra3.server.exceptions.ServiceSetupException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -17,6 +18,7 @@ import java.util.Properties;
  */
 public abstract class Service {
     private Properties mProperties;
+    private Logger mLogger;
 
     public Service() throws ServiceSetupException {
         try {
@@ -24,6 +26,12 @@ public abstract class Service {
         } catch (Exception e) {
             throw new ServiceSetupException(e);
         }
+
+        mLogger = Logger.getLogger(this.getClass());
+    }
+
+    private Logger getLogger() {
+        return mLogger;
     }
 
     private Properties getProperties(String iBasename) throws Exception {
@@ -47,4 +55,6 @@ public abstract class Service {
     }
 
     abstract public void run() throws ServiceRunException;
+
+    abstract public void stop() throws ServiceRunException;
 }
