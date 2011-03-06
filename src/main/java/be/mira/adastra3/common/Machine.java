@@ -5,6 +5,7 @@
 
 package be.mira.adastra3.common;
 
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,11 +14,12 @@ import java.util.List;
  *
  * @author tim
  */
-public class Machine {
+public class Machine implements Serializable {
     //
     // Enums and classes
     //
 
+    public static final long serialVersionUID = 42L;
 
     public enum State {
         ONLINE,

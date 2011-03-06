@@ -11,6 +11,8 @@ package be.mira.adastra3.common;
  */
 public class Kiosk extends Machine {
 
+    public static final long serialVersionUID = 42L;
+
     public Kiosk(String iName) {
         super(iName);
     }

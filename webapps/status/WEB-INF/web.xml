@@ -6,13 +6,21 @@
   version="3.0"
   metadata-complete="true">  
 
-    <description>
-      Status page for the MIRA Ad-Astra III system.
-    </description>
-    <display-name>MIRA Ad-Astra III - Status page</display-name>
+	<description>
+		Status page for the MIRA Ad-Astra III system.
+	</description>
+	<display-name>MIRA Ad-Astra III - Status page</display-name>
 
-
-    <welcome-file-list>
-        <welcome-file>index.html</welcome-file>
-    </welcome-file-list>
+	<servlet>
+		<servlet-name>StatusServlet</servlet-name>
+		<servlet-class>com.vaadin.terminal.gwt.server.ApplicationServlet</servlet-class>
+		<init-param>
+			<param-name>application</param-name>
+			<param-value>be.mira.adastra3.server.website.status.StatusApplication</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>StatusServlet</servlet-name>
+		<url-pattern>/*</url-pattern>
+	</servlet-mapping>
 </web-app>

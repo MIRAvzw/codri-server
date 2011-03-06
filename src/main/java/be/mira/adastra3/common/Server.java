@@ -11,6 +11,8 @@ package be.mira.adastra3.common;
  */
 public class Server extends Machine {
 
+    public static final long serialVersionUID = 42L;
+
     public Server(String iName) {
         super(iName);
     }

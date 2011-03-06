@@ -5,6 +5,7 @@
 
 package be.mira.adastra3.common;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,6 +49,10 @@ public class Topology {
     // Getters and setters
     //
 
+    public synchronized Collection<Kiosk> getKiosks() {
+        return mKiosks.values();
+    }
+
     public synchronized Kiosk getKiosk(String iName) {
         return mKiosks.get(iName);
     }
@@ -56,6 +61,10 @@ public class Topology {
         if (mKiosks.containsKey(iKiosk.getName()))
             throw new TopologyException("Topology already contains kiosk with name " + iKiosk.getName());
         mKiosks.put(iKiosk.getName(), iKiosk);
+    }
+
+    public synchronized Collection<Server> getServers() {
+        return mServers.values();
     }
 
     public synchronized Server getServer(String iName) {
