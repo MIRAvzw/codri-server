@@ -8,9 +8,13 @@ package be.mira.adastra3.server.website;
 import be.mira.adastra3.server.Service;
 import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;
+import com.vaadin.terminal.gwt.server.ApplicationServlet;
 import java.io.File;
+import javax.servlet.Servlet;
+import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.Wrapper;
 
 /**
  *
@@ -25,6 +29,7 @@ public class EmbeddedTomcat extends Service {
         getLogger().debug("Configuring subsystem");
         
         mTomcat = new Tomcat();
+
 
         // Server port
         try {
@@ -54,6 +59,18 @@ public class EmbeddedTomcat extends Service {
         if (! tDocumentRoot.isDirectory())
             throw new ServiceSetupException("Webapplication root not readable");
         mTomcat.addWebapp(null, "/" + iMountpoint, tDocumentRoot.getAbsolutePath());
+    }
+    
+    public Wrapper addServlet(String iName, Servlet iServlet) throws ServiceSetupException {
+        return addServlet(iName, iServlet, iName);
+    }
+
+    public Wrapper addServlet(String iName, Servlet iServlet, String iMountpoint) throws ServiceSetupException {
+        File docBase = new File(System.getProperty("java.io.tmpdir"));
+        Context ctxt = mTomcat.addContext("", docBase.getAbsolutePath());
+        Wrapper oWrapper = mTomcat.addServlet(ctxt, iName, iServlet);
+        ctxt.addServletMapping("/" + iMountpoint, iName);
+        return oWrapper;
     }
 
     public void run() throws ServiceRunException {

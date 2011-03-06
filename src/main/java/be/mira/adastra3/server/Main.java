@@ -4,6 +4,7 @@ import be.mira.adastra3.server.discovery.ServiceDiscovery;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;
 import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.website.EmbeddedTomcat;
+import be.mira.adastra3.server.website.servlets.VaadinTest;
 import javax.servlet.ServletException;
 import org.apache.catalina.LifecycleException;
 import org.apache.log4j.Logger;
@@ -101,6 +102,7 @@ public class Main implements SignalHandler {
         try {
             mTomcat = new EmbeddedTomcat();
             mTomcat.addWebapp("status");
+            mTomcat.addWebapp("vaadin");
         } catch (ServiceSetupException e) {
             mLogger.error("Could not configure embedded Tomcat subsystem", e);
             return;

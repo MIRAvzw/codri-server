@@ -64,8 +64,6 @@
         <version>3.6</version>
     </dependency>
     
-    <!-- ws-xmlrpc -->
-    
     <!-- JmDNS -->
     <dependency>
       <groupId>jmdns</groupId>
@@ -79,10 +77,19 @@
       <artifactId>xmlrpc-client</artifactId>
       <version>3.1.3</version>
     </dependency>
+    
+    <!-- Log4j logging -->
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
       <version>1.2.16</version>
+    </dependency>
+    
+    <!-- Vaadin web framework -->
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin</artifactId>
+      <version>6.5.2</version>
     </dependency>
   </dependencies>
   

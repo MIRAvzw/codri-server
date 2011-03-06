@@ -1,4 +1,4 @@
-package be.mira.adastra3.server.website.beans;
+package be.mira.adastra3.server.website.servlets;
 
 import java.io.*;
 
