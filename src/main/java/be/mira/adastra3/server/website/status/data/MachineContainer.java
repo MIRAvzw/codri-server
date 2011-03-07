@@ -8,12 +8,15 @@ import be.mira.adastra3.common.Machine;
 import be.mira.adastra3.common.Topology;
 import com.vaadin.data.util.BeanItemContainer;
 import java.io.Serializable;
+import java.util.Collection;
 
 /**
  *
  * @author tim
  */
 public class MachineContainer extends BeanItemContainer<Machine> implements Serializable {
+
+    public static final long serialVersionUID = 42L;
 
     public MachineContainer() throws InstantiationException, IllegalAccessException {
         super(Machine.class);
@@ -34,13 +37,19 @@ public class MachineContainer extends BeanItemContainer<Machine> implements Seri
         MachineContainer oContainer = null;
         try {
             oContainer = new MachineContainer();
-            oContainer.addAll(Topology.getInstance().getServers());
-            oContainer.addAll(Topology.getInstance().getKiosks());
         } catch (InstantiationException e) {
             e.printStackTrace(); // TODO
         } catch (IllegalAccessException e) {
             e.printStackTrace(); // TODO
         }
+        oContainer.updateFromTopology();
         return oContainer;
+    }
+
+    public void updateFromTopology() {
+        removeAllItems();
+        addAll(Topology.getInstance().getServers());
+        addAll(Topology.getInstance().getKiosks());
+        Collection<String> tProperties = this.getContainerPropertyIds();
     }
 }

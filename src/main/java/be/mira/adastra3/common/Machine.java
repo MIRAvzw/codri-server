@@ -52,6 +52,10 @@ public class Machine implements Serializable {
     // Getters and setters
     //
 
+    public String getType() {
+        return this.getClass().getSimpleName();
+    }
+
     public String getName() {
         return mName;
     }

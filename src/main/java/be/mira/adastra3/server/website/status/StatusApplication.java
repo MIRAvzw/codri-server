@@ -11,9 +11,6 @@ import be.mira.adastra3.server.website.status.ui.MachineList;
 import be.mira.adastra3.server.website.status.ui.MachineView;
 import be.mira.adastra3.server.website.status.ui.NavigationTree;
 import com.vaadin.Application;
-import com.vaadin.data.Item;
-import com.vaadin.data.Property;
-import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.ui.Button;
@@ -52,7 +49,7 @@ public class StatusApplication extends Application implements ItemClickListener,
 
     @Override
     public void init() {
-        refreshDataSource();
+        getDataSource();
         buildMainLayout();
         setMainComponent(getListView());
     }
@@ -80,6 +77,8 @@ public class StatusApplication extends Application implements ItemClickListener,
 
         mButtonRefresh.addListener((ClickListener) this);
         mButtonHelp.addListener((ClickListener) this);
+        
+        lo.setStyleName("toolbar");
 
         return lo;
     }
@@ -106,16 +105,17 @@ public class StatusApplication extends Application implements ItemClickListener,
             Object itemId = event.getItemId();
             if (itemId != null) {
                 if (NavigationTree.SHOW_ALL.equals(itemId)) {
-                    // clear previous filters
                     getDataSource().removeAllContainerFilters();
-                    showListView();
                 } else if (NavigationTree.SERVERS.equals(itemId)) {
-                    // TODO
+                    getDataSource().removeAllContainerFilters();
+                    getDataSource().addContainerFilter("type", "Server", false, false);
                     // Eventueel ook subfilters (offline, online)
                 } else if (NavigationTree.KIOSKS.equals(itemId)) {
-                    // TODO
+                    getDataSource().removeAllContainerFilters();
+                    getDataSource().addContainerFilter("type", "Kiosk", false, false);
                     // Eventueel ook subfilters (offline, online)
                 }
+                showListView();
             }
         }
     }
@@ -126,11 +126,13 @@ public class StatusApplication extends Application implements ItemClickListener,
     //
 
     public MachineContainer getDataSource() {
+        if (mDataSource == null)
+            mDataSource = MachineContainer.createFromTopology();
         return mDataSource;
     }
 
     public void refreshDataSource() {
-        mDataSource = MachineContainer.createFromTopology();
+        getDataSource().updateFromTopology();
     }
 
 
