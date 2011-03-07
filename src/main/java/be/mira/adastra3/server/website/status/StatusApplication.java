@@ -11,6 +11,10 @@ import be.mira.adastra3.server.website.status.ui.MachineList;
 import be.mira.adastra3.server.website.status.ui.MachineView;
 import be.mira.adastra3.server.website.status.ui.NavigationTree;
 import com.vaadin.Application;
+import com.vaadin.data.Item;
+import com.vaadin.data.Property;
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.ui.Button;
@@ -25,7 +29,7 @@ import com.vaadin.ui.Window;
  *
  * @author tim
  */
-public class StatusApplication extends Application implements ItemClickListener, Button.ClickListener {
+public class StatusApplication extends Application implements ItemClickListener, Button.ClickListener, ValueChangeListener {
     //
     // Member data
     //
@@ -116,6 +120,16 @@ public class StatusApplication extends Application implements ItemClickListener,
                     // Eventueel ook subfilters (offline, online)
                 }
                 showListView();
+            }
+        }
+    }
+
+    public void valueChange(ValueChangeEvent event) {
+        Property property = event.getProperty();
+        if (property == mMachineList) {
+            Item item = mMachineList.getItem(mMachineList.getValue());
+            if (item != mMachineDetail.getItemDataSource()) {
+                mMachineDetail.setItemDataSource(item);
             }
         }
     }
