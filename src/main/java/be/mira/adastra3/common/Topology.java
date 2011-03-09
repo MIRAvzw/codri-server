@@ -5,6 +5,7 @@
 
 package be.mira.adastra3.common;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -75,5 +76,12 @@ public class Topology {
         if (mServers.containsKey(iServer.getName()))
             throw new TopologyException("Topology already contains server with name " + iServer.getName());
         mServers.put(iServer.getName(), iServer);
+    }
+
+    public synchronized Collection<Machine> getMachines() {
+        Collection<Machine> oMachines = new ArrayList<Machine>();
+        oMachines.addAll(getServers());
+        oMachines.addAll(getKiosks());
+        return oMachines;
     }
 }
