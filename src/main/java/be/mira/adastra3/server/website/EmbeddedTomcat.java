@@ -8,13 +8,13 @@ package be.mira.adastra3.server.website;
 import be.mira.adastra3.server.Service;
 import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;
-import com.vaadin.terminal.gwt.server.ApplicationServlet;
 import java.io.File;
 import javax.servlet.Servlet;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.connector.Connector;
 
 /**
  *
@@ -26,17 +26,32 @@ public class EmbeddedTomcat extends Service {
 
     public EmbeddedTomcat() throws ServiceSetupException {
         super();
-        getLogger().debug("Configuring subsystem");
         
         mTomcat = new Tomcat();
 
+        // Connector type
+        Connector tConnector;
+        String iConnectorType = getProperty("type", "http");
+        if (iConnectorType.equalsIgnoreCase("http")) {
+            getLogger().debug("Using HTTP connector");
+            tConnector = new Connector("HTTP/1.1");
+        }
+        else if (iConnectorType.equalsIgnoreCase("ajp")) {
+            getLogger().debug("Using AJP connector");
+            tConnector = new Connector("AJP/1.3");
+        }
+        else
+            throw new ServiceSetupException("Unknown connector type");
+        mTomcat.getService().addConnector(tConnector);
+        mTomcat.setConnector(tConnector);
 
-        // Server port
+        // Port
         try {
             Integer iPort = Integer.parseInt(getProperty("port", "8080"));
             if (iPort <= 0 || iPort > 65536)
                 throw new ServiceSetupException("Server port out of valid range");
-            mTomcat.setPort(iPort);
+            getLogger().debug("Using port " + iPort);
+            tConnector.setPort(iPort);
         }
         catch (NumberFormatException e) {
             throw new ServiceSetupException("Non-integer port specification");
