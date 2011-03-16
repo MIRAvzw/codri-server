@@ -21,8 +21,17 @@ import org.apache.catalina.connector.Connector;
  * @author tim
  */
 public class EmbeddedTomcat extends Service {
+    //
+    // Data members
+    //
+    
     private Tomcat mTomcat;
     private String mServerRoot;
+
+
+    //
+    // Construction and destruction
+    //
 
     public EmbeddedTomcat() throws ServiceSetupException {
         super();
@@ -63,6 +72,33 @@ public class EmbeddedTomcat extends Service {
             throw new ServiceSetupException("Cannot read server root directory");
     }
 
+
+    //
+    // Service interface
+    //
+
+    public void run() throws ServiceRunException {
+        try {
+            mTomcat.start();
+        } catch (LifecycleException e) {
+            throw new ServiceRunException(e);
+        }
+    }
+
+    public void stop() throws ServiceRunException {
+        try {
+            mTomcat.stop();
+        }
+        catch (LifecycleException e) {
+            throw new ServiceRunException(e);
+        }
+    }
+
+
+    //
+    //
+    //
+
     public void addWebapp(String iDirectory) throws ServiceSetupException {
         addWebapp(iDirectory, iDirectory);
     }
@@ -86,26 +122,5 @@ public class EmbeddedTomcat extends Service {
         Wrapper oWrapper = mTomcat.addServlet(ctxt, iName, iServlet);
         ctxt.addServletMapping("/" + iMountpoint, iName);
         return oWrapper;
-    }
-
-    public void run() throws ServiceRunException {
-        getLogger().debug("Starting subsystem");
-
-        try {
-            mTomcat.start();
-        } catch (LifecycleException e) {
-            throw new ServiceRunException(e);
-        }
-    }
-    
-    public void stop() throws ServiceRunException {
-        getLogger().debug("Stopping subsystem");
-
-        try {
-            mTomcat.stop();
-        }
-        catch (LifecycleException e) {
-            throw new ServiceRunException(e);
-        }
     }
 }

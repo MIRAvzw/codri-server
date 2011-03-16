@@ -4,10 +4,10 @@
  */
 package be.mira.adastra3.server.discovery.listeners;
 
-import be.mira.adastra3.common.Server;
-import be.mira.adastra3.common.Machine.State;
-import be.mira.adastra3.common.Topology;
-import be.mira.adastra3.common.TopologyException;
+import be.mira.adastra3.common.topology.Topology;
+import be.mira.adastra3.common.topology.Server;
+import be.mira.adastra3.common.topology.Machine.State;
+import be.mira.adastra3.common.topology.TopologyException;
 import java.net.InetAddress;
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceEvent;

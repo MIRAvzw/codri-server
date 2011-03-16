@@ -3,6 +3,7 @@ package be.mira.adastra3.server;
 import be.mira.adastra3.server.discovery.ServiceDiscovery;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;
 import be.mira.adastra3.server.exceptions.ServiceRunException;
+import be.mira.adastra3.server.repository.RepositoryMonitor;
 import be.mira.adastra3.server.website.EmbeddedTomcat;
 import javax.servlet.ServletException;
 import org.apache.catalina.LifecycleException;
@@ -44,24 +45,10 @@ public class Main implements SignalHandler {
     public void signalAction(Signal signal) {
         mLogger.info("Handling signal " + signal.getName());
 
-        if (mTomcat != null) {
-            try {
-                mTomcat.stop();
-                mTomcat = null;
-            } catch (ServiceRunException e) {
-                mLogger.error("Could not stop embedded Tomcat subsystem", e);
-            }
-        }
+        mLogger.info("Stopping subsystems");
+        stop();
 
-        if (mServiceDiscoverer != null) {
-            try {
-                mServiceDiscoverer.stop();
-                mServiceDiscoverer = null;
-            } catch (ServiceRunException e) {
-                mLogger.error("Could not stop service discovery subsystem", e);
-            }
-        }
-
+        mLogger.info("Exiting");
         System.exit(0);
     }
 
@@ -72,6 +59,7 @@ public class Main implements SignalHandler {
     
     private static EmbeddedTomcat mTomcat;
     private static ServiceDiscovery mServiceDiscoverer;
+    private static RepositoryMonitor mRepositoryMonitor;
     private static Logger mLogger;
 
     public static SignalHandler install(String signalName) {
@@ -90,51 +78,27 @@ public class Main implements SignalHandler {
 
         // Logging
         mLogger = Logger.getLogger(Main.class);
-        mLogger.info("Initializing application");
 
         // Install handlers
         Main.install("TERM");
         Main.install("INT");
         Main.install("ABRT");
 
-        // Configure Tomcat
-        try {
-            mTomcat = new EmbeddedTomcat();
-            mTomcat.addWebapp("status");
-        } catch (ServiceSetupException e) {
-            mLogger.error("Could not configure embedded Tomcat subsystem", e);
+        // Subsystems
+        mLogger.info("Initializing subsystems");
+        if (!initialize()) {
+            mLogger.error("Some subsystems failed to initialize, bailing out");
             return;
         }
-
-        // Configure service discoverer
-        try {
-            mServiceDiscoverer = new ServiceDiscovery();
-        } catch (ServiceSetupException e) {
-            mLogger.error("Could not configure service discovery subsystem", e);
-            return;
-        }
-
 
         //
         // Start
         //
 
-        mLogger.info("Starting subservices");
-
-        // Run Tomcat
-        try {
-            mTomcat.run();
-        } catch (ServiceRunException e) {
-            mLogger.error("Could not start embedded Tomcat subsystem", e);
-            return;
-        }
-
-        // Run service discoverer
-        try {
-            mServiceDiscoverer.run();
-        } catch (ServiceRunException e) {
-            System.err.println(e.getMessage());
-            e.printStackTrace();
+        // Subsystems
+        mLogger.info("Starting subsystems");
+        if (!start()) {
+            mLogger.error("Some subsystems failed to start, bailing out");
             return;
         }
 
@@ -144,14 +108,114 @@ public class Main implements SignalHandler {
         //
 
         mLogger.info("Entering main loop");
-
         while (true) {
             try {
                 Thread.sleep(50);
             } catch (InterruptedException e) {
-            mLogger.error("Could not start service discovery subsystem", e);
+                mLogger.warn("Main loop interrupted", e);
+                break;
             }
         }
 
+        mLogger.info("Stopping subsystems");
+        stop();
+
+        mLogger.info("Exiting");
+        System.exit(0);
+    }
+
+    private static boolean initialize() {
+        // Repository monitor
+        mLogger.debug("Initializing repository monitor");
+        try {
+            mRepositoryMonitor = new RepositoryMonitor();
+        } catch (ServiceSetupException e) {
+            mLogger.error("Could not initialize repository monitor", e);
+            return false;
+        }
+
+        // Embedded Tomcat
+        mLogger.debug("Initializing embedded Tomcat");
+        try {
+            mTomcat = new EmbeddedTomcat();
+            mTomcat.addWebapp("status");
+        } catch (ServiceSetupException e) {
+            mLogger.error("Could not initialize embedded Tomcat", e);
+            return false;
+        }
+
+        // Service discoverer
+        mLogger.debug("Initializing service discovery");
+        try {
+            mServiceDiscoverer = new ServiceDiscovery();
+        } catch (ServiceSetupException e) {
+            mLogger.error("Could not initialize service discovery", e);
+            return false;
+        }
+
+        return true;
+    }
+
+    private static boolean start() {
+        // Repository monitor
+        mLogger.debug("Starting repository monitor");
+        try {
+            mRepositoryMonitor.run();
+        } catch (ServiceRunException e) {
+            mLogger.error("Could not start repository monitor", e);
+            return false;
+        }
+
+        // Embedded Tomcat
+        mLogger.debug("Starting embedded Tomcat");
+        try {
+            mTomcat.run();
+        } catch (ServiceRunException e) {
+            mLogger.error("Could not start embedded Tomcat", e);
+            return false;
+        }
+
+        // Service discoverer
+        mLogger.debug("Starting service discovery");
+        try {
+            mServiceDiscoverer.run();
+        } catch (ServiceRunException e) {
+            mLogger.error("Could not start service discovery", e);
+            return false;
+        }
+
+        return true;
+    }
+
+    private static void stop() {
+        if (mRepositoryMonitor != null) {
+            mLogger.debug("Stopping repository monitor");
+            try {
+                mRepositoryMonitor.stop();
+                mRepositoryMonitor = null;
+            } catch (ServiceRunException e) {
+                mLogger.error("Could not stop repository monitor", e);
+            }
+        }
+
+        if (mTomcat != null) {
+            mLogger.debug("Stopping embedded Tomcat");
+            try {
+                mTomcat.stop();
+                mTomcat = null;
+            } catch (ServiceRunException e) {
+                mLogger.error("Could not stop embedded Tomcat", e);
+            }
+        }
+
+        if (mServiceDiscoverer != null) {
+            mLogger.debug("Stopping service discovery");
+            try {
+                mServiceDiscoverer.stop();
+                mServiceDiscoverer = null;
+            } catch (ServiceRunException e) {
+                mLogger.error("Could not stop service discovery", e);
+            }
+        }
     }
 }

@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package be.mira.adastra3.common;
+package be.mira.adastra3.common.topology;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -4,8 +4,7 @@
  */
 package be.mira.adastra3.server.website.status.data;
 
-import be.mira.adastra3.common.Machine;
-import be.mira.adastra3.common.Topology;
+import be.mira.adastra3.common.topology.*;
 import com.vaadin.data.util.BeanItemContainer;
 import java.io.Serializable;
 import java.util.Collection;

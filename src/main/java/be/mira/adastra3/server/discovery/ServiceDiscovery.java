@@ -20,12 +20,19 @@ import javax.jmdns.ServiceInfo;
  * @author tim
  */
 public class ServiceDiscovery extends Service {
+    //
+    // Data members
+    //
     private JmDNS mJMDNS;
     private ServiceInfo mService;
 
+
+    //
+    // Construction and destruction
+    //
+
     public ServiceDiscovery() throws ServiceSetupException {
         super();
-        getLogger().debug("Configuring subsystem");
 
         // Server port
         Integer iPort;
@@ -33,6 +40,7 @@ public class ServiceDiscovery extends Service {
             iPort = Integer.parseInt(getProperty("port", "8080"));
             if (iPort <= 0 || iPort > 65536)
                 throw new ServiceSetupException("Server port out of valid range");
+            getLogger().debug("Using port " + iPort);
         }
         catch (NumberFormatException e) {
             throw new ServiceSetupException("Non-integer port specification");
@@ -54,9 +62,12 @@ public class ServiceDiscovery extends Service {
                 getProperty("description", "The application server for the MIRA Ad-Astra III application."));
     }
 
-    public void run() throws ServiceRunException {
-        getLogger().debug("Starting subsystem");
 
+    //
+    // Service interface
+    //
+
+    public void run() throws ServiceRunException {
         try {
             mJMDNS.registerService(mService);
             
@@ -70,8 +81,6 @@ public class ServiceDiscovery extends Service {
     }
 
     public void stop() throws ServiceRunException {
-        getLogger().debug("Stopping subsystem");
-
         try {
             mJMDNS.unregisterAllServices();
             mJMDNS.close();
