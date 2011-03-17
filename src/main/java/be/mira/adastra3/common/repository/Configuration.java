@@ -33,8 +33,7 @@ public class Configuration {
     // Data members
     //
 
-    String mDescription;
-    
+    String mDescription;    
     Sound mSound;
 
 
@@ -46,16 +45,18 @@ public class Configuration {
         
     }
 
-    public Configuration(Ini iIniReader) throws TopologyException {
-        // Configuration section
-        Ini.Section tConfigConfiguration = iIniReader.get("configuration");
-        if (tConfigConfiguration != null)
-            processConfiguration(tConfigConfiguration);
+    public Configuration(Ini iIniReader) throws RepositoryException {
+        // Process all sections
+        for (String tSectionName: iIniReader.keySet()) {
+            Ini.Section tSection = iIniReader.get(tSectionName);
 
-        // Sound section
-        Ini.Section tConfigSound = iIniReader.get("sound");
-        if (tConfigSound != null)
-            processSound(tConfigSound);
+            if (tSectionName.equalsIgnoreCase("configuration"))
+                processConfiguration(tSection);
+            else if (tSectionName.equalsIgnoreCase("sound"))
+                processSound(tSection);
+            else
+                throw new RepositoryException("Configuration contains unknown section '" + tSectionName + "'");
+        }
     }
 
 
@@ -63,20 +64,28 @@ public class Configuration {
     // Configuration processing
     //
 
-    final void processConfiguration(Ini.Section tIniSection) throws TopologyException {
-        mDescription = tIniSection.fetch("description");
+    final void processConfiguration(Ini.Section tSection) throws RepositoryException {
+        for (String tOptionKey: tSection.keySet()) {
+            String tOptionValue = tSection.fetch(tOptionKey);
+            if(tOptionKey.equalsIgnoreCase("description"))
+                mDescription = tOptionValue;
+            else
+                throw new RepositoryException("Configuration contains unknown option '" + tOptionKey + "'");
+        }
     }
 
-    final void processSound(Ini.Section tIniSection) throws TopologyException {
+    final void processSound(Ini.Section tSection) throws RepositoryException {
         Sound tSound = new Sound();
 
-        String tVolumeString = tIniSection.fetch("volume");
-        if (tVolumeString != null)
-            tSound.volume = Integer.parseInt(tVolumeString);
-
-        String tEnabledString = tIniSection.fetch("enabled");
-        if (tEnabledString != null)
-            tSound.enabled = Boolean.parseBoolean(tEnabledString);
+        for (String tOptionKey: tSection.keySet()) {
+            String tOptionValue = tSection.fetch(tOptionKey);
+            if (tOptionKey.equalsIgnoreCase("volume"))
+                tSound.volume = Integer.parseInt(tOptionValue);
+            else if(tOptionKey.equalsIgnoreCase("enabled"))
+                tSound.enabled = Boolean.parseBoolean(tOptionValue);
+            else
+                throw new RepositoryException("Configuration contains unknown option '" + tOptionKey + "'");
+        }
 
         setSound(tSound);
     }
@@ -94,12 +103,9 @@ public class Configuration {
         return mSound;
     }
 
-    void setSound(Sound iSound) throws TopologyException {
-        if (mSound == null)
-            mSound = iSound;
-        else {
-            // Log how it got ignored
-            return;
-        }
+    void setSound(Sound iSound) throws RepositoryException {
+        if (iSound.volume != null && (iSound.volume < 0 || iSound.volume > 100))
+            throw new RepositoryException("Sound.volume option contains invalid value");
+        mSound = iSound;
     }
 }

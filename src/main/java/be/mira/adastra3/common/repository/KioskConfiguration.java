@@ -25,7 +25,7 @@ public class KioskConfiguration extends Configuration {
     // Construction and destruction
     //
 
-    public KioskConfiguration(Ini iIniReader) throws TopologyException {
+    public KioskConfiguration(Ini iIniReader) throws RepositoryException {
         super(iIniReader);
         mDependantConfigurations = new ArrayList<String>();
 
@@ -39,7 +39,7 @@ public class KioskConfiguration extends Configuration {
     // Configuration processing
     //
 
-    final void processKiosk(Ini.Section iIniSection) throws TopologyException {
+    final void processKiosk(Ini.Section iIniSection) throws RepositoryException {
         String tLoad = iIniSection.fetch("load");
         if (tLoad != null) {
             String[] tConfigurationNames = tLoad.split(";");
@@ -48,7 +48,7 @@ public class KioskConfiguration extends Configuration {
         }
     }
 
-    Configuration flatten() throws TopologyException {
+    Configuration flatten() throws RepositoryException {
         Configuration oConfiguration = new Configuration();
 
         oConfiguration.setSound(flattenSound());
@@ -56,12 +56,12 @@ public class KioskConfiguration extends Configuration {
         return oConfiguration;
     }
 
-    Sound flattenSound() throws TopologyException {
+    Sound flattenSound() throws RepositoryException {
         Sound oSound = (mSound != null ? mSound : new Sound());
         for (String tConfigurationName : mDependantConfigurations) {
             Configuration tConfiguration = Repository.getInstance().getConfiguration(tConfigurationName);
             if (tConfiguration == null)
-                throw new TopologyException("Configuration does not exist");
+                throw new RepositoryException("Configuration does not exist");
             oSound.merge(tConfiguration.getSound());
         }
         return oSound;

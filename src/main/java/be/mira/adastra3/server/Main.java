@@ -17,6 +17,18 @@ import sun.misc.SignalHandler;
  */
 public class Main implements SignalHandler {
     //
+    // Auxiliary classes
+    //
+
+    private enum Status {
+        IDLE,
+        INITIALIZING,
+        STARTING,
+        RUNNING,
+        STOPPING
+    }
+
+    //
     // Member data
     //
 
@@ -26,6 +38,7 @@ public class Main implements SignalHandler {
     // Routines
     //
 
+    @Override
     public void handle(Signal signal) {
         mLogger.info("Received signal " + signal.getName());
         
@@ -45,11 +58,23 @@ public class Main implements SignalHandler {
     public void signalAction(Signal signal) {
         mLogger.info("Handling signal " + signal.getName());
 
-        mLogger.info("Stopping subsystems");
-        stop();
+        if (mStatus == Status.RUNNING) {
+            mLogger.info("Stopping subsystems");
+            mStatus = Status.STOPPING;
+            stop();
 
-        mLogger.info("Exiting");
-        System.exit(0);
+            mLogger.info("Exiting");
+            mStatus = Status.IDLE;
+            System.exit(0);
+        }
+        else if (mStatus != Status.STOPPING) {
+            mLogger.info("Exiting");
+            mStatus = Status.IDLE;
+            System.exit(0);
+        }
+        else {
+            mLogger.debug("Ignoring signal as the application is " + mStatus.name());
+        }
     }
 
 
@@ -61,6 +86,7 @@ public class Main implements SignalHandler {
     private static ServiceDiscovery mServiceDiscoverer;
     private static RepositoryMonitor mRepositoryMonitor;
     private static Logger mLogger;
+    private static Status mStatus = Status.IDLE;
 
     public static SignalHandler install(String signalName) {
         mLogger.debug("Installing signal handler for SIG " + signalName);
@@ -86,9 +112,12 @@ public class Main implements SignalHandler {
 
         // Subsystems
         mLogger.info("Initializing subsystems");
+        mStatus = Status.INITIALIZING;
         if (!initialize()) {
             mLogger.error("Some subsystems failed to initialize, bailing out");
-            return;
+
+            mStatus = Status.IDLE;
+            System.exit(0);
         }
 
         //
@@ -97,9 +126,15 @@ public class Main implements SignalHandler {
 
         // Subsystems
         mLogger.info("Starting subsystems");
+        mStatus = Status.STARTING;
         if (!start()) {
             mLogger.error("Some subsystems failed to start, bailing out");
-            return;
+
+            mStatus = Status.STOPPING;
+            stop();
+
+            mStatus = Status.IDLE;
+            System.exit(0);
         }
 
 
@@ -108,6 +143,7 @@ public class Main implements SignalHandler {
         //
 
         mLogger.info("Entering main loop");
+        mStatus = Status.RUNNING;
         while (true) {
             try {
                 Thread.sleep(50);
@@ -118,9 +154,11 @@ public class Main implements SignalHandler {
         }
 
         mLogger.info("Stopping subsystems");
+        mStatus = Status.STOPPING;
         stop();
 
         mLogger.info("Exiting");
+        mStatus = Status.IDLE;
         System.exit(0);
     }
 

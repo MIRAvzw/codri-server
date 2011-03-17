@@ -9,17 +9,17 @@ package be.mira.adastra3.common.repository;
  *
  * @author tim
  */
-public class TopologyException extends Exception {
+public class RepositoryException extends Exception {
 
-    public TopologyException(Throwable cause) {
+    public RepositoryException(Throwable cause) {
         super(cause);
     }
 
-    public TopologyException(String message) {
+    public RepositoryException(String message) {
         super(message);
     }
 
-    public TopologyException() {
+    public RepositoryException() {
     }
 
 }

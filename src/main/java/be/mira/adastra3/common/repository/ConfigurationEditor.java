@@ -6,9 +6,11 @@ package be.mira.adastra3.common.repository;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import org.apache.log4j.Logger;
 import org.ini4j.Ini;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNErrorCode;
@@ -27,53 +29,45 @@ import org.tmatesoft.svn.core.io.diff.SVNDiffWindow;
  */
 public class ConfigurationEditor implements ISVNEditor {
     //
-    // Auxiliary structures
-    //
-
-    private enum DataType {
-        UNKNOWN,
-        CONFIGURATION,
-        KIOSKCONFIGURATION
-    }
-
-
-    //
     // Data members
     //
 
     private ByteArrayOutputStream mTemporaryStream;
     private SVNDeltaProcessor myDeltaProcessor;
-    private DataType mDataType;
     private String mDataIdentifier;
+    private static Logger mLogger = Logger.getLogger(ConfigurationEditor.class);
 
 
     //
     // Construction and destruction
     //
 
-    /*
-     * root - the local directory where the node tree is to be exported into.
-     */
     public ConfigurationEditor() {
         /*
          * Utility class that will help us to transform 'deltas' sent by the
          * server to the new file contents.
          */
         myDeltaProcessor = new SVNDeltaProcessor();
-        mDataType = DataType.UNKNOWN;
     }
+
+
+    //
+    // ISVNEditor interface
+    //
 
     /*
      * Server reports revision to which application of the further
      * instructions will update working copy to.
      */
     public void targetRevision(long revision) throws SVNException {
+        mLogger.trace("Next instructions target revision " + revision);
     }
 
     /*
      * Called before sending other instructions.
      */
     public void openRoot(long revision) throws SVNException {
+        mLogger.trace("Opening root at revision " + revision);
     }
 
     /*
@@ -85,7 +79,7 @@ public class ConfigurationEditor implements ISVNEditor {
      * This implementation creates corresponding directory below root directory.
      */
     public void addDir(String path, String copyFromPath, long copyFromRevision) throws SVNException {
-        System.out.println("dir added: " + path);
+        mLogger.trace("Adding directory '" + path + "'");
     }
 
     /*
@@ -98,16 +92,7 @@ public class ConfigurationEditor implements ISVNEditor {
      * no 'existing' directories.
      */
     public void openDir(String path, long revision) throws SVNException {
-        System.out.println("Opening dir: " + path);
-
-        if (path.equals("configurations")) {
-            mDataType = DataType.CONFIGURATION;
-        }
-        else if (path.equals("kiosks")) {
-            mDataType = DataType.KIOSKCONFIGURATION;
-        }
-        else
-            mDataType = DataType.UNKNOWN;
+        mLogger.trace("Opening directory '" + path + "'");
     }
 
     /*
@@ -120,6 +105,7 @@ public class ConfigurationEditor implements ISVNEditor {
      * When property has to be deleted value will be 'null'.
      */
     public void changeDirProperty(String name, SVNPropertyValue property) throws SVNException {
+        mLogger.trace("Changing properties of directory '" + name + "'");
     }
 
     /*
@@ -132,15 +118,39 @@ public class ConfigurationEditor implements ISVNEditor {
      * will be updated later, and for empty files may not be sent at all.
      */
     public void addFile(String path, String copyFromPath, long copyFromRevision) throws SVNException {
+        mLogger.trace("Adding file '" + path + "'");
         if (copyFromPath != null ) {
-            SVNErrorMessage err = SVNErrorMessage.create(SVNErrorCode.IO_ERROR, "current editor cannot handle file copying");
-            throw new SVNException(err);            
+            SVNErrorMessage err = SVNErrorMessage.create(SVNErrorCode.IO_ERROR, "Current editor does not support copying files");
+            throw new SVNException(err);
+        }
+        File tFile = new File(path);
+
+        // Check if file is in configurations directory
+        File tFileParent = tFile.getParentFile();
+        if (tFileParent == null || ! tFileParent.getName().equals("configurations") || tFileParent.getParentFile() != null) {
+            SVNErrorMessage err = SVNErrorMessage.create(SVNErrorCode.IO_ERROR, "File in wrong directory found");
+            throw new SVNException(err);
         }
 
-        System.out.println("Adding file: " + path);
-        if (mDataType == DataType.UNKNOWN)
+        // Check extension
+        int tDotPosition = tFile.getName().lastIndexOf('.');
+        if (tDotPosition == -1) {
+            SVNErrorMessage err = SVNErrorMessage.create(SVNErrorCode.IO_ERROR, "File without extension found");
+            throw new SVNException(err);
+        }
+        if (tDotPosition == 0) {
+            mLogger.debug("Ignoring hidden file");
             return;
-        mDataIdentifier = path;
+        }
+        String tFileExtension = tFile.getName().substring(tDotPosition+1);
+        if (! tFileExtension.equalsIgnoreCase("ini")) {
+            SVNErrorMessage err = SVNErrorMessage.create(SVNErrorCode.IO_ERROR, "File with unknown extension found");
+            throw new SVNException(err);
+        }
+        String tFileBasename = tFile.getName().substring(0, tDotPosition);
+
+        // Prepare state
+        mDataIdentifier = tFileBasename;
         mTemporaryStream = new ByteArrayOutputStream();
     }
 
@@ -153,7 +163,8 @@ public class ConfigurationEditor implements ISVNEditor {
      * no 'existing' files.
      */
     public void openFile(String path, long revision) throws SVNException {
-        System.out.println("Opening file: " + path);
+        SVNErrorMessage err = SVNErrorMessage.create(SVNErrorCode.IO_ERROR, "Current editor does not support opening existing files");
+        throw new SVNException(err);
     }
 
     /*
@@ -173,6 +184,9 @@ public class ConfigurationEditor implements ISVNEditor {
      * like to store the result of delta application.
      */
     public void applyTextDelta(String path, String baseChecksum) throws SVNException {
+        if (mTemporaryStream == null)
+            return;
+
         myDeltaProcessor.applyTextDelta((InputStream) null, mTemporaryStream, false);
     }
 
@@ -182,6 +196,9 @@ public class ConfigurationEditor implements ISVNEditor {
      * these windows for us.
      */
     public OutputStream textDeltaChunk(String path, SVNDiffWindow diffWindow) throws SVNException {
+        if (mTemporaryStream == null)
+            return null;
+
         return myDeltaProcessor.textDeltaChunk(diffWindow);
     }
 
@@ -189,6 +206,9 @@ public class ConfigurationEditor implements ISVNEditor {
      * Called when all diff windows (delta) is transferred.
      */
     public void textDeltaEnd(String path) throws SVNException {
+        if (mTemporaryStream == null)
+            return;
+
         myDeltaProcessor.textDeltaEnd();
     }
 
@@ -197,32 +217,32 @@ public class ConfigurationEditor implements ISVNEditor {
      * This call always matches addFile or openFile call.
      */
     public void closeFile(String path, String textChecksum) throws SVNException {
-        System.out.println("Closing file: " + path);
+        mLogger.trace("Closing file '" + path + "'");
+        if (mTemporaryStream == null)
+            return;
 
+        // Read and proces the received data
         Ini tIniReader = new Ini();
         try {
             tIniReader.load(new ByteArrayInputStream(mTemporaryStream.toByteArray()));
+            
+            Configuration tConfiguration = new Configuration(tIniReader);
+            Repository.getInstance().addConfiguration(mDataIdentifier, tConfiguration);
 
-            if (mDataType == DataType.CONFIGURATION) {
-                Configuration tConfiguration = new Configuration(tIniReader);
-                Repository.getInstance().addConfiguration(mDataIdentifier, tConfiguration);
-            }
-            else if (mDataType == DataType.KIOSKCONFIGURATION) {
-                KioskConfiguration tKioskConfiguration = new KioskConfiguration(tIniReader);
-                Repository.getInstance().addKioskConfiguration(mDataIdentifier, tKioskConfiguration);
-            }
-
-        } catch (IOException e) {
-            SVNErrorMessage err = SVNErrorMessage.create(SVNErrorCode.IO_ERROR, "could not parse given configuration data");
+            mLogger.debug("Successfully loaded configuration '" + mDataIdentifier + "'");
+        }
+        catch (IOException e) {
+            SVNErrorMessage err = SVNErrorMessage.create(SVNErrorCode.IO_ERROR, "Could not read file contents");
             throw new SVNException(err, e);
         }
-        catch (TopologyException e) {
-            SVNErrorMessage err = SVNErrorMessage.create(SVNErrorCode.IO_ERROR, "could not process given configuration data");
+        catch (RepositoryException e) {
+            SVNErrorMessage err = SVNErrorMessage.create(SVNErrorCode.IO_ERROR, "Could not process file contents");
             throw new SVNException(err, e);
         }
-
-        mTemporaryStream = null;
-        mDataIdentifier = null;
+        finally {
+            mTemporaryStream = null;
+            mDataIdentifier = null;
+        }
     }
 
     /*
@@ -230,6 +250,7 @@ public class ConfigurationEditor implements ISVNEditor {
      * This call always matches addDir, openDir or openRoot call.
      */
     public void closeDir() throws SVNException {
+        mLogger.trace("Closing directory");
     }
 
     /*
@@ -237,6 +258,7 @@ public class ConfigurationEditor implements ISVNEditor {
      * called during export operation.
      */
     public void deleteEntry(String path, long revision) throws SVNException {
+        mLogger.trace("Deleting entry '" + path + "'");
     }
 
     /*
@@ -245,6 +267,7 @@ public class ConfigurationEditor implements ISVNEditor {
      * access rights to get information on this directory (properties, children).
      */
     public void absentDir(String path) throws SVNException {
+        mLogger.trace("Access denied to directory '" + path + "' (will be marked as absent)");
     }
 
     /*
@@ -253,12 +276,15 @@ public class ConfigurationEditor implements ISVNEditor {
      * access rights to get information on this file (contents, properties).
      */
     public void absentFile(String path) throws SVNException {
+        mLogger.trace("Access denied to file '" + path + "' (will be marked as absent)");
     }
 
     /*
      * Called when update is completed.
      */
     public SVNCommitInfo closeEdit() throws SVNException {
+        mLogger.trace("Closing an edit");
+
         return null;
     }
 
@@ -267,5 +293,6 @@ public class ConfigurationEditor implements ISVNEditor {
      * requests client to abort update operation.
      */
     public void abortEdit() throws SVNException {
+        mLogger.trace("Aborting an edit");
     }
 }
