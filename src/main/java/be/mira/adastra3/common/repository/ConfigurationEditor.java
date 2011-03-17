@@ -32,10 +32,11 @@ public class ConfigurationEditor implements ISVNEditor {
     // Data members
     //
 
+    private static Logger mLogger = Logger.getLogger(ConfigurationEditor.class);
     private ByteArrayOutputStream mTemporaryStream;
     private SVNDeltaProcessor myDeltaProcessor;
-    private String mDataIdentifier;
-    private static Logger mLogger = Logger.getLogger(ConfigurationEditor.class);
+    protected String mDataIdentifier;
+    protected String mRepositoryDirectory = "configurations";
 
 
     //
@@ -125,9 +126,9 @@ public class ConfigurationEditor implements ISVNEditor {
         }
         File tFile = new File(path);
 
-        // Check if file is in configurations directory
+        // Check if file is in the appropriate directory
         File tFileParent = tFile.getParentFile();
-        if (tFileParent == null || ! tFileParent.getName().equals("configurations") || tFileParent.getParentFile() != null) {
+        if (tFileParent == null || ! tFileParent.getName().equals(mRepositoryDirectory) || tFileParent.getParentFile() != null) {
             SVNErrorMessage err = SVNErrorMessage.create(SVNErrorCode.IO_ERROR, "File in wrong directory found");
             throw new SVNException(err);
         }
@@ -225,17 +226,22 @@ public class ConfigurationEditor implements ISVNEditor {
         Ini tIniReader = new Ini();
         try {
             tIniReader.load(new ByteArrayInputStream(mTemporaryStream.toByteArray()));
-            
-            Configuration tConfiguration = new Configuration(tIniReader);
-            Repository.getInstance().addConfiguration(mDataIdentifier, tConfiguration);
 
-            mLogger.debug("Successfully loaded configuration '" + mDataIdentifier + "'");
+            pushConfiguration(tIniReader);
         }
         catch (IOException e) {
+            // TODO: bug in SVNKIt, the inner error does not get printed
+            // http://old.nabble.com/Passing-an-exception-to-SVNException-td31171795.html
+            mLogger.error("SVNKit inner exception", e);
+
             SVNErrorMessage err = SVNErrorMessage.create(SVNErrorCode.IO_ERROR, "Could not read file contents");
             throw new SVNException(err, e);
         }
         catch (RepositoryException e) {
+            // TODO: bug in SVNKIt, the inner error does not get printed
+            // http://old.nabble.com/Passing-an-exception-to-SVNException-td31171795.html
+            mLogger.error("SVNKit inner exception", e);
+            
             SVNErrorMessage err = SVNErrorMessage.create(SVNErrorCode.IO_ERROR, "Could not process file contents");
             throw new SVNException(err, e);
         }
@@ -294,5 +300,17 @@ public class ConfigurationEditor implements ISVNEditor {
      */
     public void abortEdit() throws SVNException {
         mLogger.trace("Aborting an edit");
+    }
+
+
+    //
+    // Auxiliary
+    //
+
+    void pushConfiguration(Ini tIniReader) throws RepositoryException {
+        Configuration tConfiguration = new Configuration(tIniReader);
+        Repository.getInstance().addConfiguration(mDataIdentifier, tConfiguration);
+
+        mLogger.debug("Successfully loaded configuration '" + mDataIdentifier + "'");
     }
 }

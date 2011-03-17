@@ -71,6 +71,7 @@ public class Configuration {
                 mDescription = tOptionValue;
             else
                 throw new RepositoryException("Configuration contains unknown option '" + tOptionKey + "'");
+            // TODO: how to handle child sections? this currently crashes
         }
     }
 

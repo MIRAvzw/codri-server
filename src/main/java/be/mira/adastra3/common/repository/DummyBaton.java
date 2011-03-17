@@ -23,7 +23,7 @@ import org.tmatesoft.svn.core.io.ISVNReporterBaton;
  *
  * @author tim
  */
-public class ConfigurationBaton implements ISVNReporterBaton {
+public class DummyBaton implements ISVNReporterBaton {
     //
     // Data members
     //
@@ -35,7 +35,7 @@ public class ConfigurationBaton implements ISVNReporterBaton {
     // Construction and destruction
     //
 
-    public ConfigurationBaton(long revision) {
+    public DummyBaton(long revision) {
         exportRevision = revision;
     }
 
@@ -43,7 +43,7 @@ public class ConfigurationBaton implements ISVNReporterBaton {
     //
     // ISVNReporterBaton interface
     //
-
+    
     public void report(ISVNReporter reporter) throws SVNException {
         try {
             /*
