@@ -54,6 +54,11 @@ public abstract class Service {
         return mProperties.getProperty(iKey, iDefaultValue);
     }
 
+    /**
+     * The run() method starts the service, but should be non blocking.
+     * 
+     * @throws ServiceRunException
+     */
     abstract public void run() throws ServiceRunException;
 
     abstract public void stop() throws ServiceRunException;

@@ -11,6 +11,8 @@ import be.mira.adastra3.common.repository.KioskConfigurationEditor;
 import be.mira.adastra3.server.Service;
 import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;
+import java.util.Timer;
+import java.util.TimerTask;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
@@ -30,6 +32,32 @@ public class RepositoryMonitor extends Service {
 
     private String mDAVLocation;
     private SVNRepository mSVNRepository;
+    private long mSVNRevision;
+    private Timer mSVNMonitor;
+    private int mSVNMonitorInterval;
+
+
+    //
+    // Auxiliary classes
+    //
+
+    private class Monitor extends TimerTask {
+        @Override
+        public void run() {
+            getLogger().debug("Checking SVN revision");
+            try {
+                long tSVNRevision = mSVNRepository.getLatestRevision();
+                if (tSVNRevision != mSVNRevision) {
+                    getLogger().info("SVN repository changed from revision " + mSVNRevision + " to " + tSVNRevision);
+
+                    mSVNRevision = tSVNRevision;
+                }
+            }
+            catch (SVNException e) {
+                getLogger().error("Error monitoring SVN repository", e);
+            }
+        }
+    }
 
 
     //
@@ -43,7 +71,7 @@ public class RepositoryMonitor extends Service {
         mDAVLocation = "http://"
                 + getProperty("host", "localhost")
                 + getProperty("path", "/repository");
-        getLogger().debug("Repository DAV location: " + mDAVLocation);
+        getLogger().debug("SVN repository DAV location: " + mDAVLocation);
         
         // SVN repository
         try {
@@ -53,6 +81,14 @@ public class RepositoryMonitor extends Service {
         catch (SVNException e) {
             throw new ServiceSetupException(e);
         }
+
+        // Monitor timer
+        Integer iInterval = Integer.parseInt(getProperty("interval", "60"));
+        if (iInterval <= 0)
+            throw new ServiceSetupException("Server port out of valid range");
+        getLogger().debug("Scheduling SVN monitor with interval of " + iInterval + " s");
+        mSVNMonitor = new Timer();
+        mSVNMonitorInterval = iInterval;
     }
 
 
@@ -64,6 +100,9 @@ public class RepositoryMonitor extends Service {
     public void run() throws ServiceRunException {
         // Do a checkout
         checkout();
+
+        // Schedule the monitor
+        mSVNMonitor.schedule(new Monitor(), mSVNMonitorInterval * 1000);
     }
 
     @Override
@@ -77,17 +116,17 @@ public class RepositoryMonitor extends Service {
 
     void checkout() throws ServiceRunException  {
         try {
-            long tSVNRepositoryRevision = mSVNRepository.getLatestRevision();
+            mSVNRevision = mSVNRepository.getLatestRevision();
 
             getLogger().debug("Checking out configurations");
-            ISVNReporterBaton tConfigurationBaton = new DummyBaton(tSVNRepositoryRevision);
+            ISVNReporterBaton tConfigurationBaton = new DummyBaton(mSVNRevision);
             ISVNEditor tConfigurationEditor = new ConfigurationEditor();
-            mSVNRepository.update(tSVNRepositoryRevision, "configurations", true, tConfigurationBaton, tConfigurationEditor);
+            mSVNRepository.update(mSVNRevision, "configurations", true, tConfigurationBaton, tConfigurationEditor);
 
             getLogger().debug("Checking out kiosks");
-            ISVNReporterBaton tKioskBaton = new DummyBaton(tSVNRepositoryRevision);
+            ISVNReporterBaton tKioskBaton = new DummyBaton(mSVNRevision);
             ISVNEditor tKioskEditor = new KioskConfigurationEditor();
-            mSVNRepository.update(tSVNRepositoryRevision, "kiosks", true, tKioskBaton, tKioskEditor);
+            mSVNRepository.update(mSVNRevision, "kiosks", true, tKioskBaton, tKioskEditor);
         }
         catch (SVNException e) {
             getLogger().error("SVN checkout failed", e);

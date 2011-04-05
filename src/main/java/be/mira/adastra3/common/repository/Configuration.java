@@ -25,6 +25,9 @@ public class Configuration {
         public Integer volume;
 
         void apply(Sound iSound) {
+            if (iSound == null)
+                return;
+            
             if (iSound.enabled != null)
                 enabled = iSound.enabled;
             if (iSound.volume != null)
