@@ -5,6 +5,9 @@ import be.mira.adastra3.server.exceptions.ServiceSetupException;
 import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.repository.RepositoryMonitor;
 import be.mira.adastra3.server.website.EmbeddedTomcat;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
 import javax.servlet.ServletException;
 import org.apache.catalina.LifecycleException;
 import org.apache.log4j.Logger;
@@ -26,6 +29,12 @@ public class Main implements SignalHandler {
         STARTING,
         RUNNING,
         STOPPING
+    }
+
+    private enum ServiceType {
+        DISCOVERY,
+        REPOSITORY,
+        WEBSITE
     }
 
     //
@@ -81,10 +90,15 @@ public class Main implements SignalHandler {
     //
     // Static
     //
-    
-    private static EmbeddedTomcat mTomcat;
-    private static ServiceDiscovery mServiceDiscoverer;
-    private static RepositoryMonitor mRepositoryMonitor;
+
+    private static Map<ServiceType, Service> mSubservices;
+    private final static Map<ServiceType, String> mServiceNames;
+    static {
+        mServiceNames = new EnumMap<ServiceType, String>(ServiceType.class);
+        mServiceNames.put(ServiceType.DISCOVERY, "service discoverer");
+        mServiceNames.put(ServiceType.REPOSITORY, "repository monitor");
+        mServiceNames.put(ServiceType.WEBSITE, "web server");
+    }
     private static Logger mLogger;
     private static Status mStatus = Status.IDLE;
 
@@ -163,96 +177,62 @@ public class Main implements SignalHandler {
     }
 
     private static boolean initialize() {
-        // Repository monitor
-        mLogger.debug("Initializing repository monitor");
-        try {
-            mRepositoryMonitor = new RepositoryMonitor();
-        } catch (ServiceSetupException e) {
-            mLogger.error("Could not initialize repository monitor", e);
-            return false;
-        }
+        // Map with service objects
+        mSubservices = new EnumMap<ServiceType, Service>(ServiceType.class);
 
-        // Embedded Tomcat
-        mLogger.debug("Initializing embedded Tomcat");
-        try {
-            mTomcat = new EmbeddedTomcat();
-            mTomcat.addWebapp("status");
-        } catch (ServiceSetupException e) {
-            mLogger.error("Could not initialize embedded Tomcat", e);
-            return false;
-        }
-
-        // Service discoverer
-        mLogger.debug("Initializing service discovery");
-        try {
-            mServiceDiscoverer = new ServiceDiscovery();
-        } catch (ServiceSetupException e) {
-            mLogger.error("Could not initialize service discovery", e);
-            return false;
+        // Process all subservices
+        for (ServiceType tServiceType : ServiceType.values()) {
+            mLogger.debug("Initializing the " + mServiceNames.get(tServiceType));
+            try {
+                Service tService = null;
+                switch (tServiceType) {
+                    case REPOSITORY:
+                        tService = new RepositoryMonitor();
+                        break;
+                    case WEBSITE:
+                        tService = new EmbeddedTomcat();
+                        ((EmbeddedTomcat)tService).addWebapp("status");
+                        break;
+                    case DISCOVERY:
+                        tService = new ServiceDiscovery();
+                        break;
+                    default:
+                        throw new ServiceSetupException("I don't know how to initialize the " + mServiceNames.get(tServiceType));
+                }
+                mSubservices.put(tServiceType, tService);
+            } catch (ServiceSetupException e) {
+                mLogger.error("Could not initialize the " + mServiceNames.get(tServiceType), e);
+                return false;
+            }
         }
 
         return true;
     }
 
     private static boolean start() {
-        // Repository monitor
-        mLogger.debug("Starting repository monitor");
-        try {
-            mRepositoryMonitor.run();
-        } catch (ServiceRunException e) {
-            mLogger.error("Could not start repository monitor", e);
-            return false;
-        }
-
-        // Embedded Tomcat
-        mLogger.debug("Starting embedded Tomcat");
-        try {
-            mTomcat.run();
-        } catch (ServiceRunException e) {
-            mLogger.error("Could not start embedded Tomcat", e);
-            return false;
-        }
-
-        // Service discoverer
-        mLogger.debug("Starting service discovery");
-        try {
-            mServiceDiscoverer.run();
-        } catch (ServiceRunException e) {
-            mLogger.error("Could not start service discovery", e);
-            return false;
+        for (ServiceType tServiceType : mSubservices.keySet()) {
+            Service tService = mSubservices.get(tServiceType);
+            mLogger.debug("Starting the " + mServiceNames.get(tServiceType));
+            try {
+                tService.run();
+            } catch (ServiceRunException e) {
+                mLogger.error("Could not start the " + mServiceNames.get(tServiceType), e);
+                return false;
+            }
         }
 
         return true;
     }
 
     private static void stop() {
-        if (mRepositoryMonitor != null) {
-            mLogger.debug("Stopping repository monitor");
+        for (ServiceType tServiceType : mSubservices.keySet()) {
+            Service tService = mSubservices.get(tServiceType);
+            mLogger.debug("Stopping the " + mServiceNames.get(tServiceType));
             try {
-                mRepositoryMonitor.stop();
-                mRepositoryMonitor = null;
+                tService.stop();
+                mSubservices.remove(tServiceType);
             } catch (ServiceRunException e) {
-                mLogger.error("Could not stop repository monitor", e);
-            }
-        }
-
-        if (mTomcat != null) {
-            mLogger.debug("Stopping embedded Tomcat");
-            try {
-                mTomcat.stop();
-                mTomcat = null;
-            } catch (ServiceRunException e) {
-                mLogger.error("Could not stop embedded Tomcat", e);
-            }
-        }
-
-        if (mServiceDiscoverer != null) {
-            mLogger.debug("Stopping service discovery");
-            try {
-                mServiceDiscoverer.stop();
-                mServiceDiscoverer = null;
-            } catch (ServiceRunException e) {
-                mLogger.error("Could not stop service discovery", e);
+                mLogger.error("Could not stop the " + mServiceNames.get(tServiceType), e);
             }
         }
     }
