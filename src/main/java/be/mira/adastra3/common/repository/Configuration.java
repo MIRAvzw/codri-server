@@ -5,6 +5,11 @@
 
 package be.mira.adastra3.common.repository;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+import org.apache.log4j.Logger;
 import org.ini4j.Ini;
 
 /**
@@ -20,10 +25,10 @@ public class Configuration {
         public Boolean enabled;
         public Integer volume;
 
-        void merge(Sound iSound) {
-            if (enabled == null)
+        void apply(Sound iSound) {
+            if (iSound.enabled != null)
                 enabled = iSound.enabled;
-            if (volume == null)
+            if (iSound.volume != null)
                 volume = iSound.volume;
         }
     }
@@ -32,6 +37,8 @@ public class Configuration {
     //
     // Data members
     //
+
+    Map<String, Method> mProcessors;
 
     String mDescription;    
     Sound mSound;
@@ -42,27 +49,47 @@ public class Configuration {
     //
 
     public Configuration() {
+        // Load all processing methods
+        Method[] tMethods = this.getClass().getDeclaredMethods();
+        mProcessors = new HashMap<String, Method>();
+        for (Method tMethod : tMethods) {
+            if (tMethod.getName().startsWith("process")) {
+                mProcessors.put(tMethod.getName().toLowerCase(), tMethod);
+            }
+        }
         
     }
 
     public Configuration(Ini iIniReader) throws RepositoryException {
-        // Process all sections
-        for (String tSectionName: iIniReader.keySet()) {
-            Ini.Section tSection = iIniReader.get(tSectionName);
-
-            if (tSectionName.equalsIgnoreCase("configuration"))
-                processConfiguration(tSection);
-            else if (tSectionName.equalsIgnoreCase("sound"))
-                processSound(tSection);
-            else
-                throw new RepositoryException("Configuration contains unknown section '" + tSectionName + "'");
-        }
+        this();
+        process(iIniReader);
     }
 
 
     //
     // Configuration processing
     //
+
+    final void process(Ini iIniReader) throws RepositoryException {
+        // Process all sections
+        for (String tSectionName: iIniReader.keySet()) {
+            Ini.Section tSection = iIniReader.get(tSectionName);
+
+            // Find processing method
+            String tProcessorName = "process" + tSectionName.toLowerCase();
+            if (mProcessors.containsKey(tProcessorName)) {
+                Method tProcessor = mProcessors.get(tProcessorName);
+                try {
+                    tProcessor.invoke(this, tSection);
+                } catch (IllegalAccessException e) {
+                    throw new RepositoryException("Could not access processor method for section '" + tSectionName + "'", e);
+                } catch (InvocationTargetException e) {
+                    throw new RepositoryException("Processor method for section '" + tSectionName + "' reported an error", e);
+                }
+            } else
+                throw new RepositoryException("Configuration contains unknown section '" + tSectionName + "'");
+        }
+    }
 
     final void processConfiguration(Ini.Section tSection) throws RepositoryException {
         for (String tOptionKey: tSection.keySet()) {
@@ -71,7 +98,6 @@ public class Configuration {
                 mDescription = tOptionValue;
             else
                 throw new RepositoryException("Configuration contains unknown option '" + tOptionKey + "'");
-            // TODO: how to handle child sections? this currently crashes
         }
     }
 

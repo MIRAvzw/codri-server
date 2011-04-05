@@ -26,12 +26,9 @@ public class KioskConfiguration extends Configuration {
     //
 
     public KioskConfiguration(Ini iIniReader) throws RepositoryException {
-        super(iIniReader);
+        super();
         mDependantConfigurations = new ArrayList<String>();
-
-        Ini.Section tConfigKiosk =  iIniReader.get("kiosk");
-        if (tConfigKiosk != null)
-            processKiosk(tConfigKiosk);
+        process(iIniReader);
     }
 
     
@@ -48,23 +45,19 @@ public class KioskConfiguration extends Configuration {
         }
     }
 
-    Configuration flatten() throws RepositoryException {
-        Configuration oConfiguration = new Configuration();
+    void flatten() throws RepositoryException {
+        Sound tSound = new Sound();
 
-        oConfiguration.setSound(flattenSound());
-
-        return oConfiguration;
-    }
-
-    Sound flattenSound() throws RepositoryException {
-        Sound oSound = (mSound != null ? mSound : new Sound());
         for (String tConfigurationName : mDependantConfigurations) {
             Configuration tConfiguration = Repository.getInstance().getConfiguration(tConfigurationName);
             if (tConfiguration == null)
-                throw new RepositoryException("Configuration does not exist");
-            oSound.merge(tConfiguration.getSound());
+                throw new RepositoryException("Could not find dependant configuration '" + tConfigurationName + "'");
+
+            tSound.apply(tConfiguration.getSound());
         }
-        return oSound;
+
+        tSound.apply(mSound);
+        mSound = tSound;
     }
 
 

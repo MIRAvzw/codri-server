@@ -5,6 +5,7 @@
 
 package be.mira.adastra3.common.repository;
 
+import be.mira.adastra3.common.topology.Kiosk;
 import org.apache.log4j.Logger;
 import org.ini4j.Ini;
 
@@ -35,10 +36,10 @@ public class KioskConfigurationEditor extends ConfigurationEditor {
 
     @Override
     void pushConfiguration(Ini tIniReader) throws RepositoryException {
-        Configuration tConfiguration = new Configuration(tIniReader);
-        Repository.getInstance().addConfiguration(mDataIdentifier, tConfiguration);
+        KioskConfiguration tKiosk = new KioskConfiguration(tIniReader);
+        Repository.getInstance().addKioskConfiguration(mDataIdentifier, tKiosk);
 
-        mLogger.debug("Successfully loaded configuration '" + mDataIdentifier + "'");
+        mLogger.debug("Successfully loaded kiosk '" + mDataIdentifier + "'");
     }
 
 }

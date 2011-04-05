@@ -15,6 +15,10 @@ public class RepositoryException extends Exception {
         super(cause);
     }
 
+    public RepositoryException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
     public RepositoryException(String message) {
         super(message);
     }
