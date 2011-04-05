@@ -41,6 +41,16 @@ public class Machine implements Serializable {
     // Construction and destruction
     //
 
+    public Machine(Machine old) {
+        // String is immutable
+        mName = old.mName;
+
+        mState = old.mState;
+
+        // InetAddress is immutable
+        mInetAddresses = new ArrayList<InetAddress>(mInetAddresses);
+    }
+
     public Machine(String iName) {
         mInetAddresses = new ArrayList<InetAddress>();
         mState = State.UNKNOWN;

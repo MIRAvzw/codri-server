@@ -13,6 +13,10 @@ public class Kiosk extends Machine {
 
     public static final long serialVersionUID = 42L;
 
+    public Kiosk(Kiosk old) {
+        super(old);
+    }
+
     public Kiosk(String iName) {
         super(iName);
     }

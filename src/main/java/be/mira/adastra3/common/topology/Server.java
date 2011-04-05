@@ -13,6 +13,10 @@ public class Server extends Machine {
 
     public static final long serialVersionUID = 42L;
 
+    public Server(Server old) {
+        super(old);
+    }
+
     public Server(String iName) {
         super(iName);
     }
