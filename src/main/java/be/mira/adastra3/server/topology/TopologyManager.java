@@ -16,7 +16,7 @@ import be.mira.adastra3.server.exceptions.ServiceSetupException;
  *
  * @author tim
  */
-public class TopologyMonitor extends Service implements TopologyListener {
+public class TopologyManager extends Service implements TopologyListener {
     //
     // Data members
     //
@@ -26,7 +26,7 @@ public class TopologyMonitor extends Service implements TopologyListener {
     // Construction and destruction
     //
 
-    public TopologyMonitor() throws ServiceSetupException {
+    public TopologyManager() throws ServiceSetupException {
     }
 
 

@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package be.mira.adastra3.server.discovery;
+package be.mira.adastra3.server.network;
 
 import be.mira.adastra3.server.Service;
 import be.mira.adastra3.server.discovery.listeners.KioskListener;
@@ -19,7 +19,7 @@ import javax.jmdns.ServiceInfo;
  *
  * @author tim
  */
-public class ServiceDiscovery extends Service {
+public class NetworkMonitor extends Service {
     //
     // Data members
     //
@@ -31,7 +31,7 @@ public class ServiceDiscovery extends Service {
     // Construction and destruction
     //
 
-    public ServiceDiscovery() throws ServiceSetupException {
+    public NetworkMonitor() throws ServiceSetupException {
         super();
 
         // Server port

@@ -87,10 +87,10 @@ public class RepositoryMonitor extends Service {
         // Monitor timer
         Integer iInterval = Integer.parseInt(getProperty("interval", "60"));
         if (iInterval <= 0)
-            throw new ServiceSetupException("Server port out of valid range");
-        getLogger().debug("Scheduling SVN monitor with interval of " + iInterval + " s");
-        mSVNMonitor = new Timer();
+            throw new ServiceSetupException("Update interval out of valid range");
         mSVNMonitorInterval = iInterval;
+        getLogger().debug("Scheduling SVN monitor with interval of " + iInterval + " seconds");
+        mSVNMonitor = new Timer();
     }
 
 
@@ -101,10 +101,11 @@ public class RepositoryMonitor extends Service {
     @Override
     public void run() throws ServiceRunException {
         // Do a checkout
+        getLogger().debug("Checking out the repository");
         checkout();
 
         // Schedule the monitor
-        mSVNMonitor.schedule(new Monitor(), mSVNMonitorInterval * 1000);
+        mSVNMonitor.schedule(new Monitor(), 0, mSVNMonitorInterval * 1000);
     }
 
     @Override

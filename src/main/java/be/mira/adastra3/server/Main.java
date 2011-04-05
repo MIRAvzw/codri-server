@@ -1,10 +1,10 @@
 package be.mira.adastra3.server;
 
-import be.mira.adastra3.server.discovery.ServiceDiscovery;
+import be.mira.adastra3.server.network.NetworkMonitor;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;
 import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.repository.RepositoryMonitor;
-import be.mira.adastra3.server.topology.TopologyMonitor;
+import be.mira.adastra3.server.topology.TopologyManager;
 import be.mira.adastra3.server.website.EmbeddedTomcat;
 import java.util.EnumMap;
 import java.util.Map;
@@ -32,7 +32,7 @@ public class Main implements SignalHandler {
     }
 
     private enum ServiceType {
-        DISCOVERY,
+        NETWORK,
         REPOSITORY,
         TOPOLOGY,
         WEBSITE
@@ -96,9 +96,9 @@ public class Main implements SignalHandler {
     private final static Map<ServiceType, String> mServiceNames;
     static {
         mServiceNames = new EnumMap<ServiceType, String>(ServiceType.class);
-        mServiceNames.put(ServiceType.DISCOVERY, "service discoverer");
+        mServiceNames.put(ServiceType.NETWORK, "network monitor");
         mServiceNames.put(ServiceType.REPOSITORY, "repository monitor");
-        mServiceNames.put(ServiceType.TOPOLOGY, "topology monitor");
+        mServiceNames.put(ServiceType.TOPOLOGY, "topology manager");
         mServiceNames.put(ServiceType.WEBSITE, "web server");
     }
     private static Logger mLogger;
@@ -195,11 +195,11 @@ public class Main implements SignalHandler {
                         tService = new EmbeddedTomcat();
                         ((EmbeddedTomcat)tService).addWebapp("status");
                         break;
-                    case DISCOVERY:
-                        tService = new ServiceDiscovery();
+                    case NETWORK:
+                        tService = new NetworkMonitor();
                         break;
                     case TOPOLOGY:
-                        tService = new TopologyMonitor();
+                        tService = new TopologyManager();
                         break;
                     default:
                         throw new ServiceSetupException("I don't know how to initialize the " + mServiceNames.get(tServiceType));
