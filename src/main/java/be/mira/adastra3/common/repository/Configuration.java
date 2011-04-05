@@ -9,7 +9,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.log4j.Logger;
 import org.ini4j.Ini;
 
 /**
@@ -48,6 +47,11 @@ public class Configuration {
     // Construction and destruction
     //
 
+    public Configuration(Configuration old) {
+        mDescription = old.mDescription;
+        mSound = old.mSound;
+    }
+
     public Configuration() {
         // Load all processing methods
         Method[] tMethods = this.getClass().getDeclaredMethods();
@@ -56,8 +60,7 @@ public class Configuration {
             if (tMethod.getName().startsWith("process")) {
                 mProcessors.put(tMethod.getName().toLowerCase(), tMethod);
             }
-        }
-        
+        }        
     }
 
     public Configuration(Ini iIniReader) throws RepositoryException {

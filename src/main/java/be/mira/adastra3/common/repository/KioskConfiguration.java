@@ -19,16 +19,25 @@ public class KioskConfiguration extends Configuration {
     //
 
     List<String> mDependantConfigurations;
+    KioskConfiguration mShallowConfiguration;
 
 
     //
     // Construction and destruction
     //
 
+    public KioskConfiguration(KioskConfiguration old) {
+        super(old);
+        mDependantConfigurations = old.mDependantConfigurations;
+    }
+
     public KioskConfiguration(Ini iIniReader) throws RepositoryException {
         super();
         mDependantConfigurations = new ArrayList<String>();
         process(iIniReader);
+
+        mShallowConfiguration = new KioskConfiguration(this);
+        flatten();
     }
 
     
@@ -45,7 +54,7 @@ public class KioskConfiguration extends Configuration {
         }
     }
 
-    void flatten() throws RepositoryException {
+    final void flatten() throws RepositoryException {
         Sound tSound = new Sound();
 
         for (String tConfigurationName : mDependantConfigurations) {
@@ -56,7 +65,7 @@ public class KioskConfiguration extends Configuration {
             tSound.apply(tConfiguration.getSound());
         }
 
-        tSound.apply(mSound);
+        tSound.apply(mShallowConfiguration.getSound());
         mSound = tSound;
     }
 
