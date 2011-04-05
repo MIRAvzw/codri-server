@@ -4,9 +4,9 @@ import be.mira.adastra3.server.discovery.ServiceDiscovery;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;
 import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.repository.RepositoryMonitor;
+import be.mira.adastra3.server.topology.TopologyMonitor;
 import be.mira.adastra3.server.website.EmbeddedTomcat;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.ServletException;
 import org.apache.catalina.LifecycleException;
@@ -34,6 +34,7 @@ public class Main implements SignalHandler {
     private enum ServiceType {
         DISCOVERY,
         REPOSITORY,
+        TOPOLOGY,
         WEBSITE
     }
 
@@ -97,6 +98,7 @@ public class Main implements SignalHandler {
         mServiceNames = new EnumMap<ServiceType, String>(ServiceType.class);
         mServiceNames.put(ServiceType.DISCOVERY, "service discoverer");
         mServiceNames.put(ServiceType.REPOSITORY, "repository monitor");
+        mServiceNames.put(ServiceType.TOPOLOGY, "topology monitor");
         mServiceNames.put(ServiceType.WEBSITE, "web server");
     }
     private static Logger mLogger;
@@ -195,6 +197,9 @@ public class Main implements SignalHandler {
                         break;
                     case DISCOVERY:
                         tService = new ServiceDiscovery();
+                        break;
+                    case TOPOLOGY:
+                        tService = new TopologyMonitor();
                         break;
                     default:
                         throw new ServiceSetupException("I don't know how to initialize the " + mServiceNames.get(tServiceType));

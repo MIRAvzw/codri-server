@@ -38,8 +38,10 @@ public abstract class Service {
         String tFilename = iBasename + ".properties";
         
         InputStream tStream = this.getClass().getClassLoader().getResourceAsStream(tFilename);
-        if (tStream == null)
-                throw new Exception("Could not open properties file '" + tFilename + "'");
+        if (tStream == null) {
+                getLogger().warn("Could not open properties file '" + tFilename + "'");
+                return new java.util.Properties();
+        }
 
         Properties oProperties = new java.util.Properties();
         try {

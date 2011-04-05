@@ -50,6 +50,8 @@ public class RepositoryMonitor extends Service {
                 if (tSVNRevision != mSVNRevision) {
                     getLogger().info("SVN repository changed from revision " + mSVNRevision + " to " + tSVNRevision);
 
+                    // TODO
+
                     mSVNRevision = tSVNRevision;
                 }
             }
@@ -132,5 +134,4 @@ public class RepositoryMonitor extends Service {
             getLogger().error("SVN checkout failed", e);
         }
     }
-
 }

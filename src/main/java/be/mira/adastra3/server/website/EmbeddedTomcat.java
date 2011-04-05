@@ -80,6 +80,8 @@ public class EmbeddedTomcat extends Service {
     public void run() throws ServiceRunException {
         try {
             mTomcat.start();
+            // TODO: if the address is not in use, tomcat prints an error
+            // but doesn't die (happens in a thread)!!
         } catch (LifecycleException e) {
             throw new ServiceRunException(e);
         }
