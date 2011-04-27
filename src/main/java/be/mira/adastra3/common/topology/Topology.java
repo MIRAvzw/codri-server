@@ -53,74 +53,108 @@ public class Topology {
     // Getters and setters
     //
 
-    public synchronized void addListener(TopologyListener iListener) {
-        mListeners.add(iListener);
+    public void addListener(TopologyListener iListener) {
+        synchronized(this) {
+            mListeners.add(iListener);
+        }
     }
 
-    public synchronized Collection<Kiosk> getKiosks() {
-        List tKiosks = new ArrayList<Kiosk>();
-        for (Kiosk tKiosk : mKiosks.values())
-            tKiosks.add(new Kiosk(tKiosk));
-        return tKiosks;
+    public void removeListener(TopologyListener iListener) {
+        synchronized(this) {
+            mListeners.remove(iListener);
+        }
     }
 
-    public synchronized Kiosk getKiosk(String iName) {
-        return new Kiosk(mKiosks.get(iName));
+    public Collection<Kiosk> getKiosks() {
+        synchronized(this) {
+            List tKiosks = new ArrayList<Kiosk>();
+            for (Kiosk tKiosk : mKiosks.values())
+                tKiosks.add(new Kiosk(tKiosk));
+            return tKiosks;
+        }
     }
 
-    public synchronized void addKiosk(Kiosk iKiosk) throws TopologyException {
-        if (mKiosks.containsKey(iKiosk.getName()))
-            throw new TopologyException("Topology already contains kiosk with name " + iKiosk.getName());
+    public Kiosk getKiosk(String iName) {
+        synchronized(this) {
+                if (mKiosks.containsKey(iName))
+                    return new Kiosk(mKiosks.get(iName));
+                else
+                    return null;
+        }
+    }
 
-        mKiosks.put(iKiosk.getName(), iKiosk);
+    public void addKiosk(Kiosk iKiosk) throws TopologyException {
+        synchronized(this) {
+            if (mKiosks.containsKey(iKiosk.getName()))
+                throw new TopologyException("Topology already contains kiosk with name " + iKiosk.getName());
+
+            mKiosks.put(iKiosk.getName(), iKiosk);
+        }
 
         kioskAdded(iKiosk);
     }
 
-    public synchronized void updateKiosk(Kiosk iKioskNew) throws TopologyException {
-        if (! mKiosks.containsKey(iKioskNew.getName()))
-            throw new TopologyException("Topology does not yet contain a kiosk with name " + iKioskNew.getName());
+    public void updateKiosk(Kiosk iKioskNew) throws TopologyException {
+        Kiosk tKioskOld;
+        synchronized(this) {
+            if (! mKiosks.containsKey(iKioskNew.getName()))
+                throw new TopologyException("Topology does not yet contain a kiosk with name " + iKioskNew.getName());
 
-        Kiosk tKioskOld = mKiosks.remove(iKioskNew.getName());
-        mKiosks.put(iKioskNew.getName(), iKioskNew);
+            tKioskOld = mKiosks.remove(iKioskNew.getName());
+            mKiosks.put(iKioskNew.getName(), iKioskNew);
+        }
 
         kioskUpdated(tKioskOld, iKioskNew);
     }
 
-    public synchronized Collection<Server> getServers() {
-        List tServers = new ArrayList<Server>();
-        for (Server tServer : mServers.values())
-            tServers.add(new Server(tServer));
-        return tServers;
+    public Collection<Server> getServers() {
+        synchronized(this) {
+            List tServers = new ArrayList<Server>();
+            for (Server tServer : mServers.values())
+                tServers.add(new Server(tServer));
+            return tServers;
+        }
     }
 
-    public synchronized Server getServer(String iName) {
-        return mServers.get(iName);
+    public Server getServer(String iName) {
+        synchronized(this) {
+            if (mServers.containsKey(iName))
+                return new Server(mServers.get(iName));
+            else
+                return null;
+        }
     }
 
-    public synchronized void addServer(Server iServer) throws TopologyException {
-        if (mServers.containsKey(iServer.getName()))
-            throw new TopologyException("Topology already contains server with name " + iServer.getName());
-        mServers.put(iServer.getName(), iServer);
+    public void addServer(Server iServer) throws TopologyException {
+        synchronized(this) {
+            if (mServers.containsKey(iServer.getName()))
+                throw new TopologyException("Topology already contains server with name " + iServer.getName());
+            mServers.put(iServer.getName(), iServer);
+        }
 
         serverAdded(iServer);
     }
 
-    public synchronized void updateServer(Server iServerNew) throws TopologyException {
-        if (! mServers.containsKey(iServerNew.getName()))
-            throw new TopologyException("Topology does not yet contain a server with name " + iServerNew.getName());
+    public void updateServer(Server iServerNew) throws TopologyException {
+        Server tServerOld;
+        synchronized(this) {
+            if (! mServers.containsKey(iServerNew.getName()))
+                throw new TopologyException("Topology does not yet contain a server with name " + iServerNew.getName());
 
-        Server tServerOld = mServers.remove(iServerNew.getName());
-        mServers.put(iServerNew.getName(), iServerNew);
+            tServerOld = mServers.remove(iServerNew.getName());
+            mServers.put(iServerNew.getName(), iServerNew);
+        }
 
         serverUpdated(tServerOld, iServerNew);
     }
 
-    public synchronized Collection<Machine> getMachines() {
-        Collection<Machine> oMachines = new ArrayList<Machine>();
-        oMachines.addAll(getServers());
-        oMachines.addAll(getKiosks());
-        return oMachines;
+    public Collection<Machine> getMachines() {
+        synchronized(this) {
+            Collection<Machine> oMachines = new ArrayList<Machine>();
+            oMachines.addAll(getServers());
+            oMachines.addAll(getKiosks());
+            return oMachines;
+        }
     }
 
 

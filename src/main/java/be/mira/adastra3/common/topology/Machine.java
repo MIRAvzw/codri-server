@@ -48,7 +48,7 @@ public class Machine implements Serializable {
         mState = old.mState;
 
         // InetAddress is immutable
-        mInetAddresses = new ArrayList<InetAddress>(mInetAddresses);
+        mInetAddresses = new ArrayList<InetAddress>(old.mInetAddresses);
     }
 
     public Machine(String iName) {

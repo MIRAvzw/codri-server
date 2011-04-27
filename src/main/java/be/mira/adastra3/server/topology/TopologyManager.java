@@ -7,6 +7,7 @@ package be.mira.adastra3.server.topology;
 
 import be.mira.adastra3.common.topology.Kiosk;
 import be.mira.adastra3.common.topology.Server;
+import be.mira.adastra3.common.topology.Topology;
 import be.mira.adastra3.common.topology.TopologyListener;
 import be.mira.adastra3.server.Service;
 import be.mira.adastra3.server.exceptions.ServiceRunException;
@@ -36,10 +37,12 @@ public class TopologyManager extends Service implements TopologyListener {
 
     @Override
     public void run() throws ServiceRunException {
+        Topology.getInstance().addListener(this);
     }
 
     @Override
     public void stop() throws ServiceRunException {
+        Topology.getInstance().removeListener(this);
     }
 
 

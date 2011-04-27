@@ -16,5 +16,4 @@ public class TopologyException extends Exception {
 
     public TopologyException() {
     }
-
 }

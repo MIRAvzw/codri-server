@@ -25,41 +25,52 @@ public class KioskListener extends AbstractServiceListener {
     }
 
     public void serviceAddedAction(ServiceEvent iServiceEvent) {
-        getLogger().info("Kiosk addition: " + iServiceEvent.getName() + "." + iServiceEvent.getType());
+        getLogger().debug("Kiosk addition: " + iServiceEvent.getName() + "." + iServiceEvent.getType());
 
         // Alter the topology
         Kiosk tKiosk = new Kiosk(iServiceEvent.getName());
         try {
             Topology.getInstance().addKiosk(tKiosk);
-        } catch (TopologyException e) {
-            getLogger().warn("Kiosk " + iServiceEvent.getName() + " seems to be present already", e);
+        } catch (Exception e) {
+            getLogger().error("Could not add kiosk " + iServiceEvent.getName(), e);
         }
     }
 
     public void serviceRemovedAction(ServiceEvent iServiceEvent) {
-        getLogger().info("Kiosk removal: " + iServiceEvent.getName() + "." + iServiceEvent.getType());
+        getLogger().debug("Kiosk removal: " + iServiceEvent.getName() + "." + iServiceEvent.getType());
 
         // Alter the topology
-        Kiosk tKiosk = Topology.getInstance().getKiosk(iServiceEvent.getName());
-        if (tKiosk != null) {
-            tKiosk.setState(State.OFFLINE);
-            tKiosk.clearInetAddresses();
-        } else
-            getLogger().warn("Could not remove kiosk " + iServiceEvent.getName() + ", not present in topology");
+        try {
+            Kiosk tKiosk = Topology.getInstance().getKiosk(iServiceEvent.getName());
+            if (tKiosk != null) {
+                tKiosk.setState(State.OFFLINE);
+                tKiosk.clearInetAddresses();
+                Topology.getInstance().updateKiosk(tKiosk);
+            } else
+                getLogger().error("Could not remove kiosk " + iServiceEvent.getName() + ", not present in topology");
+        } catch (Exception e) {
+            getLogger().error("Could not remove kiosk " + iServiceEvent.getName(), e);
+        }
     }
 
     public void serviceResolvedAction(ServiceEvent iServiceEvent) {
-        getLogger().info("Kiosk resolved: " + iServiceEvent.getInfo());
+        getLogger().debug("Kiosk resolved: " + iServiceEvent.getInfo());
 
         // Alter the topology
-        Kiosk tKiosk = Topology.getInstance().getKiosk(iServiceEvent.getName());
-        if (tKiosk != null) {
-            tKiosk.setState(State.ONLINE);
-            ServiceInfo iServiceInfo = iServiceEvent.getInfo();
-            for (InetAddress tInetAddress : iServiceInfo.getInetAddresses()) {
-                tKiosk.addInetAddress(tInetAddress);
-            }
-        } else
-            getLogger().warn("Could not resolve kiosk " + iServiceEvent.getName() + ", not present in topology");
+        try {
+            Kiosk tKiosk = Topology.getInstance().getKiosk(iServiceEvent.getName());
+            if (tKiosk != null) {
+                tKiosk.setState(State.ONLINE);
+                ServiceInfo iServiceInfo = iServiceEvent.getInfo();
+                for (InetAddress tInetAddress : iServiceInfo.getInetAddresses()) {
+                    tKiosk.addInetAddress(tInetAddress);
+                }
+                Topology.getInstance().updateKiosk(tKiosk);
+            } else
+                getLogger().error("Could not resolve kiosk " + iServiceEvent.getName() + ", not present in topology");
+        }
+        catch (Exception e) {
+            getLogger().error("Could not resolve kiosk " + iServiceEvent.getName(), e);
+        }
     }
 }
