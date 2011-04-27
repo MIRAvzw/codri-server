@@ -65,6 +65,7 @@ public class KioskListener extends AbstractServiceListener {
                 for (InetAddress tInetAddress : iServiceInfo.getInetAddresses()) {
                     tKiosk.addInetAddress(tInetAddress);
                 }
+                tKiosk.setPort(iServiceInfo.getPort());
                 Topology.getInstance().updateKiosk(tKiosk);
             } else
                 getLogger().error("Could not resolve kiosk " + iServiceEvent.getName() + ", not present in topology");

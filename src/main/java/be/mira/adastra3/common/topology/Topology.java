@@ -181,4 +181,17 @@ public class Topology {
         for (TopologyListener tListener : mListeners)
             tListener.serverUpdatedAction(iServerOld, iServerNew);
     }
+    
+    
+    //
+    // Auxiliary
+    //
+    
+    // TODO: use
+    private void checkMachine(Machine iMachine) throws TopologyException {
+        if (iMachine.getState() == Machine.State.ONLINE && iMachine.getInetAddresses().size() == 0)
+            throw new TopologyException("Online machine without address");
+        if (iMachine.getPort() <= 0 || iMachine.getPort() > 65535)
+            throw new TopologyException("Invalid port specification");
+    }
 }

@@ -34,6 +34,7 @@ public class Machine implements Serializable {
 
     private final String mName;
     private List<InetAddress> mInetAddresses;
+    private int mPort;
     private State mState;
 
 
@@ -46,6 +47,7 @@ public class Machine implements Serializable {
         mName = old.mName;
 
         mState = old.mState;
+        mPort = old.mPort;
 
         // InetAddress is immutable
         mInetAddresses = new ArrayList<InetAddress>(old.mInetAddresses);
@@ -53,6 +55,7 @@ public class Machine implements Serializable {
 
     public Machine(String iName) {
         mInetAddresses = new ArrayList<InetAddress>();
+        mPort = 0;
         mState = State.UNKNOWN;
         mName = iName;
     }
@@ -88,5 +91,13 @@ public class Machine implements Serializable {
 
     public void setState(State iState) {
         mState = iState;
+    }
+    
+    public void setPort(int iPort) {
+        mPort = iPort;
+    }
+    
+    public int getPort() {
+        return mPort;
     }
 }

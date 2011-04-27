@@ -6,12 +6,17 @@
 package be.mira.adastra3.server.topology;
 
 import be.mira.adastra3.common.topology.Kiosk;
+import be.mira.adastra3.common.topology.Machine;
+import be.mira.adastra3.common.topology.ProxyFactory;
 import be.mira.adastra3.common.topology.Server;
 import be.mira.adastra3.common.topology.Topology;
 import be.mira.adastra3.common.topology.TopologyListener;
+import be.mira.adastra3.common.topology.proxies.KioskProxy;
 import be.mira.adastra3.server.Service;
 import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;
+import java.lang.reflect.UndeclaredThrowableException;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -19,8 +24,11 @@ import be.mira.adastra3.server.exceptions.ServiceSetupException;
  */
 public class TopologyManager extends Service implements TopologyListener {
     //
-    // Data members
+    // Member data
     //
+    
+    ProxyFactory mProxyFactory;
+    Logger mLogger;
 
 
     //
@@ -28,6 +36,8 @@ public class TopologyManager extends Service implements TopologyListener {
     //
 
     public TopologyManager() throws ServiceSetupException {
+        mProxyFactory = new ProxyFactory();
+        mLogger = Logger.getLogger(this.getClass());
     }
 
 
@@ -60,6 +70,15 @@ public class TopologyManager extends Service implements TopologyListener {
     @Override
     public void kioskUpdatedAction(Kiosk iKioskOld, Kiosk iKioskNew) {
         getLogger().debug("Kiosk updated: " + iKioskNew.getName());
+        
+        if (iKioskOld.getState() != Machine.State.ONLINE && iKioskNew.getState() == Machine.State.ONLINE) {
+            try {
+                KioskProxy tKioskProxy = mProxyFactory.getKioskProxy(iKioskNew);
+                tKioskProxy.setInterfaceLocation("foobar");
+            } catch (UndeclaredThrowableException e) {
+                mLogger.error("Could not configure newly appeared kiosk", e.getCause());
+            }
+        }
 
         // TODO
     }
