@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package be.mira.adastra3.common.repository;
+package be.mira.adastra3.server.exceptions;
 
 /**
  *

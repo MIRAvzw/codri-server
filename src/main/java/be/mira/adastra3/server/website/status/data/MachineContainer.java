@@ -4,7 +4,7 @@
  */
 package be.mira.adastra3.server.website.status.data;
 
-import be.mira.adastra3.common.topology.*;
+import be.mira.adastra3.server.network.Kiosk;
 import com.vaadin.data.util.BeanItemContainer;
 import java.io.Serializable;
 import java.util.Collection;
@@ -13,12 +13,12 @@ import java.util.Collection;
  *
  * @author tim
  */
-public class MachineContainer extends BeanItemContainer<Machine> implements Serializable {
+public class MachineContainer extends BeanItemContainer<Kiosk> implements Serializable {
 
     public static final long serialVersionUID = 42L;
 
     public MachineContainer() throws InstantiationException, IllegalAccessException {
-        super(Machine.class);
+        super(Kiosk.class);
     }
     /**
      * Natural property order for Person bean. Used in tables and forms.
@@ -47,8 +47,8 @@ public class MachineContainer extends BeanItemContainer<Machine> implements Seri
 
     public void updateFromTopology() {
         removeAllItems();
-        addAll(Topology.getInstance().getServers());
-        addAll(Topology.getInstance().getKiosks());
+        //addAll(Topology.getInstance().getServers());
+        //addAll(Topology.getInstance().getKiosks());
         Collection<String> tProperties = this.getContainerPropertyIds();
     }
 }

@@ -4,7 +4,6 @@ import be.mira.adastra3.server.network.NetworkMonitor;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;
 import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.repository.RepositoryMonitor;
-import be.mira.adastra3.server.topology.TopologyManager;
 import be.mira.adastra3.server.website.EmbeddedTomcat;
 import java.util.EnumMap;
 import java.util.Map;
@@ -34,7 +33,6 @@ public class Main implements SignalHandler {
     private enum ServiceType {
         NETWORK,
         REPOSITORY,
-        TOPOLOGY,
         WEBSITE
     }
 
@@ -98,7 +96,6 @@ public class Main implements SignalHandler {
         mServiceNames = new EnumMap<ServiceType, String>(ServiceType.class);
         mServiceNames.put(ServiceType.NETWORK, "network monitor");
         mServiceNames.put(ServiceType.REPOSITORY, "repository monitor");
-        mServiceNames.put(ServiceType.TOPOLOGY, "topology manager");
         mServiceNames.put(ServiceType.WEBSITE, "web server");
     }
     private static Logger mLogger;
@@ -197,9 +194,6 @@ public class Main implements SignalHandler {
                         break;
                     case NETWORK:
                         tService = new NetworkMonitor();
-                        break;
-                    case TOPOLOGY:
-                        tService = new TopologyManager();
                         break;
                     default:
                         throw new ServiceSetupException("I don't know how to initialize the " + mServiceNames.get(tServiceType));

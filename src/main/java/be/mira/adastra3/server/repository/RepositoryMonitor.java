@@ -5,9 +5,6 @@
 
 package be.mira.adastra3.server.repository;
 
-import be.mira.adastra3.common.repository.DummyBaton;
-import be.mira.adastra3.common.repository.ConfigurationEditor;
-import be.mira.adastra3.common.repository.KioskConfigurationEditor;
 import be.mira.adastra3.server.Service;
 import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;

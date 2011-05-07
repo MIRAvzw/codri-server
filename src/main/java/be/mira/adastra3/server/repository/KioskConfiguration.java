@@ -3,8 +3,9 @@
  * and open the template in the editor.
  */
 
-package be.mira.adastra3.common.repository;
+package be.mira.adastra3.server.repository;
 
+import be.mira.adastra3.server.exceptions.RepositoryException;
 import java.util.ArrayList;
 import java.util.List;
 import org.ini4j.Ini;

@@ -6,14 +6,18 @@
 package be.mira.adastra3.server.network;
 
 import be.mira.adastra3.server.Service;
-import be.mira.adastra3.server.discovery.listeners.KioskListener;
-import be.mira.adastra3.server.discovery.listeners.ServerListener;
-import be.mira.adastra3.server.discovery.listeners.TypeListener;
 import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;
-import java.io.IOException;
-import javax.jmdns.JmDNS;
-import javax.jmdns.ServiceInfo;
+import org.teleal.cling.UpnpService;
+import org.teleal.cling.UpnpServiceImpl;
+import org.teleal.cling.model.message.header.STAllHeader;
+import org.teleal.cling.model.meta.RemoteDevice;
+import org.teleal.cling.model.meta.RemoteService;
+import org.teleal.cling.model.types.ServiceId;
+import org.teleal.cling.model.types.UDAServiceId;
+import org.teleal.cling.registry.DefaultRegistryListener;
+import org.teleal.cling.registry.Registry;
+import org.teleal.cling.registry.RegistryListener;
 
 /**
  *
@@ -23,8 +27,7 @@ public class NetworkMonitor extends Service {
     //
     // Data members
     //
-    private JmDNS mJMDNS;
-    private ServiceInfo mService;
+    private UpnpService mUpnpService;
 
 
     //
@@ -33,33 +36,17 @@ public class NetworkMonitor extends Service {
 
     public NetworkMonitor() throws ServiceSetupException {
         super();
-
-        // Server port
-        Integer iPort;
+        
         try {
-            iPort = Integer.parseInt(getProperty("port", "8080"));
-            if (iPort <= 0 || iPort > 65536)
-                throw new ServiceSetupException("Server port out of valid range");
-            getLogger().debug("Using port " + iPort);
-        }
-        catch (NumberFormatException e) {
-            throw new ServiceSetupException("Non-integer port specification");
-        }
+            mUpnpService = new UpnpServiceImpl();
 
-        // JmDNS object
-        try {
-            mJMDNS = JmDNS.create();
-        }
-        catch (IOException e) {
-            throw new ServiceSetupException(e);
-        }
+            // Add a listener for device registration events
+            mUpnpService.getRegistry().addListener(createRegistryListener(mUpnpService)
+            );
 
-        // Service
-        mService = ServiceInfo.create(
-                getProperty("type", "_miraserver._tcp.local."),
-                getProperty("name", "MIRA Ad-Astra III server"),
-                iPort,
-                getProperty("description", "The application server for the MIRA Ad-Astra III application."));
+        } catch (Exception ex) {
+            throw new ServiceSetupException(ex);
+        }
     }
 
 
@@ -69,25 +56,52 @@ public class NetworkMonitor extends Service {
 
     public void run() throws ServiceRunException {
         try {
-            mJMDNS.registerService(mService);
-            
-            mJMDNS.addServiceListener(KioskListener.ServiceType, new KioskListener(mJMDNS));
-            mJMDNS.addServiceListener(ServerListener.ServiceType, new ServerListener(mJMDNS));
-            mJMDNS.addServiceTypeListener(new TypeListener());
-        }
-        catch (IOException e) {
-            throw new ServiceRunException(e);
+            // Broadcast a search message for all devices
+            mUpnpService.getControlPoint().search(
+                    new STAllHeader()
+            );
+
+        } catch (Exception ex) {
+            throw new ServiceRunException(ex);
         }
     }
 
     public void stop() throws ServiceRunException {
         try {
-            mJMDNS.unregisterAllServices();
-            mJMDNS.close();
+            mUpnpService.shutdown();
         }
-        catch (IOException e) {
+        catch (Exception e) {
             throw new ServiceRunException(e);
         }
+    }
+    
+    RegistryListener createRegistryListener(final UpnpService upnpService) {
+        return new DefaultRegistryListener() {
+            ServiceId tDataServiceId = new UDAServiceId("Data");
+            ServiceId tApplicationServiceId = new UDAServiceId("Application");
+
+            @Override
+            public void remoteDeviceAdded(Registry iRegistry, RemoteDevice iDevice) {
+
+                RemoteService tService;
+                if ((tService = iDevice.findService(tDataServiceId)) != null) {
+
+                    getLogger().debug("Service discovered: " + tService);
+                    //executeAction(upnpService, tService);
+
+                }
+
+            }
+
+            @Override
+            public void remoteDeviceRemoved(Registry iRegistry, RemoteDevice iDevice) {
+                RemoteService tService;
+                if ((tService = iDevice.findService(tDataServiceId)) != null) {
+                    getLogger().debug("Service disappeared: " + tService);
+                }
+            }
+
+        };
     }
 
 }

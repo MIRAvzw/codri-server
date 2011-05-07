@@ -3,8 +3,9 @@
  * and open the template in the editor.
  */
 
-package be.mira.adastra3.common.repository;
+package be.mira.adastra3.server.repository;
 
+import be.mira.adastra3.server.exceptions.RepositoryException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
