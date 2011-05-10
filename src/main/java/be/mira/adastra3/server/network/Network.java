@@ -5,8 +5,8 @@
 package be.mira.adastra3.server.network;
 
 import be.mira.adastra3.server.exceptions.NetworkException;
-import be.mira.adastra3.server.network.controls.KioskControl;
-import be.mira.adastra3.server.network.controls.MediaControl;
+import be.mira.adastra3.server.network.controls.DeviceControl;
+import be.mira.adastra3.server.network.controls.ApplicationControl;
 import java.util.HashMap;
 import java.util.Map;
 import org.teleal.cling.UpnpService;
@@ -23,8 +23,8 @@ public class Network {
     // Member data
     //
     
-    private Map<UDN, KioskControl> mKioskControls;
-    private Map<UDN, MediaControl> mMediaControls;
+    private Map<UDN, DeviceControl> mKioskControls;
+    private Map<UDN, ApplicationControl> mMediaControls;
     private UpnpService mUpnpService;
 
 
@@ -46,8 +46,8 @@ public class Network {
     //
 
     private Network() {
-        mKioskControls = new HashMap<UDN, KioskControl>();
-        mMediaControls = new HashMap<UDN, MediaControl>();
+        mKioskControls = new HashMap<UDN, DeviceControl>();
+        mMediaControls = new HashMap<UDN, ApplicationControl>();
         mUpnpService = new UpnpServiceImpl();
     }
 
@@ -64,33 +64,33 @@ public class Network {
         return mUpnpService;
     }
     
-    public KioskControl getKioskControl(UDN iUDN) {
+    public DeviceControl getKioskControl(UDN iUDN) {
         return mKioskControls.get(iUDN);
     }
     
-    public void addKioskControl(UDN iUDN, KioskControl iKioskControl) throws NetworkException{
+    public void addKioskControl(UDN iUDN, DeviceControl iKioskControl) throws NetworkException{
         if (mKioskControls.containsKey(iUDN))
             throw new NetworkException("Cannot add kiosk control: device " + iUDN + " already present in network");
         mKioskControls.put(iUDN, iKioskControl);
     }
     
-    public KioskControl removeKioskControl(UDN iUDN) throws NetworkException {
+    public DeviceControl removeKioskControl(UDN iUDN) throws NetworkException {
         if (!mKioskControls.containsKey(iUDN))
             throw new NetworkException("Cannot remove kiosk control: device " + iUDN + " not present in network");
         return mKioskControls.remove(iUDN);
     }
     
-    public MediaControl getMediaControl(UDN iUDN) {
+    public ApplicationControl getMediaControl(UDN iUDN) {
         return mMediaControls.get(iUDN);
     }
     
-    public void addMediaControl(UDN iUDN, MediaControl iMediaControl) throws NetworkException {
+    public void addMediaControl(UDN iUDN, ApplicationControl iMediaControl) throws NetworkException {
         if (mMediaControls.containsKey(iUDN))
             throw new NetworkException("Cannot add media control: device " + iUDN + " already present in network");
         mMediaControls.put(iUDN, iMediaControl);
     }
     
-    public MediaControl removeMediaControl(UDN iUDN) throws NetworkException {
+    public ApplicationControl removeMediaControl(UDN iUDN) throws NetworkException {
         if (!mMediaControls.containsKey(iUDN))
             throw new NetworkException("Cannot remove media control: device " + iUDN + " not present in network");
         return mMediaControls.remove(iUDN);

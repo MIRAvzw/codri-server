@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package be.mira.adastra3.server.network.actions.media;
+package be.mira.adastra3.server.network.actions.application;
 
 import be.mira.adastra3.server.exceptions.NetworkException;
 import org.teleal.cling.model.action.ActionInvocation;

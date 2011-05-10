@@ -4,7 +4,7 @@
  */
 package be.mira.adastra3.server.website.status.data;
 
-import be.mira.adastra3.server.network.controls.KioskControl;
+import be.mira.adastra3.server.network.controls.DeviceControl;
 import com.vaadin.data.util.BeanItemContainer;
 import java.io.Serializable;
 import java.util.Collection;
@@ -13,12 +13,12 @@ import java.util.Collection;
  *
  * @author tim
  */
-public class MachineContainer extends BeanItemContainer<KioskControl> implements Serializable {
+public class MachineContainer extends BeanItemContainer<DeviceControl> implements Serializable {
 
     public static final long serialVersionUID = 42L;
 
     public MachineContainer() throws InstantiationException, IllegalAccessException {
-        super(KioskControl.class);
+        super(DeviceControl.class);
     }
     /**
      * Natural property order for Person bean. Used in tables and forms.

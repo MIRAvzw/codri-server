@@ -6,11 +6,12 @@ package be.mira.adastra3.server.network.controls;
 
 import be.mira.adastra3.server.exceptions.NetworkException;
 import be.mira.adastra3.server.network.Network;
-import be.mira.adastra3.server.network.actions.kiosk.GetInterfaceRevision;
-import be.mira.adastra3.server.network.actions.kiosk.LoadInterface;
-import be.mira.adastra3.server.network.actions.kiosk.Reboot;
-import be.mira.adastra3.server.network.actions.kiosk.SetInterfaceLocation;
-import be.mira.adastra3.server.network.actions.kiosk.Shutdown;
+import be.mira.adastra3.server.network.actions.application.GetInterfaceRevision;
+import be.mira.adastra3.server.network.actions.application.GetMediaRevision;
+import be.mira.adastra3.server.network.actions.application.LoadInterface;
+import be.mira.adastra3.server.network.actions.application.LoadMedia;
+import be.mira.adastra3.server.network.actions.application.SetInterfaceLocation;
+import be.mira.adastra3.server.network.actions.application.SetMediaLocation;
 import org.teleal.cling.controlpoint.ActionCallback;
 import org.teleal.cling.model.meta.RemoteService;
 import org.teleal.cling.model.types.ServiceId;
@@ -19,22 +20,22 @@ import org.teleal.cling.model.types.ServiceId;
  *
  * @author tim
  */
-public class KioskControl extends Control {
+public class ApplicationControl extends Control {
     //
     // Data members
     //
     
-    public static ServiceId ServiceId = new ServiceId("mira-be", "Kiosk:1");
+    public static ServiceId ServiceId = new ServiceId("mira-be", "Media:1");
     
     
     //
     // Construction and destruction
     //
 
-    public KioskControl(RemoteService iService) throws NetworkException {
+    public ApplicationControl(RemoteService iService) throws NetworkException {
         super(iService);
         if (! iService.getServiceId().equals(ServiceId))
-            throw new NetworkException("KioskControl instantiated for a non-KioskService");
+            throw new NetworkException("MediaControl instantiated for a non-MediaService");
     }
     
     
@@ -42,20 +43,8 @@ public class KioskControl extends Control {
     // Service actions
     //
     
-    public void Shutdown() throws NetworkException {
-        Shutdown tAction = new Shutdown(getService());
-        
-        Network.getControlPoint().execute(
-                new ActionCallback.Default(
-                    tAction,
-                    Network.getControlPoint()
-                )
-        );        
-    }
-    
-    
-    public void Reboot() throws NetworkException {
-        Reboot tAction = new Reboot(getService());
+    public void SetMediaLocation(String iMediaLocation) throws NetworkException {
+        SetMediaLocation tAction = new SetMediaLocation(getService(), iMediaLocation);
         
         Network.getControlPoint().execute(
                 new ActionCallback.Default(
@@ -65,6 +54,29 @@ public class KioskControl extends Control {
         );
     }
     
+    public void LoadMedia() throws NetworkException {
+        LoadMedia tAction = new LoadMedia(getService());
+        
+        Network.getControlPoint().execute(
+                new ActionCallback.Default(
+                    tAction,
+                    Network.getControlPoint()
+                )
+        );        
+    }
+    
+    public Integer GetMediaRevision() throws NetworkException {
+        GetMediaRevision tAction = new GetMediaRevision(getService());
+        
+        Network.getControlPoint().execute(
+                new ActionCallback.Default(
+                    tAction,
+                    Network.getControlPoint()
+                )
+        );
+        
+        return tAction.GetMediaRevisionValue();
+    }
     public void SetInterfaceLocation(String iInterfaceLocation) throws NetworkException {
         SetInterfaceLocation tAction = new SetInterfaceLocation(getService(), iInterfaceLocation);
         

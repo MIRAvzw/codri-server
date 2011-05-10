@@ -9,8 +9,8 @@ import be.mira.adastra3.server.Service;
 import be.mira.adastra3.server.exceptions.NetworkException;
 import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;
-import be.mira.adastra3.server.network.controls.KioskControl;
-import be.mira.adastra3.server.network.controls.MediaControl;
+import be.mira.adastra3.server.network.controls.DeviceControl;
+import be.mira.adastra3.server.network.controls.ApplicationControl;
 import org.teleal.cling.UpnpService;
 import org.teleal.cling.UpnpServiceImpl;
 import org.teleal.cling.model.message.header.STAllHeader;
@@ -82,19 +82,19 @@ public class NetworkMonitor extends Service {
 
                 // Scan for services
                 RemoteService tService;
-                if ((tService = iDevice.findService(KioskControl.ServiceId)) != null) {
+                if ((tService = iDevice.findService(DeviceControl.ServiceId)) != null) {
                     getLogger().debug("Registering kiosk service");
                     try {
-                        KioskControl tKioskControl = new KioskControl(tService);
+                        DeviceControl tKioskControl = new DeviceControl(tService);
                         Network.getInstance().addKioskControl(tUDN, tKioskControl);
                     } catch (NetworkException iException) {
                         getLogger().error("Could not register kiosk service", iException);
                     }
                 }
-                if ((tService = iDevice.findService(MediaControl.ServiceId)) != null) {
+                if ((tService = iDevice.findService(ApplicationControl.ServiceId)) != null) {
                     getLogger().debug("Registering media service");
                     try {
-                        MediaControl tMediaControl = new MediaControl(tService);
+                        ApplicationControl tMediaControl = new ApplicationControl(tService);
                         Network.getInstance().addMediaControl(tUDN, tMediaControl);
                     } catch (NetworkException iException) {
                         getLogger().error("Could not register media service", iException);                    }
@@ -109,7 +109,7 @@ public class NetworkMonitor extends Service {
 
                 // Scan for services
                 RemoteService tService;
-                if ((tService = iDevice.findService(KioskControl.ServiceId)) != null) {
+                if ((tService = iDevice.findService(DeviceControl.ServiceId)) != null) {
                     getLogger().debug("Removing kiosk control");
                     try {
                         Network.getInstance().removeKioskControl(tUDN);
@@ -117,7 +117,7 @@ public class NetworkMonitor extends Service {
                         getLogger().error("Could not remove kiosk control", iException);
                     }
                 }
-                if ((tService = iDevice.findService(MediaControl.ServiceId)) != null) {
+                if ((tService = iDevice.findService(ApplicationControl.ServiceId)) != null) {
                     getLogger().debug("Removing media control");
                     try {
                         Network.getInstance().removeMediaControl(tUDN);

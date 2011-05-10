@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.mira.be" xmlns="http://www.mira.be">
+    <!--
+      Configuration
+      -->
+    
+    <xsd:element name="configuration">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="sound" type="xsd:integer" />            
+            </xsd:sequence>
+            <xsd:attribute name="id" type="xsd:string" />
+            <xsd:attribute name="abstract" type="xsd:boolean" />
+        </xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="sound">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="volume" type="xsd:integer" />
+            </xsd:sequence>
+            <xsd:attribute name="enabled" type="xsd:boolean" />
+        </xsd:complexType>    
+    </xsd:element>
+    
+    <!--
+      Kiosk
+      -->
+    
+    <xsd:element name="configuration">
+</xsd:schema>
