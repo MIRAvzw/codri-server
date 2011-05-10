@@ -57,6 +57,12 @@
         </xsd:sequence>
     </xsd:complexType>
     
+    <xsd:simpleType name="volumeType">
+        <xsd:restriction base="xsd:unsignedLong">
+            <xsd:maxInclusive value="255"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    
     
     <!--
       The application element represents the application on a kiosk. It is the

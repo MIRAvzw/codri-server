@@ -5,6 +5,8 @@
 
 package be.mira.adastra3.server.repository;
 
+import be.mira.adastra3.server.repository.configurations.OldKioskConfiguration;
+import be.mira.adastra3.server.repository.configurations.OldConfiguration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,8 +19,8 @@ public class Repository {
     // Member data
     //
 
-    private Map<String, Configuration> mConfigurations;
-    private Map<String, KioskConfiguration> mKioskConfigurations;
+    private Map<String, OldConfiguration> mConfigurations;
+    private Map<String, OldKioskConfiguration> mKioskConfigurations;
 
 
     //
@@ -39,8 +41,8 @@ public class Repository {
     //
 
     private Repository() {
-        mConfigurations = new HashMap<String, Configuration>();
-        mKioskConfigurations = new HashMap<String, KioskConfiguration>();
+        mConfigurations = new HashMap<String, OldConfiguration>();
+        mKioskConfigurations = new HashMap<String, OldKioskConfiguration>();
     }
 
 
@@ -48,19 +50,19 @@ public class Repository {
     // Getters and setters
     //
 
-    public Configuration getConfiguration(String iName) {
+    public OldConfiguration getConfiguration(String iName) {
         return mConfigurations.get(iName);
     }
 
-    public void addConfiguration(String iName, Configuration iConfiguration) {
+    public void addConfiguration(String iName, OldConfiguration iConfiguration) {
         mConfigurations.put(iName, iConfiguration);
     }
 
-    public KioskConfiguration getKioskConfiguration(String iName) {
+    public OldKioskConfiguration getKioskConfiguration(String iName) {
         return mKioskConfigurations.get(iName);
     }
 
-    public void addKioskConfiguration(String iName, KioskConfiguration iKioskConfiguration) {
+    public void addKioskConfiguration(String iName, OldKioskConfiguration iKioskConfiguration) {
         mKioskConfigurations.put(iName, iKioskConfiguration);
     }
 }

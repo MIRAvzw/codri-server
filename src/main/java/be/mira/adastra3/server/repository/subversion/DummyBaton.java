@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package be.mira.adastra3.server.repository;
+package be.mira.adastra3.server.repository.subversion;
 
 import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNException;
@@ -44,6 +44,7 @@ public class DummyBaton implements ISVNReporterBaton {
     // ISVNReporterBaton interface
     //
     
+    @Override
     public void report(ISVNReporter reporter) throws SVNException {
         try {
             /*

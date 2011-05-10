@@ -2,17 +2,16 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package be.mira.adastra3.server.repository;
+package be.mira.adastra3.server.repository.subversion;
 
 import be.mira.adastra3.server.exceptions.RepositoryException;
+import be.mira.adastra3.server.repository.ConfigurationReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import org.apache.log4j.Logger;
-import org.ini4j.Ini;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNErrorCode;
 import org.tmatesoft.svn.core.SVNErrorMessage;
@@ -61,6 +60,7 @@ public class ConfigurationEditor implements ISVNEditor {
      * Server reports revision to which application of the further
      * instructions will update working copy to.
      */
+    @Override
     public void targetRevision(long revision) throws SVNException {
         mLogger.trace("Next instructions target revision " + revision);
     }
@@ -68,6 +68,7 @@ public class ConfigurationEditor implements ISVNEditor {
     /*
      * Called before sending other instructions.
      */
+    @Override
     public void openRoot(long revision) throws SVNException {
         mLogger.trace("Opening root at revision " + revision);
     }
@@ -80,6 +81,7 @@ public class ConfigurationEditor implements ISVNEditor {
      *
      * This implementation creates corresponding directory below root directory.
      */
+    @Override
     public void addDir(String path, String copyFromPath, long copyFromRevision) throws SVNException {
         mLogger.trace("Adding directory '" + path + "'");
     }
@@ -93,6 +95,7 @@ public class ConfigurationEditor implements ISVNEditor {
      * that our 'working copy' is empty and so server knows that there are
      * no 'existing' directories.
      */
+    @Override
     public void openDir(String path, long revision) throws SVNException {
         mLogger.trace("Opening directory '" + path + "'");
     }
@@ -106,6 +109,7 @@ public class ConfigurationEditor implements ISVNEditor {
      *
      * When property has to be deleted value will be 'null'.
      */
+    @Override
     public void changeDirProperty(String name, SVNPropertyValue property) throws SVNException {
         mLogger.trace("Changing properties of directory '" + name + "'");
     }
@@ -119,6 +123,7 @@ public class ConfigurationEditor implements ISVNEditor {
      * This implementation creates empty file below root directory, file contents
      * will be updated later, and for empty files may not be sent at all.
      */
+    @Override
     public void addFile(String path, String copyFromPath, long copyFromRevision) throws SVNException {
         mLogger.trace("Adding file '" + path + "'");
         if (copyFromPath != null ) {
@@ -145,7 +150,7 @@ public class ConfigurationEditor implements ISVNEditor {
             return;
         }
         String tFileExtension = tFile.getName().substring(tDotPosition+1);
-        if (! tFileExtension.equalsIgnoreCase("ini")) {
+        if (! tFileExtension.equalsIgnoreCase("xml")) {
             SVNErrorMessage err = SVNErrorMessage.create(SVNErrorCode.IO_ERROR, "File with unknown extension found");
             throw new SVNException(err);
         }
@@ -164,6 +169,7 @@ public class ConfigurationEditor implements ISVNEditor {
      * that our 'working copy' is empty and so server knows that there are
      * no 'existing' files.
      */
+    @Override
     public void openFile(String path, long revision) throws SVNException {
         SVNErrorMessage err = SVNErrorMessage.create(SVNErrorCode.IO_ERROR, "Current editor does not support opening existing files");
         throw new SVNException(err);
@@ -175,6 +181,7 @@ public class ConfigurationEditor implements ISVNEditor {
      * may inspect 'svn:eol-style' or 'svn:mime-type' property values to
      * transfor file contents propertly after receiving.
      */
+    @Override
     public void changeFileProperty(String path, String name, SVNPropertyValue property) throws SVNException {
     }
 
@@ -185,6 +192,7 @@ public class ConfigurationEditor implements ISVNEditor {
      * we set up deltaProcessor with 'null' base file and target file to which we would
      * like to store the result of delta application.
      */
+    @Override
     public void applyTextDelta(String path, String baseChecksum) throws SVNException {
         if (mTemporaryStream == null)
             return;
@@ -197,6 +205,7 @@ public class ConfigurationEditor implements ISVNEditor {
      * there may be several diff windows. Utility class SVNDeltaProcessor processes
      * these windows for us.
      */
+    @Override
     public OutputStream textDeltaChunk(String path, SVNDiffWindow diffWindow) throws SVNException {
         if (mTemporaryStream == null)
             return null;
@@ -207,6 +216,7 @@ public class ConfigurationEditor implements ISVNEditor {
     /*
      * Called when all diff windows (delta) is transferred.
      */
+    @Override
     public void textDeltaEnd(String path) throws SVNException {
         if (mTemporaryStream == null)
             return;
@@ -218,25 +228,16 @@ public class ConfigurationEditor implements ISVNEditor {
      * Called when file update is completed.
      * This call always matches addFile or openFile call.
      */
+    @Override
     public void closeFile(String path, String textChecksum) throws SVNException {
         mLogger.trace("Closing file '" + path + "'");
         if (mTemporaryStream == null)
             return;
 
-        // Read and proces the received data
-        Ini tIniReader = new Ini();
+        // Read and proces the received data        
         try {
-            tIniReader.load(new ByteArrayInputStream(mTemporaryStream.toByteArray()));
-
-            pushConfiguration(tIniReader);
-        }
-        catch (IOException e) {
-            // TODO: bug in SVNKIt, the inner error does not get printed
-            // http://old.nabble.com/Passing-an-exception-to-SVNException-td31171795.html
-            mLogger.error("SVNKit inner exception", e);
-
-            SVNErrorMessage err = SVNErrorMessage.create(SVNErrorCode.IO_ERROR, "Could not read file contents");
-            throw new SVNException(err, e);
+            ConfigurationReader tReader = new ConfigurationReader(new ByteArrayInputStream(mTemporaryStream.toByteArray()));
+            tReader.process();
         }
         catch (RepositoryException e) {
             // TODO: bug in SVNKIt, the inner error does not get printed
@@ -256,6 +257,7 @@ public class ConfigurationEditor implements ISVNEditor {
      * Called when all child files and directories are processed.
      * This call always matches addDir, openDir or openRoot call.
      */
+    @Override
     public void closeDir() throws SVNException {
         mLogger.trace("Closing directory");
     }
@@ -264,6 +266,7 @@ public class ConfigurationEditor implements ISVNEditor {
      * Insturcts to delete an entry in the 'working copy'. Of course will not be
      * called during export operation.
      */
+    @Override
     public void deleteEntry(String path, long revision) throws SVNException {
         mLogger.trace("Deleting entry '" + path + "'");
     }
@@ -273,6 +276,7 @@ public class ConfigurationEditor implements ISVNEditor {
      * but authenticated user (or anonymous user) doesn't have enough
      * access rights to get information on this directory (properties, children).
      */
+    @Override
     public void absentDir(String path) throws SVNException {
         mLogger.trace("Access denied to directory '" + path + "' (will be marked as absent)");
     }
@@ -282,6 +286,7 @@ public class ConfigurationEditor implements ISVNEditor {
      * but authenticated user (or anonymous user) doesn't have enough
      * access rights to get information on this file (contents, properties).
      */
+    @Override
     public void absentFile(String path) throws SVNException {
         mLogger.trace("Access denied to file '" + path + "' (will be marked as absent)");
     }
@@ -289,6 +294,7 @@ public class ConfigurationEditor implements ISVNEditor {
     /*
      * Called when update is completed.
      */
+    @Override
     public SVNCommitInfo closeEdit() throws SVNException {
         mLogger.trace("Closing an edit");
 
@@ -299,19 +305,8 @@ public class ConfigurationEditor implements ISVNEditor {
      * Called when update is completed with an error or server
      * requests client to abort update operation.
      */
+    @Override
     public void abortEdit() throws SVNException {
         mLogger.trace("Aborting an edit");
-    }
-
-
-    //
-    // Auxiliary
-    //
-
-    void pushConfiguration(Ini tIniReader) throws RepositoryException {
-        Configuration tConfiguration = new Configuration(tIniReader);
-        Repository.getInstance().addConfiguration(mDataIdentifier, tConfiguration);
-
-        mLogger.debug("Successfully loaded configuration '" + mDataIdentifier + "'");
     }
 }

@@ -5,6 +5,8 @@
 
 package be.mira.adastra3.server.repository;
 
+import be.mira.adastra3.server.repository.subversion.ConfigurationEditor;
+import be.mira.adastra3.server.repository.subversion.DummyBaton;
 import be.mira.adastra3.server.Service;
 import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;
@@ -122,11 +124,6 @@ public class RepositoryMonitor extends Service {
             ISVNReporterBaton tConfigurationBaton = new DummyBaton(mSVNRevision);
             ISVNEditor tConfigurationEditor = new ConfigurationEditor();
             mSVNRepository.update(mSVNRevision, "configurations", true, tConfigurationBaton, tConfigurationEditor);
-
-            getLogger().debug("Checking out kiosks");
-            ISVNReporterBaton tKioskBaton = new DummyBaton(mSVNRevision);
-            ISVNEditor tKioskEditor = new KioskConfigurationEditor();
-            mSVNRepository.update(mSVNRevision, "kiosks", true, tKioskBaton, tKioskEditor);
         }
         catch (SVNException e) {
             getLogger().error("SVN checkout failed", e);
