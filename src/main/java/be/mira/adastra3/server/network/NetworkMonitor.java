@@ -6,15 +6,17 @@
 package be.mira.adastra3.server.network;
 
 import be.mira.adastra3.server.Service;
+import be.mira.adastra3.server.exceptions.NetworkException;
 import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;
+import be.mira.adastra3.server.network.controls.KioskControl;
+import be.mira.adastra3.server.network.controls.MediaControl;
 import org.teleal.cling.UpnpService;
 import org.teleal.cling.UpnpServiceImpl;
 import org.teleal.cling.model.message.header.STAllHeader;
 import org.teleal.cling.model.meta.RemoteDevice;
 import org.teleal.cling.model.meta.RemoteService;
-import org.teleal.cling.model.types.ServiceId;
-import org.teleal.cling.model.types.UDAServiceId;
+import org.teleal.cling.model.types.UDN;
 import org.teleal.cling.registry.DefaultRegistryListener;
 import org.teleal.cling.registry.Registry;
 import org.teleal.cling.registry.RegistryListener;
@@ -24,11 +26,6 @@ import org.teleal.cling.registry.RegistryListener;
  * @author tim
  */
 public class NetworkMonitor extends Service {
-    //
-    // Data members
-    //
-    private UpnpService mUpnpService;
-
 
     //
     // Construction and destruction
@@ -38,10 +35,9 @@ public class NetworkMonitor extends Service {
         super();
         
         try {
-            mUpnpService = new UpnpServiceImpl();
-
             // Add a listener for device registration events
-            mUpnpService.getRegistry().addListener(createRegistryListener(mUpnpService)
+            Network.getInstance().getUpnpService().getRegistry().addListener(
+                    createRegistryListener(Network.getInstance().getUpnpService())
             );
 
         } catch (Exception ex) {
@@ -57,7 +53,8 @@ public class NetworkMonitor extends Service {
     public void run() throws ServiceRunException {
         try {
             // Broadcast a search message for all devices
-            mUpnpService.getControlPoint().search(
+            getLogger().debug("Looking for devices");
+            Network.getInstance().getUpnpService().getControlPoint().search(
                     new STAllHeader()
             );
 
@@ -68,7 +65,7 @@ public class NetworkMonitor extends Service {
 
     public void stop() throws ServiceRunException {
         try {
-            mUpnpService.shutdown();
+            Network.getInstance().getUpnpService().shutdown();
         }
         catch (Exception e) {
             throw new ServiceRunException(e);
@@ -77,30 +74,57 @@ public class NetworkMonitor extends Service {
     
     RegistryListener createRegistryListener(final UpnpService upnpService) {
         return new DefaultRegistryListener() {
-            ServiceId tDataServiceId = new UDAServiceId("Data");
-            ServiceId tApplicationServiceId = new UDAServiceId("Application");
-
+            // Device addition
             @Override
             public void remoteDeviceAdded(Registry iRegistry, RemoteDevice iDevice) {
+                getLogger().debug("New device added to registry: " + iDevice.getDisplayString());
+                UDN tUDN = iDevice.getIdentity().getUdn();
 
+                // Scan for services
                 RemoteService tService;
-                if ((tService = iDevice.findService(tDataServiceId)) != null) {
-
-                    getLogger().debug("Service discovered: " + tService);
-                    //executeAction(upnpService, tService);
-
+                if ((tService = iDevice.findService(KioskControl.ServiceId)) != null) {
+                    getLogger().debug("Registering kiosk service");
+                    try {
+                        KioskControl tKioskControl = new KioskControl(tService);
+                        Network.getInstance().addKioskControl(tUDN, tKioskControl);
+                    } catch (NetworkException iException) {
+                        getLogger().error("Could not register kiosk service", iException);
+                    }
                 }
-
+                if ((tService = iDevice.findService(MediaControl.ServiceId)) != null) {
+                    getLogger().debug("Registering media service");
+                    try {
+                        MediaControl tMediaControl = new MediaControl(tService);
+                        Network.getInstance().addMediaControl(tUDN, tMediaControl);
+                    } catch (NetworkException iException) {
+                        getLogger().error("Could not register media service", iException);                    }
+                }
             }
 
+            // Device removal
             @Override
             public void remoteDeviceRemoved(Registry iRegistry, RemoteDevice iDevice) {
+                getLogger().debug("Device removed from registry: " + iDevice.getDisplayString());
+                UDN tUDN = iDevice.getIdentity().getUdn();
+
+                // Scan for services
                 RemoteService tService;
-                if ((tService = iDevice.findService(tDataServiceId)) != null) {
-                    getLogger().debug("Service disappeared: " + tService);
+                if ((tService = iDevice.findService(KioskControl.ServiceId)) != null) {
+                    getLogger().debug("Removing kiosk control");
+                    try {
+                        Network.getInstance().removeKioskControl(tUDN);
+                    } catch (NetworkException iException) {
+                        getLogger().error("Could not remove kiosk control", iException);
+                    }
+                }
+                if ((tService = iDevice.findService(MediaControl.ServiceId)) != null) {
+                    getLogger().debug("Removing media control");
+                    try {
+                        Network.getInstance().removeMediaControl(tUDN);
+                    } catch (NetworkException iException) {
+                        getLogger().error("Could not remove media control", iException);                    }
                 }
             }
-
         };
     }
 
