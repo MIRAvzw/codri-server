@@ -13,9 +13,12 @@ import be.mira.adastra3.server.repository.configurations.KioskConfiguration;
 import be.mira.adastra3.server.repository.configurations.device.SoundConfiguration;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
+import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -40,12 +43,29 @@ public class ConfigurationReader {
     
     public ConfigurationReader(InputStream iStream) throws RepositoryException {
         try {
+            // Validate the file
+            String schemaLang = "http://www.w3.org/2001/XMLSchema";
+            SchemaFactory factory = SchemaFactory.newInstance(schemaLang);
+            Schema schema = factory.newSchema(this.getClass().getClassLoader().getResource("configuration.xsd"));
+            Validator validator = schema.newValidator();
+            validator.validate(new StreamSource(iStream));
+            iStream.reset();
+            
+            // Setup the parser factory
             if (mParserFactory == null)
-                mParserFactory = XmlPullParserFactory.newInstance();
+                mParserFactory = XmlPullParserFactory.newInstance();            
+            mParserFactory.setNamespaceAware(true);
+            mParserFactory.setValidating(false);
+            
+            // Aquire a parser
             mParser = mParserFactory.newPullParser();
             mParser.setInput(iStream, null);
         } catch (XmlPullParserException iException) {
             throw new RepositoryException(iException);
+        } catch (SAXException iException) {
+            throw new RepositoryException("could not validate file", iException);
+        } catch (IOException iException) {
+            throw new RepositoryException("could not open schema", iException);
         }
     }
     
