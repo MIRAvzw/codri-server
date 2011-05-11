@@ -13,9 +13,15 @@ public class ServiceRunException extends Exception {
     public ServiceRunException() {
         super();
     }
+    
     public ServiceRunException(String iMessage) {
         super(iMessage);
     }
+
+    public ServiceRunException(String message, Throwable cause) {
+        super(message, cause);
+    }
+    
     public ServiceRunException(Exception e) {
         super(e);
     }

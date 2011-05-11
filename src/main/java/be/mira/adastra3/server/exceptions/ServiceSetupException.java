@@ -13,9 +13,15 @@ public class ServiceSetupException extends Exception {
     public ServiceSetupException() {
         super();
     }
+    
     public ServiceSetupException(String iMessage) {
         super(iMessage);
     }
+
+    public ServiceSetupException(String message, Throwable cause) {
+        super(message, cause);
+    }
+    
     public ServiceSetupException(Exception e) {
         super(e);
     }

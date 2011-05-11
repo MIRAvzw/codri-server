@@ -28,7 +28,7 @@
             <xsd:element name="device" type="deviceType" minOccurs="0" />
             <xsd:element name="application" type="applicationType" minOccurs="0" />
         </xsd:sequence>
-        <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attribute name="id" type="xsd:string" use="required" />
     </xsd:complexType>
     
     <xsd:simpleType name="UuidType">

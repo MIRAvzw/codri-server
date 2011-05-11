@@ -36,7 +36,7 @@ public class DeviceConfiguration extends Configuration {
         return mSound;
     }
     
-    public void setSoundConfiguration(SoundConfiguration iSound) {
+    public final void setSoundConfiguration(SoundConfiguration iSound) {
         if (iSound == null)
             return;
         mSound = iSound;

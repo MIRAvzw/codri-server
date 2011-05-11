@@ -6,11 +6,14 @@ package be.mira.adastra3.server.repository.subversion;
 
 import be.mira.adastra3.server.exceptions.RepositoryException;
 import be.mira.adastra3.server.repository.ConfigurationReader;
+import be.mira.adastra3.server.repository.configurations.Configuration;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.log4j.Logger;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNErrorCode;
@@ -37,6 +40,8 @@ public class ConfigurationEditor implements ISVNEditor {
     private SVNDeltaProcessor myDeltaProcessor;
     protected String mDataIdentifier;
     protected String mRepositoryDirectory = "configurations";
+    private long mRevision;
+    private List<Configuration> mConfigurations;
 
 
     //
@@ -49,6 +54,17 @@ public class ConfigurationEditor implements ISVNEditor {
          * server to the new file contents.
          */
         myDeltaProcessor = new SVNDeltaProcessor();
+        
+        mConfigurations = new ArrayList<Configuration>();
+    }
+    
+    
+    //
+    // Getters and setters
+    //
+    
+    public List<Configuration> getConfigurations() {
+        return mConfigurations;
     }
 
 
@@ -63,6 +79,7 @@ public class ConfigurationEditor implements ISVNEditor {
     @Override
     public void targetRevision(long revision) throws SVNException {
         mLogger.trace("Next instructions target revision " + revision);
+        mRevision = revision;
     }
 
     /*
@@ -238,6 +255,11 @@ public class ConfigurationEditor implements ISVNEditor {
         try {
             ConfigurationReader tReader = new ConfigurationReader(new ByteArrayInputStream(mTemporaryStream.toByteArray()));
             tReader.process();
+            
+            for (Configuration tConfiguration : tReader.getConfigurations()) {
+                tConfiguration.setRevision(mRevision);
+                mConfigurations.add(tConfiguration);
+            }
         }
         catch (RepositoryException e) {
             // TODO: bug in SVNKIt, the inner error does not get printed

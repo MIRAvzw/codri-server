@@ -17,14 +17,15 @@ public class KioskConfiguration extends Configuration {
     
     private DeviceConfiguration mDeviceConfiguration;
     private ApplicationConfiguration mApplicationConfiguration;
+    private String mId;
     
     
     //
     // Construction and destruction
     //
     
-    public KioskConfiguration(String iName) {
-        setProperty("name", iName);
+    public KioskConfiguration(String iId) {
+        mId = iId;
         
         setDeviceConfiguration(new DeviceConfiguration());
         setApplicationConfiguration(new ApplicationConfiguration());
@@ -35,20 +36,13 @@ public class KioskConfiguration extends Configuration {
     // Getters and setters
     //
 
-    public boolean isAbstract() {
-        return (getTarget() == null);
-    }
-
-    public String getName() {
-        if (getProperty("name") != null)
-            return (String) getProperty("name");
-        else
-            return null;
+    public String getId() {
+        return mId;
     }
 
     public UUID getTarget() {
-        if (getProperty("UUID") != null)
-            return (UUID) getProperty("UUID");
+        if (getProperty("target") != null)
+            return (UUID) getProperty("target");
         else
             return null;
     }

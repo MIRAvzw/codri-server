@@ -17,6 +17,7 @@ public abstract class Configuration {
     //
     
     private Map<String, Object> mProperties;
+    private long mRevision;
     
     
     //
@@ -25,6 +26,7 @@ public abstract class Configuration {
     
     public Configuration() {
         mProperties = new HashMap<String, Object>();
+        mRevision = 0;
     }
     
     
@@ -43,5 +45,13 @@ public abstract class Configuration {
         if (iProperty == null)
             return;
         mProperties.put(iName, iProperty);
+    }
+    
+    public long getRevision() {
+        return mRevision;
+    }
+    
+    public void setRevision(long iRevision) {
+        mRevision = iRevision;
     }
 }

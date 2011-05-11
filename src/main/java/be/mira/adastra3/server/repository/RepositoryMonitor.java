@@ -8,8 +8,12 @@ package be.mira.adastra3.server.repository;
 import be.mira.adastra3.server.repository.subversion.ConfigurationEditor;
 import be.mira.adastra3.server.repository.subversion.DummyBaton;
 import be.mira.adastra3.server.Service;
+import be.mira.adastra3.server.exceptions.RepositoryException;
 import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;
+import be.mira.adastra3.server.repository.configurations.Configuration;
+import be.mira.adastra3.server.repository.configurations.KioskConfiguration;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import org.tmatesoft.svn.core.SVNException;
@@ -49,7 +53,11 @@ public class RepositoryMonitor extends Service {
                 if (tSVNRevision != mSVNRevision) {
                     getLogger().info("SVN repository changed from revision " + mSVNRevision + " to " + tSVNRevision);
 
-                    // TODO
+                    try {
+                        checkout();
+                    } catch (RepositoryException iException) {
+                        getLogger().error("could not perform update checkout", iException);
+                    }
 
                     mSVNRevision = tSVNRevision;
                 }
@@ -101,7 +109,11 @@ public class RepositoryMonitor extends Service {
     public void run() throws ServiceRunException {
         // Do a checkout
         getLogger().debug("Checking out the repository");
-        checkout();
+        try {
+            checkout();
+        } catch (RepositoryException iException) {
+            throw new ServiceRunException("Could not perform initial checkout", iException);
+        }
 
         // Schedule the monitor
         mSVNMonitor.schedule(new Monitor(), 0, mSVNMonitorInterval * 1000);
@@ -116,17 +128,47 @@ public class RepositoryMonitor extends Service {
     // Auxiliary
     //
 
-    void checkout() throws ServiceRunException  {
+    void checkout() throws RepositoryException  {
         try {
             mSVNRevision = mSVNRepository.getLatestRevision();
 
+            // Checkout the new configurations
             getLogger().debug("Checking out configurations");
             ISVNReporterBaton tConfigurationBaton = new DummyBaton(mSVNRevision);
             ISVNEditor tConfigurationEditor = new ConfigurationEditor();
             mSVNRepository.update(mSVNRevision, "configurations", true, tConfigurationBaton, tConfigurationEditor);
+            
+            // Process them
+            Repository tRepository = Repository.getInstance();
+            List<Configuration> tConfigurations = ((ConfigurationEditor)tConfigurationEditor).getConfigurations();
+            for (Configuration tConfiguration : tConfigurations) {
+                try {
+                    // KioskConfiguration processing
+                    if (tConfiguration instanceof KioskConfiguration) {
+                        KioskConfiguration tKioskConfiguration = (KioskConfiguration) tConfiguration;
+                        getLogger().debug("Processing kiosk configuration " + tKioskConfiguration.getId());
+                        KioskConfiguration tOldKioskConfiguration = tRepository.getKioskConfiguration(tKioskConfiguration.getId());
+                        if (tOldKioskConfiguration == null) {
+                            getLogger().debug("Configuration seems new, adding to repository");
+                            tRepository.addKioskConfiguration(tKioskConfiguration);
+                        }
+                        else if (tKioskConfiguration.getRevision() > tOldKioskConfiguration.getRevision()) {
+                            getLogger().debug("New configuration is a more recent version of an existing configuration, updating the repository");
+                            tRepository.updateKioskConfiguration(tKioskConfiguration);
+                        }
+                        else
+                            getLogger().debug("Configuration hasn't been updated, ignoring");
+                    }
+                    else
+                        throw new RepositoryException("unknown configuration type");
+                }
+                catch (RepositoryException iException) {
+                    throw new RepositoryException("could not process configuration", iException);
+                }
+            }
         }
         catch (SVNException e) {
-            getLogger().error("SVN checkout failed", e);
+            throw new RepositoryException("SVN checkout failed", e);
         }
     }
 }

@@ -11,5 +11,6 @@ import be.mira.adastra3.server.repository.configurations.KioskConfiguration;
  * @author tim
  */
 public interface IRepositoryListener {
-    public void doConfigurationAdded(KioskConfiguration iConfiguration);
+    public void doKioskConfigurationAdded(KioskConfiguration iKioskConfiguration);
+    public void doKioskConfigurationUpdated(KioskConfiguration iOldKioskConfiguration, KioskConfiguration iConfiguration);
 }

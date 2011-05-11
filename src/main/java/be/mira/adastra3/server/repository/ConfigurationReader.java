@@ -6,6 +6,7 @@ package be.mira.adastra3.server.repository;
 
 import be.mira.adastra3.server.exceptions.RepositoryException;
 import be.mira.adastra3.server.repository.configurations.ApplicationConfiguration;
+import be.mira.adastra3.server.repository.configurations.Configuration;
 import be.mira.adastra3.server.repository.configurations.application.InterfaceConfiguration;
 import be.mira.adastra3.server.repository.configurations.application.MediaConfiguration;
 import be.mira.adastra3.server.repository.configurations.DeviceConfiguration;
@@ -13,6 +14,8 @@ import be.mira.adastra3.server.repository.configurations.KioskConfiguration;
 import be.mira.adastra3.server.repository.configurations.device.SoundConfiguration;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -34,6 +37,7 @@ public class ConfigurationReader {
     
     static private XmlPullParserFactory mParserFactory;
     static XmlPullParser mParser;
+    private List<Configuration> mConfigurations;
     
     
     
@@ -106,6 +110,10 @@ public class ConfigurationReader {
         }
     }
     
+    public List<Configuration> getConfigurations() {
+        return mConfigurations;
+    }
+    
     
     //
     // Parsing helpers
@@ -113,6 +121,7 @@ public class ConfigurationReader {
     
     private void parseRoot() throws RepositoryException, XmlPullParserException, IOException {
         // Process the tags
+        mConfigurations = new ArrayList<Configuration>();
         mParser.next();
         loop: while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
             switch (mParser.getEventType()) {
@@ -121,7 +130,7 @@ public class ConfigurationReader {
                     break loop;
                 case (XmlPullParser.START_TAG):
                     if (mParser.getName().equals("kiosk"))
-                        Repository.getInstance().addConfiguration(parseKioskConfiguration());
+                        mConfigurations.add(parseKioskConfiguration());
                     else
                         throw new RepositoryException("unknown tag " + mParser.getName());
                     break;
@@ -129,7 +138,6 @@ public class ConfigurationReader {
                     mParser.next();
             }
         }
-        
     }
     
     private String parseTextElement()  throws RepositoryException, XmlPullParserException, IOException {   
@@ -149,13 +157,13 @@ public class ConfigurationReader {
     
     private KioskConfiguration parseKioskConfiguration() throws RepositoryException, XmlPullParserException, IOException {
         // Process the attributes
-        String tName = null;
+        String tId = null;
         for (int i = 0; i < mParser.getAttributeCount(); i++) {
             String tAttributeName = mParser.getAttributeName(i);
             String tAttributeValue = mParser.getAttributeValue(i);
             
-            if (tAttributeName.equals("name"))
-                tName = tAttributeValue;
+            if (tAttributeName.equals("id"))
+                tId = tAttributeValue;
             else
                 throw new RepositoryException("unknown attribute " + tAttributeName);
         }
@@ -171,9 +179,7 @@ public class ConfigurationReader {
                     mParser.next();
                     break loop;
                 case (XmlPullParser.START_TAG):
-                    if (mParser.getName().equals("name"))
-                        tName = parseTextElement();
-                    else if (mParser.getName().equals("target"))
+                    if (mParser.getName().equals("target"))
                         tTarget = UUID.fromString(parseTextElement());
                     else if (mParser.getName().equals("application"))
                         tApplicationConfiguration = parseApplicationConfiguration();
@@ -188,7 +194,7 @@ public class ConfigurationReader {
         }
         
         // Create the object
-        KioskConfiguration tKioskConfiguration = new KioskConfiguration(tName);
+        KioskConfiguration tKioskConfiguration = new KioskConfiguration(tId);
         tKioskConfiguration.setTarget(tTarget);
         tKioskConfiguration.setApplicationConfiguration(tApplicationConfiguration);
         tKioskConfiguration.setDeviceConfiguration(tDeviceConfiguration);
