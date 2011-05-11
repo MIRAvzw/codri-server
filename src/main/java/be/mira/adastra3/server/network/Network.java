@@ -7,12 +7,14 @@ package be.mira.adastra3.server.network;
 import be.mira.adastra3.server.exceptions.NetworkException;
 import be.mira.adastra3.server.network.controls.DeviceControl;
 import be.mira.adastra3.server.network.controls.ApplicationControl;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import org.teleal.cling.UpnpService;
 import org.teleal.cling.UpnpServiceImpl;
 import org.teleal.cling.controlpoint.ControlPoint;
-import org.teleal.cling.model.types.UDN;
 
 /**
  *
@@ -23,9 +25,10 @@ public class Network {
     // Member data
     //
     
-    private Map<UDN, DeviceControl> mKioskControls;
-    private Map<UDN, ApplicationControl> mMediaControls;
+    private Map<UUID, DeviceControl> mDeviceControls;
+    private Map<UUID, ApplicationControl> mApplicationControls;
     private UpnpService mUpnpService;
+    private List<INetworkListener> mListeners;
 
 
     //
@@ -46,15 +49,24 @@ public class Network {
     //
 
     private Network() {
-        mKioskControls = new HashMap<UDN, DeviceControl>();
-        mMediaControls = new HashMap<UDN, ApplicationControl>();
+        mDeviceControls = new HashMap<UUID, DeviceControl>();
+        mApplicationControls = new HashMap<UUID, ApplicationControl>();
         mUpnpService = new UpnpServiceImpl();
+        mListeners = new ArrayList<INetworkListener>();
     }
 
 
     //
     // Getters and setters
     //
+    
+    public void addListener(INetworkListener iListener) {
+        mListeners.add(iListener);
+    }
+    
+    public void removeListener(INetworkListener iListener) {
+        mListeners.remove(iListener);
+    }
     
     public static ControlPoint getControlPoint() {
         return Network.getInstance().getUpnpService().getControlPoint();
@@ -64,36 +76,80 @@ public class Network {
         return mUpnpService;
     }
     
-    public DeviceControl getKioskControl(UDN iUDN) {
-        return mKioskControls.get(iUDN);
+    public DeviceControl getDeviceControl(UUID iUuid) {
+        return mDeviceControls.get(iUuid);
     }
     
-    public void addKioskControl(UDN iUDN, DeviceControl iKioskControl) throws NetworkException{
-        if (mKioskControls.containsKey(iUDN))
-            throw new NetworkException("device " + iUDN + " already present in network");
-        mKioskControls.put(iUDN, iKioskControl);
+    public void addDeviceControl(UUID iUuid, DeviceControl iDeviceControl) throws NetworkException{
+        if (mDeviceControls.containsKey(iUuid))
+            throw new NetworkException("device " + iUuid + " already present in network");
+        emitDeviceControlAdded(iUuid, iDeviceControl);
+        mDeviceControls.put(iUuid, iDeviceControl);
     }
     
-    public DeviceControl removeKioskControl(UDN iUDN) throws NetworkException {
-        if (!mKioskControls.containsKey(iUDN))
-            throw new NetworkException("device " + iUDN + " not present in network");
-        return mKioskControls.remove(iUDN);
+    public DeviceControl removeDeviceControl(UUID iUuid) throws NetworkException {
+        if (!mDeviceControls.containsKey(iUuid))
+            throw new NetworkException("device " + iUuid + " not present in network");
+        emitDeviceControlRemoved(iUuid);
+        return mDeviceControls.remove(iUuid);
     }
     
-    public ApplicationControl getMediaControl(UDN iUDN) {
-        return mMediaControls.get(iUDN);
+    public ApplicationControl getApplicationControl(UUID iUuid) {
+        return mApplicationControls.get(iUuid);
     }
     
-    public void addMediaControl(UDN iUDN, ApplicationControl iMediaControl) throws NetworkException {
-        if (mMediaControls.containsKey(iUDN))
-            throw new NetworkException("device " + iUDN + " already present in network");
-        mMediaControls.put(iUDN, iMediaControl);
+    public void addApplicationControl(UUID iUuid, ApplicationControl iApplicationControl) throws NetworkException {
+        if (mApplicationControls.containsKey(iUuid))
+            throw new NetworkException("device " + iUuid + " already present in network");
+        emitApplicationControlAdded(iUuid, iApplicationControl);
+        mApplicationControls.put(iUuid, iApplicationControl);
     }
     
-    public ApplicationControl removeMediaControl(UDN iUDN) throws NetworkException {
-        if (!mMediaControls.containsKey(iUDN))
-            throw new NetworkException("device " + iUDN + " not present in network");
-        return mMediaControls.remove(iUDN);
+    public ApplicationControl removeApplicationControl(UUID iUuid) throws NetworkException {
+        if (!mApplicationControls.containsKey(iUuid))
+            throw new NetworkException("device " + iUuid + " not present in network");
+        emitApplicationControlRemoved(iUuid);
+        return mApplicationControls.remove(iUuid);
     }
     
+    
+    //
+    // Signals
+    //
+    
+    public void emitError(String iMessage, NetworkException iException) {
+        for (INetworkListener tListener : mListeners) {
+            tListener.doError(iMessage, iException);
+        }
+    }
+    
+    public void emitWarning(String iMessage) {
+        for (INetworkListener tListener : mListeners) {
+            tListener.doWarning(iMessage);
+        }
+    }
+    
+    private void emitDeviceControlAdded(UUID iUuid, DeviceControl iMediaControl) {
+        for (INetworkListener tListener : mListeners) {
+            tListener.doDeviceControlAdded(iUuid, iMediaControl);
+        }
+    }
+    
+    private void emitDeviceControlRemoved(UUID iUuid) {
+        for (INetworkListener tListener : mListeners) {
+            tListener.doDeviceControlRemoved(iUuid);
+        }
+    }
+    
+    private void emitApplicationControlAdded(UUID iUuid, ApplicationControl iApplicationControl) {
+        for (INetworkListener tListener : mListeners) {
+            tListener.doApplicationControlAdded(iUuid, iApplicationControl);
+        }
+    }
+    
+    private void emitApplicationControlRemoved(UUID iUuid) {
+        for (INetworkListener tListener : mListeners) {
+            tListener.doApplicationControlRemoved(iUuid);
+        }
+    }
 }

@@ -93,6 +93,18 @@ public class Repository {
     // Signals
     //
     
+    public void emitError(String iMessage, RepositoryException iException) {
+        for (IRepositoryListener tListener : mListeners) {
+            tListener.doError(iMessage, iException);
+        }
+    }
+    
+    public void emitWarning(String iMessage) {
+        for (IRepositoryListener tListener : mListeners) {
+            tListener.doWarning(iMessage);
+        }
+    }  
+    
     private void emitKioskConfigurationAdded(KioskConfiguration iKioskConfiguration) {
         for (IRepositoryListener tListener : mListeners) {
             tListener.doKioskConfigurationAdded(iKioskConfiguration);

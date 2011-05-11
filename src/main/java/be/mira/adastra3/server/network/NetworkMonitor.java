@@ -11,6 +11,7 @@ import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;
 import be.mira.adastra3.server.network.controls.DeviceControl;
 import be.mira.adastra3.server.network.controls.ApplicationControl;
+import java.util.UUID;
 import org.teleal.cling.UpnpService;
 import org.teleal.cling.UpnpServiceImpl;
 import org.teleal.cling.model.message.header.STAllHeader;
@@ -77,8 +78,15 @@ public class NetworkMonitor extends Service {
             // Device addition
             @Override
             public void remoteDeviceAdded(Registry iRegistry, RemoteDevice iDevice) {
+                Network tNetwork = Network.getInstance();
                 getLogger().debug("New device added to registry: " + iDevice.getDisplayString());
-                UDN tUDN = iDevice.getIdentity().getUdn();
+                UUID tUuid;
+                try {
+                    tUuid = _convertUdn(iDevice.getIdentity().getUdn());
+                } catch (NetworkException iException) {
+                    tNetwork.emitError("Cannot proceed without having the device identifier", iException);
+                    return;
+                }
 
                 // Scan for services
                 RemoteService tService;
@@ -86,46 +94,65 @@ public class NetworkMonitor extends Service {
                     getLogger().debug("Registering kiosk service");
                     try {
                         DeviceControl tKioskControl = new DeviceControl(tService);
-                        Network.getInstance().addKioskControl(tUDN, tKioskControl);
+                        Network.getInstance().addDeviceControl(tUuid, tKioskControl);
                     } catch (NetworkException iException) {
-                        getLogger().error("Could not register kiosk service", iException);
+                        tNetwork.emitError("Could not register kiosk service", iException);
                     }
                 }
                 if ((tService = iDevice.findService(ApplicationControl.ServiceId)) != null) {
                     getLogger().debug("Registering media service");
                     try {
                         ApplicationControl tMediaControl = new ApplicationControl(tService);
-                        Network.getInstance().addMediaControl(tUDN, tMediaControl);
+                        Network.getInstance().addApplicationControl(tUuid, tMediaControl);
                     } catch (NetworkException iException) {
-                        getLogger().error("Could not register media service", iException);                    }
+                        tNetwork.emitError("Could not register media service", iException);                    }
                 }
             }
 
             // Device removal
             @Override
             public void remoteDeviceRemoved(Registry iRegistry, RemoteDevice iDevice) {
+                Network tNetwork = Network.getInstance();
                 getLogger().debug("Device removed from registry: " + iDevice.getDisplayString());
-                UDN tUDN = iDevice.getIdentity().getUdn();
+                UUID tUuid;
+                try {
+                    tUuid = _convertUdn(iDevice.getIdentity().getUdn());
+                } catch (NetworkException iException) {
+                    tNetwork.emitError("Cannot proceed without having the device identifier", iException);
+                    return;
+                }
 
                 // Scan for services
                 RemoteService tService;
                 if ((tService = iDevice.findService(DeviceControl.ServiceId)) != null) {
                     getLogger().debug("Removing kiosk control");
                     try {
-                        Network.getInstance().removeKioskControl(tUDN);
+                        Network.getInstance().removeDeviceControl(tUuid);
                     } catch (NetworkException iException) {
-                        getLogger().error("Could not remove kiosk control", iException);
+                        tNetwork.emitError("Could not remove kiosk control", iException);
                     }
                 }
                 if ((tService = iDevice.findService(ApplicationControl.ServiceId)) != null) {
                     getLogger().debug("Removing media control");
                     try {
-                        Network.getInstance().removeMediaControl(tUDN);
+                        Network.getInstance().removeApplicationControl(tUuid);
                     } catch (NetworkException iException) {
-                        getLogger().error("Could not remove media control", iException);                    }
+                        tNetwork.emitError("Could not remove media control", iException);
+                    }
                 }
             }
         };
+    }
+    
+    
+    //
+    // Auxiliary
+    //
+    
+    UUID _convertUdn(UDN iUDN) throws NetworkException {
+        if (! iUDN.isUDA11Compliant())
+            throw new NetworkException("cannot convert incompatible UDN");
+        return UUID.fromString(iUDN.getIdentifierString());
     }
 
 }

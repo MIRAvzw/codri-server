@@ -49,21 +49,10 @@ public class RepositoryMonitor extends Service {
         public void run() {
             getLogger().debug("Checking SVN revision");
             try {
-                long tSVNRevision = mSVNRepository.getLatestRevision();
-                if (tSVNRevision != mSVNRevision) {
-                    getLogger().info("SVN repository changed from revision " + mSVNRevision + " to " + tSVNRevision);
-
-                    try {
-                        checkout();
-                    } catch (RepositoryException iException) {
-                        getLogger().error("could not perform update checkout", iException);
-                    }
-
-                    mSVNRevision = tSVNRevision;
-                }
+                update();
             }
-            catch (SVNException e) {
-                getLogger().error("Error monitoring SVN repository", e);
+            catch (RepositoryException iException) {
+                Repository.getInstance().emitError("could not update repository", iException);
             }
         }
     }
@@ -169,6 +158,22 @@ public class RepositoryMonitor extends Service {
         }
         catch (SVNException e) {
             throw new RepositoryException("SVN checkout failed", e);
+        }
+    }
+    
+    private void update() throws RepositoryException {
+        long tSVNRevision;
+        try {
+            tSVNRevision = mSVNRepository.getLatestRevision();
+        }
+        catch (SVNException iException) {
+            throw new RepositoryException("could not fetch SVN revision", iException);
+        }
+        
+        if (tSVNRevision != mSVNRevision) {
+            getLogger().info("SVN repository changed from revision " + mSVNRevision + " to " + tSVNRevision);
+            checkout();
+            mSVNRevision = tSVNRevision;
         }
     }
 }
