@@ -11,6 +11,19 @@ import be.mira.adastra3.server.repository.configurations.Configuration;
  * @author tim
  */
 public class SoundConfiguration extends Configuration {
+    //
+    // Construction and destruction
+    //
+    
+    public SoundConfiguration() {
+        setProperty("volume", 128);
+    }
+    
+    
+    //
+    // Getters and setters
+    //
+    
     Integer getVolume() {
         if (getProperty("volume") != null)
             return (Integer) getProperty("volume");

@@ -42,8 +42,6 @@ public class ApplicationConfiguration extends Configuration {
         if (iInterface == null)
             return;
         mInterfaceConfiguration = iInterface;
-        if (getParent() != null)
-            mInterfaceConfiguration.setParent(((ApplicationConfiguration)getParent()).mInterfaceConfiguration);
     }
 
     public MediaConfiguration getMediaConfiguration() {
@@ -54,7 +52,5 @@ public class ApplicationConfiguration extends Configuration {
         if (iMedia == null)
             return;
         mMediaConfiguration = iMedia;
-        if (getParent() != null)
-            mMediaConfiguration.setParent(((ApplicationConfiguration)getParent()).mMediaConfiguration);
     }
 }

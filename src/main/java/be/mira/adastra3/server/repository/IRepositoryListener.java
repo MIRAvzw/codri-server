@@ -4,10 +4,12 @@
  */
 package be.mira.adastra3.server.repository;
 
+import be.mira.adastra3.server.repository.configurations.KioskConfiguration;
+
 /**
  *
  * @author tim
  */
-public class IRepositoryListener {
-    
+public interface IRepositoryListener {
+    public void doConfigurationAdded(KioskConfiguration iConfiguration);
 }

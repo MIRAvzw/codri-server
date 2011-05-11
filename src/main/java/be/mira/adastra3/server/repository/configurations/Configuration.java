@@ -16,7 +16,6 @@ public abstract class Configuration {
     // Member data
     //
     
-    private Configuration mParent;
     private Map<String, Object> mProperties;
     
     
@@ -36,8 +35,6 @@ public abstract class Configuration {
     protected Object getProperty(String iName) {
         if (mProperties.containsKey(iName))
             return mProperties.get(iName);
-        else if (mParent != null)
-            return mParent.getProperty(iName);
         else
             return null;
     }
@@ -46,13 +43,5 @@ public abstract class Configuration {
         if (iProperty == null)
             return;
         mProperties.put(iName, iProperty);
-    }
-    
-    protected Configuration getParent() {
-        return mParent;
-    }
-    
-    protected void setParent(Configuration iParent) {        
-        mParent = iParent;
     }
 }

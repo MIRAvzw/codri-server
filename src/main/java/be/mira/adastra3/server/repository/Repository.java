@@ -7,7 +7,9 @@ package be.mira.adastra3.server.repository;
 
 import be.mira.adastra3.server.exceptions.RepositoryException;
 import be.mira.adastra3.server.repository.configurations.KioskConfiguration;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -22,6 +24,7 @@ public class Repository {
 
     private Map<String, KioskConfiguration> mConfigurations;
     private Map<UUID, String> mConcreteMapping;
+    private List<IRepositoryListener> mListeners;
 
 
     //
@@ -44,12 +47,21 @@ public class Repository {
     private Repository() {
         mConfigurations = new HashMap<String, KioskConfiguration>();
         mConcreteMapping = new HashMap<UUID, String>();
+        mListeners = new ArrayList<IRepositoryListener>();
     }
 
 
     //
     // Getters and setters
     //
+    
+    public void addListener(IRepositoryListener iListener) {
+        mListeners.add(iListener);
+    }
+    
+    public void removeListener(IRepositoryListener iListener) {
+        mListeners.remove(iListener);
+    }
 
     public void addConfiguration(KioskConfiguration iConfiguration) throws RepositoryException {
         if (mConfigurations.containsKey(iConfiguration.getName()))
@@ -70,5 +82,16 @@ public class Repository {
         if (!mConcreteMapping.containsKey(iUuid))
             return null;
         return mConfigurations.get(mConcreteMapping.get(iUuid));
+    }
+    
+    
+    //
+    // Signals
+    //
+    
+    public void emitConfigurationAdded(KioskConfiguration iConfiguration) {
+        for (IRepositoryListener tListener : mListeners) {
+            tListener.doConfigurationAdded(iConfiguration);
+        }
     }
 }

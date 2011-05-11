@@ -149,19 +149,13 @@ public class ConfigurationReader {
     
     private KioskConfiguration parseKioskConfiguration() throws RepositoryException, XmlPullParserException, IOException {
         // Process the attributes
-        Boolean tAbstract = null;
         String tName = null;
-        String tParent = null;
         for (int i = 0; i < mParser.getAttributeCount(); i++) {
             String tAttributeName = mParser.getAttributeName(i);
             String tAttributeValue = mParser.getAttributeValue(i);
             
-            if (tAttributeName.equals("abstract"))
-                tAbstract = Boolean.parseBoolean(tAttributeValue);
-            else if (tAttributeName.equals("name"))
+            if (tAttributeName.equals("name"))
                 tName = tAttributeValue;
-            else if (tAttributeName.equals("inherits"))
-                tParent = tAttributeValue;
             else
                 throw new RepositoryException("unknown attribute " + tAttributeName);
         }
@@ -193,19 +187,8 @@ public class ConfigurationReader {
             }
         }
         
-        // Look up the parent object
-        KioskConfiguration tParentObject = null;
-        if (tParent != null) {
-            try {
-                tParentObject = Repository.getInstance().getConfiguration(tParent);
-            }
-            catch (RepositoryException iException) {
-                throw new RepositoryException("Could not find parent configuration", iException);
-            }
-        }
-        
         // Create the object
-        KioskConfiguration tKioskConfiguration = new KioskConfiguration(tName, tParentObject);
+        KioskConfiguration tKioskConfiguration = new KioskConfiguration(tName);
         tKioskConfiguration.setTarget(tTarget);
         tKioskConfiguration.setApplicationConfiguration(tApplicationConfiguration);
         tKioskConfiguration.setDeviceConfiguration(tDeviceConfiguration);

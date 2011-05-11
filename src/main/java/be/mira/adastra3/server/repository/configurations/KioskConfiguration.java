@@ -23,10 +23,8 @@ public class KioskConfiguration extends Configuration {
     // Construction and destruction
     //
     
-    public KioskConfiguration(String iName, Configuration iParent) {
+    public KioskConfiguration(String iName) {
         setProperty("name", iName);
-        
-        setParent(iParent);
         
         setDeviceConfiguration(new DeviceConfiguration());
         setApplicationConfiguration(new ApplicationConfiguration());
@@ -67,8 +65,6 @@ public class KioskConfiguration extends Configuration {
         if (iApplicationConfiguration == null)
             return;
         mApplicationConfiguration = iApplicationConfiguration;
-        if (getParent() != null)
-            mApplicationConfiguration.setParent(((KioskConfiguration)getParent()).mApplicationConfiguration);
     }
 
     public DeviceConfiguration getDeviceConfiguration() {
@@ -79,7 +75,5 @@ public class KioskConfiguration extends Configuration {
         if (iDeviceConfiguration == null)
             return;
         mDeviceConfiguration = iDeviceConfiguration;
-        if (getParent() != null)
-            mDeviceConfiguration.setParent(((KioskConfiguration)getParent()).mDeviceConfiguration);
     }
 }

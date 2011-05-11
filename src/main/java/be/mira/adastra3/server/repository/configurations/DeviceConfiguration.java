@@ -40,7 +40,5 @@ public class DeviceConfiguration extends Configuration {
         if (iSound == null)
             return;
         mSound = iSound;
-        if (getParent() != null)
-            mSound.setParent(((DeviceConfiguration)getParent()).mSound);
     }
 }
