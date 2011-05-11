@@ -70,13 +70,13 @@ public class Network {
     
     public void addKioskControl(UDN iUDN, DeviceControl iKioskControl) throws NetworkException{
         if (mKioskControls.containsKey(iUDN))
-            throw new NetworkException("Cannot add kiosk control: device " + iUDN + " already present in network");
+            throw new NetworkException("device " + iUDN + " already present in network");
         mKioskControls.put(iUDN, iKioskControl);
     }
     
     public DeviceControl removeKioskControl(UDN iUDN) throws NetworkException {
         if (!mKioskControls.containsKey(iUDN))
-            throw new NetworkException("Cannot remove kiosk control: device " + iUDN + " not present in network");
+            throw new NetworkException("device " + iUDN + " not present in network");
         return mKioskControls.remove(iUDN);
     }
     
@@ -86,13 +86,13 @@ public class Network {
     
     public void addMediaControl(UDN iUDN, ApplicationControl iMediaControl) throws NetworkException {
         if (mMediaControls.containsKey(iUDN))
-            throw new NetworkException("Cannot add media control: device " + iUDN + " already present in network");
+            throw new NetworkException("device " + iUDN + " already present in network");
         mMediaControls.put(iUDN, iMediaControl);
     }
     
     public ApplicationControl removeMediaControl(UDN iUDN) throws NetworkException {
         if (!mMediaControls.containsKey(iUDN))
-            throw new NetworkException("Cannot remove media control: device " + iUDN + " not present in network");
+            throw new NetworkException("device " + iUDN + " not present in network");
         return mMediaControls.remove(iUDN);
     }
     

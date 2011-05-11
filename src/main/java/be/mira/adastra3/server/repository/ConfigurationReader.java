@@ -6,8 +6,11 @@ package be.mira.adastra3.server.repository;
 
 import be.mira.adastra3.server.exceptions.RepositoryException;
 import be.mira.adastra3.server.repository.configurations.ApplicationConfiguration;
+import be.mira.adastra3.server.repository.configurations.application.InterfaceConfiguration;
+import be.mira.adastra3.server.repository.configurations.application.MediaConfiguration;
 import be.mira.adastra3.server.repository.configurations.DeviceConfiguration;
 import be.mira.adastra3.server.repository.configurations.KioskConfiguration;
+import be.mira.adastra3.server.repository.configurations.device.SoundConfiguration;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -54,24 +57,24 @@ public class ConfigurationReader {
     public void process() throws RepositoryException {
         try {
             // Setup parsing
-            int tEventType = mParser.getEventType();
-            if (tEventType != XmlPullParser.START_DOCUMENT)
+            if (mParser.getEventType() != XmlPullParser.START_DOCUMENT)
                 throw new RepositoryException("not at start of document");
             
             // Process tags
-            tEventType = mParser.next();
-            while (tEventType != XmlPullParser.END_DOCUMENT) {
-                switch (tEventType) {
+            mParser.next();
+            while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
+                switch (mParser.getEventType()) {
                     case (XmlPullParser.END_TAG):
-                        tEventType = mParser.next();
+                        mParser.next();
                         break;
                     case (XmlPullParser.START_TAG):
                         if (mParser.getName().equals("root"))
                             parseRoot();
                         else
                             throw new RepositoryException("unknown tag " + mParser.getName());
+                    break;
                     default:                        
-                        tEventType = mParser.next();
+                        mParser.next();
                 }
             }
         }
@@ -98,9 +101,10 @@ public class ConfigurationReader {
                     break loop;
                 case (XmlPullParser.START_TAG):
                     if (mParser.getName().equals("kiosk"))
-                        parseKioskConfiguration(); // TODO
+                        Repository.getInstance().addConfiguration(parseKioskConfiguration());
                     else
                         throw new RepositoryException("unknown tag " + mParser.getName());
+                    break;
                 default:                        
                     mParser.next();
             }
@@ -108,21 +112,17 @@ public class ConfigurationReader {
         
     }
     
-    private String parseTextElement()  throws RepositoryException, XmlPullParserException, IOException {        
-        // Process the tags
-        String oText = null;
+    private String parseTextElement()  throws RepositoryException, XmlPullParserException, IOException {   
+        // Parse the contents
         mParser.next();
-        loop: while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
-            switch (mParser.getEventType()) {
-                case (XmlPullParser.TEXT):
-                    oText = mParser.getText();        
-                    if (mParser.getEventType() == XmlPullParser.END_TAG)
-                        mParser.next();
-                    break loop;
-                default:
-                    mParser.next();
-            }
-        }
+        if (mParser.getEventType() != XmlPullParser.TEXT)
+            throw new XmlPullParserException("asked to parse text where there is no text");
+        String oText = oText = mParser.getText();
+        
+        // If there is an end tag after the text, skip it
+        mParser.next();
+        if (mParser.getEventType() == XmlPullParser.END_TAG)
+            mParser.next();
         
         return oText;
     }
@@ -131,6 +131,7 @@ public class ConfigurationReader {
         // Process the attributes
         Boolean tAbstract = null;
         String tName = null;
+        String tParent = null;
         for (int i = 0; i < mParser.getAttributeCount(); i++) {
             String tAttributeName = mParser.getAttributeName(i);
             String tAttributeValue = mParser.getAttributeValue(i);
@@ -139,12 +140,13 @@ public class ConfigurationReader {
                 tAbstract = Boolean.parseBoolean(tAttributeValue);
             else if (tAttributeName.equals("name"))
                 tName = tAttributeValue;
+            else if (tAttributeName.equals("inherits"))
+                tParent = tAttributeValue;
             else
                 throw new RepositoryException("unknown attribute " + tAttributeName);
         }
         
         // Process the tags
-        List<String> tInheritance = new ArrayList<String>();
         UUID tTarget = null;
         DeviceConfiguration tDeviceConfiguration = null;
         ApplicationConfiguration tApplicationConfiguration = null;
@@ -159,25 +161,32 @@ public class ConfigurationReader {
                         tName = parseTextElement();
                     else if (mParser.getName().equals("target"))
                         tTarget = UUID.fromString(parseTextElement());
-                    else if (mParser.getName().equals("inherits"))
-                        tInheritance.add(parseTextElement());
                     else if (mParser.getName().equals("application"))
                         tApplicationConfiguration = parseApplicationConfiguration();
                     else if (mParser.getName().equals("device"))
                         tDeviceConfiguration = parseDeviceConfiguration();
                     else
                         throw new RepositoryException("unknown tag " + mParser.getName());
+                    break;
                 default:
                     mParser.next();
             }
         }
         
+        // Look up the parent object
+        KioskConfiguration tParentObject = null;
+        if (tParent != null) {
+            try {
+                tParentObject = Repository.getInstance().getConfiguration(tParent);
+            }
+            catch (RepositoryException iException) {
+                throw new RepositoryException("Could not find parent configuration", iException);
+            }
+        }
+        
         // Create the object
-        KioskConfiguration tKioskConfiguration = new KioskConfiguration();
-        tKioskConfiguration.setAbstract(tAbstract);
-        tKioskConfiguration.setName(tName);
+        KioskConfiguration tKioskConfiguration = new KioskConfiguration(tName, tParentObject);
         tKioskConfiguration.setTarget(tTarget);
-        // TODO: inherits
         tKioskConfiguration.setApplicationConfiguration(tApplicationConfiguration);
         tKioskConfiguration.setDeviceConfiguration(tDeviceConfiguration);
         return tKioskConfiguration;
@@ -186,7 +195,7 @@ public class ConfigurationReader {
     
     private DeviceConfiguration parseDeviceConfiguration() throws RepositoryException, XmlPullParserException, IOException {
         // Process the tags
-        DeviceConfiguration.Sound tSound = null;
+        SoundConfiguration tSound = null;
         mParser.next();
         loop: while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
             switch (mParser.getEventType()) {
@@ -198,6 +207,7 @@ public class ConfigurationReader {
                         tSound = parseDeviceSound();
                     else
                         throw new RepositoryException("unknown tag " + mParser.getName());
+                    break;
                 default:
                     mParser.next();
             }
@@ -205,14 +215,40 @@ public class ConfigurationReader {
         
         // Create the object
         DeviceConfiguration tDeviceConfiguration = new DeviceConfiguration();
-        tDeviceConfiguration.setSound(tSound);
+        tDeviceConfiguration.setSoundConfiguration(tSound);
         return tDeviceConfiguration;
+    }
+    
+    private SoundConfiguration parseDeviceSound() throws RepositoryException, XmlPullParserException, IOException {
+        // Process the tags
+        Integer tVolume = null;
+        mParser.next();
+        loop: while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
+            switch (mParser.getEventType()) {
+                case (XmlPullParser.END_TAG):
+                    mParser.next();
+                    break loop;
+                case (XmlPullParser.START_TAG):
+                    if (mParser.getName().equals("volume"))
+                        tVolume = Integer.parseInt(parseTextElement());
+                    else
+                        throw new RepositoryException("unknown tag " + mParser.getName());
+                    break;
+                default:
+                    mParser.next();
+            }
+        }
+        
+        // Create the obhect
+        SoundConfiguration oSound = new SoundConfiguration();
+        oSound.setVolume(tVolume);
+        return oSound;
     }
     
     private ApplicationConfiguration parseApplicationConfiguration() throws RepositoryException, XmlPullParserException, IOException {
         // Process the tags
-        ApplicationConfiguration.Interface tInterface = null;
-        ApplicationConfiguration.Media tMedia = null;
+        InterfaceConfiguration tInterface = null;
+        MediaConfiguration tMedia = null;
         mParser.next();
         loop: while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
             switch (mParser.getEventType()) {
@@ -226,6 +262,7 @@ public class ConfigurationReader {
                         tMedia = parseApplicationMedia();
                     else
                         throw new RepositoryException("unknown tag " + mParser.getName());
+                    break;
                 default:
                     mParser.next();
             }
@@ -233,8 +270,60 @@ public class ConfigurationReader {
         
         // Create the object
         ApplicationConfiguration tApplicationConfiguration = new ApplicationConfiguration();
-        tApplicationConfiguration.setMedia(tMedia);
-        tApplicationConfiguration.setInterface(tInterface);
+        tApplicationConfiguration.setMediaConfiguration(tMedia);
+        tApplicationConfiguration.setInterfaceConfiguration(tInterface);
         return tApplicationConfiguration;
+    }
+    
+    private InterfaceConfiguration parseApplicationInterface() throws RepositoryException, XmlPullParserException, IOException {
+        // Process the tags
+        String tLocation = null;
+        mParser.next();
+        loop: while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
+            switch (mParser.getEventType()) {
+                case (XmlPullParser.END_TAG):
+                    mParser.next();
+                    break loop;
+                case (XmlPullParser.START_TAG):
+                    if (mParser.getName().equals("location"))
+                        tLocation = parseTextElement();
+                    else
+                        throw new RepositoryException("unknown tag " + mParser.getName());
+                    break;
+                default:
+                    mParser.next();
+            }
+        }
+        
+        // Create the object
+        InterfaceConfiguration oApplicationInterface = new InterfaceConfiguration();
+        oApplicationInterface.setLocation(tLocation);
+        return oApplicationInterface;
+    }
+    
+    private MediaConfiguration parseApplicationMedia() throws RepositoryException, XmlPullParserException, IOException {
+        // Process the tags
+        String tLocation = null;
+        mParser.next();
+        loop: while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
+            switch (mParser.getEventType()) {
+                case (XmlPullParser.END_TAG):
+                    mParser.next();
+                    break loop;
+                case (XmlPullParser.START_TAG):
+                    if (mParser.getName().equals("location"))
+                        tLocation = parseTextElement();
+                    else
+                        throw new RepositoryException("unknown tag " + mParser.getName());
+                    break;
+                default:
+                    mParser.next();
+            }
+        }
+        
+        // Create the object
+        MediaConfiguration oApplicationMedia = new MediaConfiguration();
+        oApplicationMedia.setLocation(tLocation);
+        return oApplicationMedia;
     }
 }

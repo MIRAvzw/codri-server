@@ -25,12 +25,11 @@
     <xsd:complexType name="kioskType">
         <xsd:sequence>
             <xsd:element name="target" type="UuidType" minOccurs="0" />
-            <xsd:element name="inherits" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
             <xsd:element name="device" type="deviceType" minOccurs="0" />
             <xsd:element name="application" type="applicationType" minOccurs="0" />
         </xsd:sequence>
-        <xsd:attribute name="abstract" type="xsd:boolean" />
         <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attribute name="inherits" type="xsd:string" />
     </xsd:complexType>
     
     <xsd:simpleType name="UuidType">

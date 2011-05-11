@@ -4,76 +4,82 @@
  */
 package be.mira.adastra3.server.repository.configurations;
 
-import be.mira.adastra3.server.exceptions.RepositoryException;
 import java.util.UUID;
 
 /**
  *
  * @author tim
  */
-public class KioskConfiguration implements IConfiguration {
+public class KioskConfiguration extends Configuration {
     //
     // Data members
     //
     
-    private UUID mTarget;
-    private Boolean mAbstract;
-    private String mName;
     private DeviceConfiguration mDeviceConfiguration;
     private ApplicationConfiguration mApplicationConfiguration;
     
     
     //
-    // Getters and setters
+    // Construction and destruction
     //
     
-    @Override
-    public void check() throws RepositoryException {
-        if (isAbstract() && getTarget() != null)
-            throw new RepositoryException("Abstract kiosk cannot have an instance target");
-        if (!isAbstract() && getTarget() == null)
-            throw new RepositoryException("Non-abstract kiosk should have an instance target");
+    public KioskConfiguration(String iName, Configuration iParent) {
+        setProperty("name", iName);
+        
+        setParent(iParent);
+        
+        setDeviceConfiguration(new DeviceConfiguration());
+        setApplicationConfiguration(new ApplicationConfiguration());
     }
+    
+    
+    //
+    // Getters and setters
+    //
 
     public boolean isAbstract() {
-        if (mAbstract == null)
-            return false;
-        return mAbstract;
-    }
-
-    public void setAbstract(boolean iAbstract) {
-        mAbstract = iAbstract;
+        return (getTarget() == null);
     }
 
     public String getName() {
-        return mName;
-    }
-
-    public void setName(String iName) {
-        mName = iName;
+        if (getProperty("name") != null)
+            return (String) getProperty("name");
+        else
+            return null;
     }
 
     public UUID getTarget() {
-        return mTarget;
+        if (getProperty("UUID") != null)
+            return (UUID) getProperty("UUID");
+        else
+            return null;
     }
 
     public void setTarget(UUID iTarget) {
-        mTarget = iTarget;
+        setProperty("target", iTarget);
     }
 
     public ApplicationConfiguration getApplicationConfiguration() {
         return mApplicationConfiguration;
     }
 
-    public void setApplicationConfiguration(ApplicationConfiguration iApplicationConfiguration) {
+    public final void setApplicationConfiguration(ApplicationConfiguration iApplicationConfiguration) {
+        if (iApplicationConfiguration == null)
+            return;
         mApplicationConfiguration = iApplicationConfiguration;
+        if (getParent() != null)
+            mApplicationConfiguration.setParent(((KioskConfiguration)getParent()).mApplicationConfiguration);
     }
 
     public DeviceConfiguration getDeviceConfiguration() {
         return mDeviceConfiguration;
     }
 
-    public void setDeviceConfiguration(DeviceConfiguration iDeviceConfiguration) {
+    public final void setDeviceConfiguration(DeviceConfiguration iDeviceConfiguration) {
+        if (iDeviceConfiguration == null)
+            return;
         mDeviceConfiguration = iDeviceConfiguration;
+        if (getParent() != null)
+            mDeviceConfiguration.setParent(((KioskConfiguration)getParent()).mDeviceConfiguration);
     }
 }

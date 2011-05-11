@@ -5,10 +5,11 @@
 
 package be.mira.adastra3.server.repository;
 
-import be.mira.adastra3.server.repository.configurations.OldKioskConfiguration;
-import be.mira.adastra3.server.repository.configurations.OldConfiguration;
+import be.mira.adastra3.server.exceptions.RepositoryException;
+import be.mira.adastra3.server.repository.configurations.KioskConfiguration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  *
@@ -19,8 +20,8 @@ public class Repository {
     // Member data
     //
 
-    private Map<String, OldConfiguration> mConfigurations;
-    private Map<String, OldKioskConfiguration> mKioskConfigurations;
+    private Map<String, KioskConfiguration> mConfigurations;
+    private Map<UUID, String> mConcreteMapping;
 
 
     //
@@ -41,8 +42,8 @@ public class Repository {
     //
 
     private Repository() {
-        mConfigurations = new HashMap<String, OldConfiguration>();
-        mKioskConfigurations = new HashMap<String, OldKioskConfiguration>();
+        mConfigurations = new HashMap<String, KioskConfiguration>();
+        mConcreteMapping = new HashMap<UUID, String>();
     }
 
 
@@ -50,19 +51,24 @@ public class Repository {
     // Getters and setters
     //
 
-    public OldConfiguration getConfiguration(String iName) {
+    public void addConfiguration(KioskConfiguration iConfiguration) throws RepositoryException {
+        if (mConfigurations.containsKey(iConfiguration.getName()))
+            throw new RepositoryException("configuration " + iConfiguration.getName() + " already present in repository");
+        mConfigurations.put(iConfiguration.getName(), iConfiguration);
+        if (! iConfiguration.isAbstract()) {
+            if (mConcreteMapping.containsKey(iConfiguration.getTarget()))
+                throw new RepositoryException("configuration target " + iConfiguration.getTarget() + " in configuration " + iConfiguration.getName() + " already present in repository");
+            mConcreteMapping.put(iConfiguration.getTarget(), iConfiguration.getName());
+        }
+    }
+
+    public KioskConfiguration getConfiguration(String iName) throws RepositoryException {
         return mConfigurations.get(iName);
     }
 
-    public void addConfiguration(String iName, OldConfiguration iConfiguration) {
-        mConfigurations.put(iName, iConfiguration);
-    }
-
-    public OldKioskConfiguration getKioskConfiguration(String iName) {
-        return mKioskConfigurations.get(iName);
-    }
-
-    public void addKioskConfiguration(String iName, OldKioskConfiguration iKioskConfiguration) {
-        mKioskConfigurations.put(iName, iKioskConfiguration);
+    public KioskConfiguration getConfigurationByTarget(UUID iUuid) throws RepositoryException {
+        if (!mConcreteMapping.containsKey(iUuid))
+            return null;
+        return mConfigurations.get(mConcreteMapping.get(iUuid));
     }
 }

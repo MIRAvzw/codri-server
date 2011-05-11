@@ -4,82 +4,57 @@
  */
 package be.mira.adastra3.server.repository.configurations;
 
-import be.mira.adastra3.server.exceptions.RepositoryException;
+import be.mira.adastra3.server.repository.configurations.application.MediaConfiguration;
+import be.mira.adastra3.server.repository.configurations.application.InterfaceConfiguration;
 
 /**
  *
  * @author tim
  */
-public class ApplicationConfiguration implements IConfiguration {
+public class ApplicationConfiguration extends Configuration {
     //
     // Data members
     //
     
-    private Media mMedia;
-    private Interface mInterface;
+    private MediaConfiguration mMediaConfiguration;
+    private InterfaceConfiguration mInterfaceConfiguration;
     
     
     //
-    // Auxiliry classes
+    // Construction and destruction
     //
     
-    public class Interface implements IConfiguration  {
-        private String mLocation;
-    
-        @Override
-        public void check() throws RepositoryException {
-            // TODO: location should be present, unless abstract...
-        }
-        
-        String getLocation() {
-            return mLocation;
-        }
-        
-        public void setLocation(String iLocation) {
-            mLocation = iLocation;
-        }
-    }
-    
-    public class Media implements IConfiguration  {
-        private String mLocation;
-    
-        @Override
-        public void check() throws RepositoryException {
-            // TODO: location should be present, unless abstract...
-        }
-        
-        String getLocation() {
-            return mLocation;
-        }
-        
-        public void setLocation(String iLocation) {
-            mLocation = iLocation;
-        }
+    public ApplicationConfiguration() {        
+        setMediaConfiguration(new MediaConfiguration());
+        setInterfaceConfiguration(new InterfaceConfiguration());
     }
     
     
     //
     // Getters and setters
     //
-    
-    @Override
-    public void check() throws RepositoryException {
-        
+
+    public InterfaceConfiguration getInterfaceConfiguration() {
+        return mInterfaceConfiguration;
     }
 
-    public Interface getInterface() {
-        return mInterface;
+    public final void setInterfaceConfiguration(InterfaceConfiguration iInterface) {
+        if (iInterface == null)
+            return;
+        mInterfaceConfiguration = iInterface;
+        if (getParent() != null)
+            mInterfaceConfiguration.setParent(((ApplicationConfiguration)getParent()).mInterfaceConfiguration);
     }
 
-    public void setInterface(Interface iInterface) {
-        mInterface = iInterface;
+    public MediaConfiguration getMediaConfiguration() {
+        return mMediaConfiguration;
     }
 
-    public Media getMedia() {
-        return mMedia;
-    }
-
-    public void setMedia(Media iMedia) {
-        mMedia = iMedia;
+    public final void setMediaConfiguration(MediaConfiguration iMedia) {
+        if (iMedia == null)
+            return;
+        mMediaConfiguration = iMedia;
+        if (getParent() != null)
+            mMediaConfiguration.setParent(((ApplicationConfiguration)getParent()).mMediaConfiguration);
     }
 }

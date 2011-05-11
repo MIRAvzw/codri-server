@@ -5,42 +5,26 @@
 package be.mira.adastra3.server.repository.configurations;
 
 import be.mira.adastra3.server.exceptions.RepositoryException;
+import be.mira.adastra3.server.repository.configurations.device.SoundConfiguration;
 
 /**
  *
  * @author tim
  */
-public class DeviceConfiguration implements IConfiguration {
+public class DeviceConfiguration extends Configuration {
     //
     // Data members
     //
     
-    private Sound mSound;
+    private SoundConfiguration mSound;
     
     
     //
-    // Auxiliary classes
+    // Construction and destruction
     //
     
-    public class Sound implements IConfiguration {
-        private Integer mVolume;
-        
-        @Override
-        public void check() throws RepositoryException {
-        if (getVolume() < 0 || getVolume() > 255)
-            throw new RepositoryException("Volume value should fall between 0 and 255");
-
-        }
-
-        public int getVolume() {
-            if (mVolume == null)
-                return 0;
-            return mVolume;
-        }
-
-        public void setVolume(int iVolume) {
-            mVolume = iVolume;
-        }
+    public DeviceConfiguration() {        
+        setSoundConfiguration(new SoundConfiguration());
     }
     
     
@@ -48,18 +32,15 @@ public class DeviceConfiguration implements IConfiguration {
     // Getters and setters
     //
     
-    @Override
-    public void check() throws RepositoryException {
-        getSound().check();
-    }
-    
-    public Sound getSound() {
-        if (mSound == null)
-            return new Sound();
+    public SoundConfiguration getSoundConfiguration() {
         return mSound;
     }
     
-    public void setSound(Sound iSound) {
+    public void setSoundConfiguration(SoundConfiguration iSound) {
+        if (iSound == null)
+            return;
         mSound = iSound;
+        if (getParent() != null)
+            mSound.setParent(((DeviceConfiguration)getParent()).mSound);
     }
 }
