@@ -12,8 +12,8 @@ import be.mira.adastra3.server.repository.configurations.KioskConfiguration;
  * @author tim
  */
 public interface IRepositoryListener {
-    public void doError(String iMessage, RepositoryException iException);
-    public void doWarning(String iMessage);
+    public void doRepositoryError(String iMessage, RepositoryException iException);
+    public void doRepositoryWarning(String iMessage);
     public void doKioskConfigurationAdded(KioskConfiguration iKioskConfiguration);
-    public void doKioskConfigurationUpdated(KioskConfiguration iOldKioskConfiguration, KioskConfiguration iConfiguration);
+    public void doKioskConfigurationUpdated(KioskConfiguration iOldKioskConfiguration, KioskConfiguration iKioskConfiguration);
 }

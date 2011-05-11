@@ -95,13 +95,13 @@ public class Repository {
     
     public void emitError(String iMessage, RepositoryException iException) {
         for (IRepositoryListener tListener : mListeners) {
-            tListener.doError(iMessage, iException);
+            tListener.doRepositoryError(iMessage, iException);
         }
     }
     
     public void emitWarning(String iMessage) {
         for (IRepositoryListener tListener : mListeners) {
-            tListener.doWarning(iMessage);
+            tListener.doRepositoryWarning(iMessage);
         }
     }  
     

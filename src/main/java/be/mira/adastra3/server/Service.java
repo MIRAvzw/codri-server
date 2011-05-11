@@ -17,18 +17,40 @@ import org.apache.log4j.Logger;
  * @author tim
  */
 public abstract class Service {
+    //
+    // Data members
+    //
+    
     private Properties mProperties;
     private Logger mLogger;
+    
+    
+    //
+    // Construction and destruction
+    //
 
     public Service() throws ServiceSetupException {
+        mLogger = Logger.getLogger(this.getClass());
+        
         try {
             mProperties = getProperties(this.getClass().getSimpleName());
         } catch (Exception e) {
             throw new ServiceSetupException(e);
         }
-
-        mLogger = Logger.getLogger(this.getClass());
     }
+
+    //
+    // Service interface
+    //
+    
+    abstract public void run() throws ServiceRunException;
+
+    abstract public void stop() throws ServiceRunException;
+    
+    
+    //
+    // Getters and setters
+    //
 
     protected Logger getLogger() {
         return mLogger;
@@ -55,13 +77,4 @@ public abstract class Service {
     protected final String getProperty(String iKey, String iDefaultValue) {
         return mProperties.getProperty(iKey, iDefaultValue);
     }
-
-    /**
-     * The run() method starts the service, but should be non blocking.
-     * 
-     * @throws ServiceRunException
-     */
-    abstract public void run() throws ServiceRunException;
-
-    abstract public void stop() throws ServiceRunException;
 }

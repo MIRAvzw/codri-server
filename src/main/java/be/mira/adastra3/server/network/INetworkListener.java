@@ -14,8 +14,8 @@ import java.util.UUID;
  * @author tim
  */
 public interface INetworkListener {
-    public void doError(String iMessage, NetworkException iException);
-    public void doWarning(String iMessage);
+    public void doNetworkError(String iMessage, NetworkException iException);
+    public void doNetworkWarning(String iMessage);
     public void doDeviceControlAdded(UUID iUuid, DeviceControl iMediaControl);
     public void doDeviceControlRemoved(UUID iUuid);
     public void doApplicationControlAdded(UUID iUuid, ApplicationControl iApplicationControl);

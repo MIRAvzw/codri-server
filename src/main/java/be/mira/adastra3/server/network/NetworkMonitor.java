@@ -12,8 +12,9 @@ import be.mira.adastra3.server.exceptions.ServiceSetupException;
 import be.mira.adastra3.server.network.controls.DeviceControl;
 import be.mira.adastra3.server.network.controls.ApplicationControl;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.teleal.cling.UpnpService;
-import org.teleal.cling.UpnpServiceImpl;
 import org.teleal.cling.model.message.header.STAllHeader;
 import org.teleal.cling.model.meta.RemoteDevice;
 import org.teleal.cling.model.meta.RemoteService;
@@ -80,11 +81,9 @@ public class NetworkMonitor extends Service {
             public void remoteDeviceAdded(Registry iRegistry, RemoteDevice iDevice) {
                 Network tNetwork = Network.getInstance();
                 getLogger().debug("New device added to registry: " + iDevice.getDisplayString());
-                UUID tUuid;
-                try {
-                    tUuid = _convertUdn(iDevice.getIdentity().getUdn());
-                } catch (NetworkException iException) {
-                    tNetwork.emitError("Cannot proceed without having the device identifier", iException);
+                UUID tUuid = _convertUdn(iDevice.getIdentity().getUdn());
+                if (tUuid == null) {
+                    tNetwork.emitWarning("could not convert device UDN '" + iDevice.getIdentity().getUdn() + "' to a valid UUID");
                     return;
                 }
 
@@ -114,11 +113,9 @@ public class NetworkMonitor extends Service {
             public void remoteDeviceRemoved(Registry iRegistry, RemoteDevice iDevice) {
                 Network tNetwork = Network.getInstance();
                 getLogger().debug("Device removed from registry: " + iDevice.getDisplayString());
-                UUID tUuid;
-                try {
-                    tUuid = _convertUdn(iDevice.getIdentity().getUdn());
-                } catch (NetworkException iException) {
-                    tNetwork.emitError("Cannot proceed without having the device identifier", iException);
+                UUID tUuid = _convertUdn(iDevice.getIdentity().getUdn());
+                if (tUuid == null) {
+                    tNetwork.emitWarning("could not convert device UDN '" + iDevice.getIdentity().getUdn() + "' to a valid UUID");
                     return;
                 }
 
@@ -149,10 +146,13 @@ public class NetworkMonitor extends Service {
     // Auxiliary
     //
     
-    UUID _convertUdn(UDN iUDN) throws NetworkException {
-        if (! iUDN.isUDA11Compliant())
-            throw new NetworkException("cannot convert incompatible UDN");
-        return UUID.fromString(iUDN.getIdentifierString());
+    private Pattern mUuidPattern = Pattern.compile("[\\p{XDigit}]{8}-[\\p{XDigit}]{4}-[\\p{XDigit}]{4}-[\\p{XDigit}]{4}-[\\p{XDigit}]{12}");
+    UUID _convertUdn(UDN iUdn) {
+        Matcher mUuidMatcher = mUuidPattern.matcher(iUdn.getIdentifierString());
+        if (mUuidMatcher.find())
+            return UUID.fromString(mUuidMatcher.group());
+        else
+            return null;
     }
 
 }

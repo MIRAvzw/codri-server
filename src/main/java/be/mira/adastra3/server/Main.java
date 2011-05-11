@@ -1,5 +1,6 @@
 package be.mira.adastra3.server;
 
+import be.mira.adastra3.server.controller.Controller;
 import be.mira.adastra3.server.network.NetworkMonitor;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;
 import be.mira.adastra3.server.exceptions.ServiceRunException;
@@ -33,7 +34,8 @@ public class Main implements SignalHandler {
     private enum ServiceType {
         NETWORK,
         REPOSITORY,
-        WEBSITE
+        WEBSITE,
+        CONTROLLER
     }
 
     //
@@ -92,11 +94,13 @@ public class Main implements SignalHandler {
 
     private static Map<ServiceType, Service> mSubservices;
     private final static Map<ServiceType, String> mServiceNames;
+    private static Controller mController;
     static {
         mServiceNames = new EnumMap<ServiceType, String>(ServiceType.class);
         mServiceNames.put(ServiceType.NETWORK, "network monitor");
         mServiceNames.put(ServiceType.REPOSITORY, "repository monitor");
         mServiceNames.put(ServiceType.WEBSITE, "web server");
+        mServiceNames.put(ServiceType.CONTROLLER, "application controller");
     }
     private static Logger mLogger;
     private static Status mStatus = Status.IDLE;
@@ -194,6 +198,9 @@ public class Main implements SignalHandler {
                         break;
                     case NETWORK:
                         tService = new NetworkMonitor();
+                        break;
+                    case CONTROLLER:
+                        tService = new Controller();
                         break;
                     default:
                         throw new ServiceSetupException("I don't know how to initialize the " + mServiceNames.get(tServiceType));

@@ -119,13 +119,13 @@ public class Network {
     
     public void emitError(String iMessage, NetworkException iException) {
         for (INetworkListener tListener : mListeners) {
-            tListener.doError(iMessage, iException);
+            tListener.doNetworkError(iMessage, iException);
         }
     }
     
     public void emitWarning(String iMessage) {
         for (INetworkListener tListener : mListeners) {
-            tListener.doWarning(iMessage);
+            tListener.doNetworkWarning(iMessage);
         }
     }
     
