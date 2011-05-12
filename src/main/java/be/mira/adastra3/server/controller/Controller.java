@@ -11,8 +11,8 @@ import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;
 import be.mira.adastra3.server.network.INetworkListener;
 import be.mira.adastra3.server.network.Network;
-import be.mira.adastra3.server.network.controls.ApplicationControl;
 import be.mira.adastra3.server.network.controls.DeviceControl;
+import be.mira.adastra3.server.network.devices.Device;
 import be.mira.adastra3.server.repository.IRepositoryListener;
 import be.mira.adastra3.server.repository.Repository;
 import be.mira.adastra3.server.repository.configurations.KioskConfiguration;
@@ -98,22 +98,12 @@ public class Controller extends Service implements INetworkListener, IRepository
     }
 
     @Override
-    public void doApplicationControlAdded(UUID iUuid, ApplicationControl iApplicationControl) {
-        getLogger().info("Application control added on kiosk " + iUuid);
+    public void doDeviceAdded(Device iDevice) {
+        getLogger().info("MIRA device added to network: " + iDevice.getUuid());
     }
 
     @Override
-    public void doApplicationControlRemoved(UUID iUuid) {
-        getLogger().info("Application control removed from kiosk " + iUuid);
-    }
-
-    @Override
-    public void doDeviceControlAdded(UUID iUuid, DeviceControl iMediaControl) {
-        getLogger().info("Device control added on kiosk " + iUuid);
-    }
-
-    @Override
-    public void doDeviceControlRemoved(UUID iUuid) {
-        getLogger().info("Device control removed from kiosk " + iUuid);
+    public void doDeviceRemoved(Device iDevice) {
+        getLogger().info("MIRA device removed from network: " + iDevice.getUuid());
     }
 }

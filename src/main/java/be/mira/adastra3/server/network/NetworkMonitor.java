@@ -11,11 +11,15 @@ import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;
 import be.mira.adastra3.server.network.controls.DeviceControl;
 import be.mira.adastra3.server.network.controls.ApplicationControl;
+import be.mira.adastra3.server.network.devices.Device;
+import be.mira.adastra3.server.network.devices.Kiosk30;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.teleal.cling.UpnpService;
 import org.teleal.cling.model.message.header.STAllHeader;
+import org.teleal.cling.model.meta.ManufacturerDetails;
+import org.teleal.cling.model.meta.ModelDetails;
 import org.teleal.cling.model.meta.RemoteDevice;
 import org.teleal.cling.model.meta.RemoteService;
 import org.teleal.cling.model.types.UDN;
@@ -79,62 +83,67 @@ public class NetworkMonitor extends Service {
             // Device addition
             @Override
             public void remoteDeviceAdded(Registry iRegistry, RemoteDevice iDevice) {
-                Network tNetwork = Network.getInstance();
-                getLogger().debug("New device added to registry: " + iDevice.getDisplayString());
-                UUID tUuid = _convertUdn(iDevice.getIdentity().getUdn());
-                if (tUuid == null) {
-                    tNetwork.emitWarning("could not convert device UDN '" + iDevice.getIdentity().getUdn() + "' to a valid UUID");
-                    return;
-                }
-
-                // Scan for services
-                RemoteService tService;
-                if ((tService = iDevice.findService(DeviceControl.ServiceId)) != null) {
-                    getLogger().debug("Registering kiosk service");
-                    try {
-                        DeviceControl tKioskControl = new DeviceControl(tService);
-                        Network.getInstance().addDeviceControl(tUuid, tKioskControl);
-                    } catch (NetworkException iException) {
-                        tNetwork.emitError("Could not register kiosk service", iException);
+                // Check for MIRA devices
+                getLogger().debug("New device entered the network: " + iDevice.getDisplayString());
+                ManufacturerDetails tManufacturer = iDevice.getDetails().getManufacturerDetails();
+                if (tManufacturer.getManufacturer().equals("Volkssterrenwacht MIRA vzw")) {                
+                    // Get the device UUID
+                    Network tNetwork = Network.getInstance();
+                    UUID tUuid = _convertUdn(iDevice.getIdentity().getUdn());
+                    if (tUuid == null) {
+                        tNetwork.emitWarning("could not convert device UDN '" + iDevice.getIdentity().getUdn() + "' to a valid UUID");
+                        return;
                     }
-                }
-                if ((tService = iDevice.findService(ApplicationControl.ServiceId)) != null) {
-                    getLogger().debug("Registering media service");
-                    try {
-                        ApplicationControl tMediaControl = new ApplicationControl(tService);
-                        Network.getInstance().addApplicationControl(tUuid, tMediaControl);
-                    } catch (NetworkException iException) {
-                        tNetwork.emitError("Could not register media service", iException);                    }
+
+                    // Check the device type
+                    ModelDetails tModel = iDevice.getDetails().getModelDetails();
+                    if (tModel.getModelName().equals("Ad-Astra") && tModel.getModelNumber().equals("3.0")) {
+                        getLogger().debug("Identified device as Ad-Astra 3.0 model");
+                        
+                        try {                        
+                            // Extract services
+                            RemoteService tServiceDevice = iDevice.findService(DeviceControl.ServiceId);
+                            RemoteService tServiceApplication = iDevice.findService(ApplicationControl.ServiceId);
+                            if (tServiceDevice == null || tServiceApplication == null)
+                                throw new NetworkException("an essential network service has not been found");
+                            
+                            // Create device
+                            Kiosk30 tDevice = new Kiosk30(tUuid, new DeviceControl(tServiceDevice), new ApplicationControl(tServiceApplication));
+                            tNetwork.addDevice(tDevice);
+                        } catch (NetworkException iException) {
+                            tNetwork.emitError("could not register Ad-Astra 3.0 device", iException);
+                            return;
+                        }
+                    }
+                    else {
+                        tNetwork.emitWarning("an unknown MIRA device has been detected: " + tModel.getModelName() + " " + tModel.getModelNumber());
+                        return;
+                    }
                 }
             }
 
             // Device removal
             @Override
             public void remoteDeviceRemoved(Registry iRegistry, RemoteDevice iDevice) {
-                Network tNetwork = Network.getInstance();
-                getLogger().debug("Device removed from registry: " + iDevice.getDisplayString());
-                UUID tUuid = _convertUdn(iDevice.getIdentity().getUdn());
-                if (tUuid == null) {
-                    tNetwork.emitWarning("could not convert device UDN '" + iDevice.getIdentity().getUdn() + "' to a valid UUID");
-                    return;
-                }
-
-                // Scan for services
-                RemoteService tService;
-                if ((tService = iDevice.findService(DeviceControl.ServiceId)) != null) {
-                    getLogger().debug("Removing kiosk control");
-                    try {
-                        Network.getInstance().removeDeviceControl(tUuid);
-                    } catch (NetworkException iException) {
-                        tNetwork.emitError("Could not remove kiosk control", iException);
+                // Check for MIRA devices
+                getLogger().debug("Device exited the network: " + iDevice.getDisplayString());
+                ManufacturerDetails tManufacturer = iDevice.getDetails().getManufacturerDetails();
+                if (tManufacturer.getManufacturer().equals("Volkssterrenwacht MIRA vzw")) {                
+                    // Get the device UUID
+                    Network tNetwork = Network.getInstance();
+                    UUID tUuid = _convertUdn(iDevice.getIdentity().getUdn());
+                    if (tUuid == null) {
+                        tNetwork.emitWarning("could not convert device UDN '" + iDevice.getIdentity().getUdn() + "' to a valid UUID");
+                        return;
                     }
-                }
-                if ((tService = iDevice.findService(ApplicationControl.ServiceId)) != null) {
-                    getLogger().debug("Removing media control");
+                    
+                    // Remove the device (without type checking, so this might
+                    // error a bit).
                     try {
-                        Network.getInstance().removeApplicationControl(tUuid);
+                        Device tDevice = tNetwork.getDevice(tUuid); 
+                        tNetwork.removeDevice(tDevice);
                     } catch (NetworkException iException) {
-                        tNetwork.emitError("Could not remove media control", iException);
+                        tNetwork.emitError("could not remove a MIRA device", iException);
                     }
                 }
             }

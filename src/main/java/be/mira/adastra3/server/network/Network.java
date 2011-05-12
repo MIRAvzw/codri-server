@@ -7,6 +7,7 @@ package be.mira.adastra3.server.network;
 import be.mira.adastra3.server.exceptions.NetworkException;
 import be.mira.adastra3.server.network.controls.DeviceControl;
 import be.mira.adastra3.server.network.controls.ApplicationControl;
+import be.mira.adastra3.server.network.devices.Device;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,8 +26,7 @@ public class Network {
     // Member data
     //
     
-    private Map<UUID, DeviceControl> mDeviceControls;
-    private Map<UUID, ApplicationControl> mApplicationControls;
+    private Map<UUID, Device> mDevices;
     private UpnpService mUpnpService;
     private List<INetworkListener> mListeners;
 
@@ -49,8 +49,7 @@ public class Network {
     //
 
     private Network() {
-        mDeviceControls = new HashMap<UUID, DeviceControl>();
-        mApplicationControls = new HashMap<UUID, ApplicationControl>();
+        mDevices = new HashMap<UUID, Device>();
         mUpnpService = new UpnpServiceImpl();
         mListeners = new ArrayList<INetworkListener>();
     }
@@ -76,40 +75,22 @@ public class Network {
         return mUpnpService;
     }
     
-    public DeviceControl getDeviceControl(UUID iUuid) {
-        return mDeviceControls.get(iUuid);
+    public Device getDevice(UUID iUuid) {
+        return mDevices.get(iUuid);
     }
     
-    public void addDeviceControl(UUID iUuid, DeviceControl iDeviceControl) throws NetworkException{
-        if (mDeviceControls.containsKey(iUuid))
-            throw new NetworkException("device " + iUuid + " already present in network");
-        emitDeviceControlAdded(iUuid, iDeviceControl);
-        mDeviceControls.put(iUuid, iDeviceControl);
+    public void addDevice(Device iDevice) throws NetworkException{
+        if (mDevices.containsKey(iDevice.getUuid()))
+            throw new NetworkException("device " + iDevice.getUuid() + " already present in network");
+        mDevices.put(iDevice.getUuid(), iDevice);
+        emitDeviceAdded(iDevice);
     }
     
-    public DeviceControl removeDeviceControl(UUID iUuid) throws NetworkException {
-        if (!mDeviceControls.containsKey(iUuid))
-            throw new NetworkException("device " + iUuid + " not present in network");
-        emitDeviceControlRemoved(iUuid);
-        return mDeviceControls.remove(iUuid);
-    }
-    
-    public ApplicationControl getApplicationControl(UUID iUuid) {
-        return mApplicationControls.get(iUuid);
-    }
-    
-    public void addApplicationControl(UUID iUuid, ApplicationControl iApplicationControl) throws NetworkException {
-        if (mApplicationControls.containsKey(iUuid))
-            throw new NetworkException("device " + iUuid + " already present in network");
-        emitApplicationControlAdded(iUuid, iApplicationControl);
-        mApplicationControls.put(iUuid, iApplicationControl);
-    }
-    
-    public ApplicationControl removeApplicationControl(UUID iUuid) throws NetworkException {
-        if (!mApplicationControls.containsKey(iUuid))
-            throw new NetworkException("device " + iUuid + " not present in network");
-        emitApplicationControlRemoved(iUuid);
-        return mApplicationControls.remove(iUuid);
+    public void removeDevice(Device iDevice) throws NetworkException {
+        if (!mDevices.containsKey(iDevice.getUuid()))
+            throw new NetworkException("device " + iDevice.getUuid() + " not present in network");
+        mDevices.remove(iDevice.getUuid());
+        emitDeviceRemoved(iDevice);
     }
     
     
@@ -129,27 +110,15 @@ public class Network {
         }
     }
     
-    private void emitDeviceControlAdded(UUID iUuid, DeviceControl iMediaControl) {
+    private void emitDeviceAdded(Device iDevice) {
         for (INetworkListener tListener : mListeners) {
-            tListener.doDeviceControlAdded(iUuid, iMediaControl);
+            tListener.doDeviceAdded(iDevice);
         }
     }
     
-    private void emitDeviceControlRemoved(UUID iUuid) {
+    private void emitDeviceRemoved(Device iDevice) {
         for (INetworkListener tListener : mListeners) {
-            tListener.doDeviceControlRemoved(iUuid);
-        }
-    }
-    
-    private void emitApplicationControlAdded(UUID iUuid, ApplicationControl iApplicationControl) {
-        for (INetworkListener tListener : mListeners) {
-            tListener.doApplicationControlAdded(iUuid, iApplicationControl);
-        }
-    }
-    
-    private void emitApplicationControlRemoved(UUID iUuid) {
-        for (INetworkListener tListener : mListeners) {
-            tListener.doApplicationControlRemoved(iUuid);
-        }
+            tListener.doDeviceRemoved(iDevice);
+        }        
     }
 }

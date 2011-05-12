@@ -5,9 +5,7 @@
 package be.mira.adastra3.server.network;
 
 import be.mira.adastra3.server.exceptions.NetworkException;
-import be.mira.adastra3.server.network.controls.ApplicationControl;
-import be.mira.adastra3.server.network.controls.DeviceControl;
-import java.util.UUID;
+import be.mira.adastra3.server.network.devices.Device;
 
 /**
  *
@@ -16,8 +14,6 @@ import java.util.UUID;
 public interface INetworkListener {
     public void doNetworkError(String iMessage, NetworkException iException);
     public void doNetworkWarning(String iMessage);
-    public void doDeviceControlAdded(UUID iUuid, DeviceControl iMediaControl);
-    public void doDeviceControlRemoved(UUID iUuid);
-    public void doApplicationControlAdded(UUID iUuid, ApplicationControl iApplicationControl);
-    public void doApplicationControlRemoved(UUID iUuid);
+    public void doDeviceAdded(Device iDevice);
+    public void doDeviceRemoved(Device iDevice);
 }
