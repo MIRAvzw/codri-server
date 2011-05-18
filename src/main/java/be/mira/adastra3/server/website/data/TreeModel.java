@@ -139,6 +139,21 @@ public class TreeModel<E extends TreeItem> extends WAbstractItemModel {
         return success;        
     }
     
+    public boolean removeRow(TreeItem iItem, WModelIndex parent) {
+        TreeItem parentItem = getItem(parent);
+        
+        for (int row = 0; row < parentItem.getChildCount(); ++row) {
+            TreeItem childItem = parentItem.getChild(row);
+            if (childItem == iItem) {
+                removeRows(childItem.getRow(), 1, parent);
+                return true;
+            }
+            else if (removeRow(iItem, getIndex(childItem.getRow(), 0)))
+                return true;
+        }
+        return false;
+    }
+    
     /*
     public boolean setData(WModelIndex index, Object value, int role) {
         if (role != ItemDataRole.EditRole)
