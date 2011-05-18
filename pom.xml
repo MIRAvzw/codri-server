@@ -86,11 +86,21 @@
       <version>1.2.16</version>
     </dependency>
     
-    <!-- Vaadin web framework -->
+    <!-- JWt -->
     <dependency>
-      <groupId>com.vaadin</groupId>
-      <artifactId>vaadin</artifactId>
-      <version>6.5.2</version>
+        <groupId>eu.webtoolkit</groupId>
+        <artifactId>jwt</artifactId>
+        <version>3.1.9</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-fileupload</groupId>
+      <artifactId>commons-fileupload</artifactId>
+      <version>1.2.1</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>1.4</version>
     </dependency>
     
     <!-- SVNKit -->

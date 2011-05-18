@@ -12,15 +12,11 @@
 	<display-name>MIRA Ad-Astra III - Status page</display-name>
 
 	<servlet>
-		<servlet-name>StatusServlet</servlet-name>
-		<servlet-class>com.vaadin.terminal.gwt.server.ApplicationServlet</servlet-class>
-		<init-param>
-			<param-name>application</param-name>
-			<param-value>be.mira.adastra3.server.website.status.StatusApplication</param-value>
-		</init-param>
+		<servlet-name>Status</servlet-name>
+		<servlet-class>be.mira.adastra3.server.website.Status</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>StatusServlet</servlet-name>
+		<servlet-name>Status</servlet-name>
 		<url-pattern>/*</url-pattern>
 	</servlet-mapping>
 </web-app>
