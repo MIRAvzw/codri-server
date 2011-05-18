@@ -16,6 +16,7 @@ public class Device {
     //
     
     private UUID mUuid;
+    private String mName;
     
     
     //
@@ -33,5 +34,13 @@ public class Device {
     
     public UUID getUuid() {
         return mUuid;
+    }
+    
+    public String getName() {
+        return mName;
+    }
+    
+    public void setName(String iName) {
+        mName = iName;
     }
 }

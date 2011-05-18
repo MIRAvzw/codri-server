@@ -16,6 +16,17 @@ import eu.webtoolkit.jwt.WTreeView;
  * to events, read input, and give feed-back.
  */
 public class StatusApplication extends WApplication {
+    //
+    // Data members
+    //
+    
+    NetworkModel mNetworkModel;
+    
+    
+    //
+    // Construction and destruction
+    //
+    
     public StatusApplication(WEnvironment env) {
         super(env);
         
@@ -34,8 +45,10 @@ public class StatusApplication extends WApplication {
 
         getRoot().addWidget(new WBreak());
         
+        mNetworkModel = new NetworkModel();
+        mNetworkModel.attach();
         WTreeView treeview = new WTreeView(getRoot());
-        treeview.setModel(new NetworkModel());
+        treeview.setModel(mNetworkModel);
 
         button.clicked().addListener(this, new Signal.Listener() {
             @Override
@@ -43,5 +56,10 @@ public class StatusApplication extends WApplication {
                 greeting.setText("Hello there, " + nameEdit.getText());
             }
         });
+    }
+    
+    @Override
+    protected void finalize() throws Throwable {
+        mNetworkModel.detach();
     }
 }

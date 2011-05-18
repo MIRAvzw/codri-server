@@ -25,7 +25,7 @@ public class ApplicationControl extends Control {
     // Data members
     //
     
-    public static ServiceId ServiceId = new ServiceId("mira-be", "Media:1");
+    public static ServiceId ServiceId = new ServiceId("mira-be", "Application:1");
     
     
     //

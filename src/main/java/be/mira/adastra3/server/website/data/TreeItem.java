@@ -6,6 +6,7 @@ package be.mira.adastra3.server.website.data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 /**
  *
@@ -38,18 +39,6 @@ public abstract class TreeItem {
     // Item interface
     //
     
-    void appendChild(TreeItem iChild) {
-        mChildren.add(iChild);
-    }
-    
-    public int getChildCount() {
-        return mChildren.size();
-    }
-    
-    public abstract int getFieldCount();
-    
-    public abstract Object getField(int iField);
-    
     public int getRow() {
         if (mParent != null)
             return mParent.mChildren.indexOf(this);
@@ -60,7 +49,38 @@ public abstract class TreeItem {
         return mParent;
     }
     
-    public TreeItem getChild(int row) {
-        return mChildren.get(row);
+    public TreeItem getChild(int iRow) {
+        return mChildren.get(iRow);
     }
+    
+    public int getChildCount() {
+        return mChildren.size();
+    }
+    
+    void appendChild(TreeItem iChild) {
+        mChildren.add(iChild);
+    }
+    
+    boolean insertChildren(int position, List<? extends TreeItem> iChildren)            
+    {
+        if (position < 0 || position > mChildren.size())
+            return false;
+        
+        mChildren.addAll(position, iChildren);
+        return true;     
+    }
+    
+    boolean removeChildren(int position, int count)
+    {
+        if (position < 0 || position + count > mChildren.size())
+            return false;
+        
+        for (int row = 0; row < count; ++row)
+            mChildren.remove(position);
+        return true;
+    }
+    
+    public abstract Object getField(int iField);
+    
+    public abstract int getFieldCount();
 }

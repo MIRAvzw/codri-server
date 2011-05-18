@@ -97,7 +97,7 @@ public class NetworkMonitor extends Service {
 
                     // Check the device type
                     ModelDetails tModel = iDevice.getDetails().getModelDetails();
-                    if (tModel.getModelName().equals("Ad-Astra") && tModel.getModelNumber().equals("3.0")) {
+                    if (tModel.getModelName().equals("Ad-Astra Kiosk") && tModel.getModelNumber().equals("3.0")) {
                         getLogger().debug("Identified device as Ad-Astra 3.0 model");
                         
                         try {                        
@@ -109,6 +109,7 @@ public class NetworkMonitor extends Service {
                             
                             // Create device
                             Kiosk30 tDevice = new Kiosk30(tUuid, new DeviceControl(tServiceDevice), new ApplicationControl(tServiceApplication));
+                            tDevice.setName(iDevice.getDetails().getFriendlyName());
                             tNetwork.addDevice(tDevice);
                         } catch (NetworkException iException) {
                             tNetwork.emitError("could not register Ad-Astra 3.0 device", iException);
@@ -137,8 +138,7 @@ public class NetworkMonitor extends Service {
                         return;
                     }
                     
-                    // Remove the device (without type checking, so this might
-                    // error a bit).
+                    // Remove the device (without type checking, so this might croak ocasionally)
                     try {
                         Device tDevice = tNetwork.getDevice(tUuid); 
                         tNetwork.removeDevice(tDevice);

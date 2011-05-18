@@ -35,6 +35,8 @@ public class NetworkItem extends TreeItem {
     @Override
     public Object getField(int iField) {
         switch (iField) {
+            case 0:
+                return mDevice.getName();
             case 1:
                 return mDevice.getUuid();
             default:
@@ -44,6 +46,6 @@ public class NetworkItem extends TreeItem {
 
     @Override
     public int getFieldCount() {
-        return 1;
+        return 2;
     }    
 }

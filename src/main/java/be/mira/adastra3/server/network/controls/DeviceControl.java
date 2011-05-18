@@ -23,7 +23,7 @@ public class DeviceControl extends Control {
     // Data members
     //
     
-    public static ServiceId ServiceId = new ServiceId("mira-be", "Kiosk:1");
+    public static ServiceId ServiceId = new ServiceId("mira-be", "Device:1");
     
     
     //
