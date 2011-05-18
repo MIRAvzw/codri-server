@@ -9,10 +9,13 @@ import be.mira.adastra3.server.network.INetworkListener;
 import be.mira.adastra3.server.network.Network;
 import be.mira.adastra3.server.network.devices.Device;
 import eu.webtoolkit.jwt.ItemFlag;
+import eu.webtoolkit.jwt.Signal1;
 import eu.webtoolkit.jwt.WApplication;
 import eu.webtoolkit.jwt.WModelIndex;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.List;
 
 /**
  *
@@ -57,8 +60,18 @@ public class NetworkModel extends TreeModel<NetworkItem> implements INetworkList
     public void doDeviceAdded(Device iDevice) {
         System.err.println("Adding device");
         
-        WModelIndex tIndex = getIndex(mSectionKiosks.getRow(), 0);
-        this.insertRows(0, Arrays.asList(new NetworkItem(iDevice, mSectionKiosks)), tIndex);
+        DeferredExecution.DEFERREES.add(new DeferredExecution() {
+            Device mDevice;
+            public DeferredExecution construct(Device iDevice) {
+                mDevice = iDevice;
+                return this;
+            }
+            @Override
+            public void execute() {
+                WModelIndex tIndex = getIndex(mSectionKiosks.getRow(), 0);
+                insertRows(0, Arrays.asList(new NetworkItem(mDevice, mSectionKiosks)), tIndex);                
+            }
+        }.construct(iDevice));
     }
 
     @Override

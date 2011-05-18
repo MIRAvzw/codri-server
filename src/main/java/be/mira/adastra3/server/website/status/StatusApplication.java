@@ -1,14 +1,11 @@
 package be.mira.adastra3.server.website.status;
 
+import be.mira.adastra3.server.website.data.DeferredExecution;
 import be.mira.adastra3.server.website.data.NetworkModel;
-import eu.webtoolkit.jwt.Side;
 import eu.webtoolkit.jwt.Signal;
 import eu.webtoolkit.jwt.WApplication;
-import eu.webtoolkit.jwt.WBreak;
 import eu.webtoolkit.jwt.WEnvironment;
-import eu.webtoolkit.jwt.WLineEdit;
-import eu.webtoolkit.jwt.WPushButton;
-import eu.webtoolkit.jwt.WText;
+import eu.webtoolkit.jwt.WTimer;
 import eu.webtoolkit.jwt.WTreeView;
 
 /*
@@ -21,41 +18,37 @@ public class StatusApplication extends WApplication {
     //
     
     NetworkModel mNetworkModel;
+    WTimer mTimer;
     
     
     //
     // Construction and destruction
     //
     
-    public StatusApplication(WEnvironment env) {
-        super(env);
+    public StatusApplication(WEnvironment iEnvironment) {
+        super(iEnvironment);
         
-        setTitle("Hello world");
-
-        getRoot().addWidget(new WText("Your name, please ? "));
-        final WLineEdit nameEdit = new WLineEdit(getRoot());
-        nameEdit.setFocus();
-
-        WPushButton button = new WPushButton("Greet me.", getRoot());
-        button.setMargin(5, Side.Left);
-
-        getRoot().addWidget(new WBreak());
-
-        final WText greeting = new WText(getRoot());
-
-        getRoot().addWidget(new WBreak());
+        setTitle("Status page");
         
+        // Prepare model
         mNetworkModel = new NetworkModel();
         mNetworkModel.attach();
         WTreeView treeview = new WTreeView(getRoot());
         treeview.setModel(mNetworkModel);
-
-        button.clicked().addListener(this, new Signal.Listener() {
+        
+        // Schedule deferred executions
+        mTimer = new WTimer(getRoot());
+        mTimer.setInterval(1000);
+        mTimer.timeout().addListener(this, new Signal.Listener() {
             @Override
             public void trigger() {
-                greeting.setText("Hello there, " + nameEdit.getText());
-            }
+                for (DeferredExecution tDeferree : DeferredExecution.DEFERREES) {
+                    tDeferree.execute();
+                }
+                DeferredExecution.DEFERREES.clear();
+            }            
         });
+        mTimer.start();
     }
     
     @Override
