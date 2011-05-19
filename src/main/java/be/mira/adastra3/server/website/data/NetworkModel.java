@@ -72,15 +72,13 @@ public class NetworkModel extends TreeModel<NetworkItem> implements INetworkList
                 WModelIndex tIndex = getIndex(mSectionKiosks.getRow(), 0);
                 NetworkItem tNetworkItem = new NetworkItem(mDevice, mSectionKiosks);                
                 mDevices.put(mDevice, tNetworkItem);
-                insertRows(0, Arrays.asList(tNetworkItem), tIndex);                
+                insertRows(0, Arrays.asList(tNetworkItem), tIndex);
             }
         }.construct(iDevice));
     }
 
     @Override
-    public void doDeviceRemoved(Device iDevice) {
-        System.err.println("Removing device");
-        
+    public void doDeviceRemoved(Device iDevice) {        
         DeferredExecution.DEFERREES.add(new DeferredExecution() {
             Device mDevice;
             public DeferredExecution construct(Device iDevice) {

@@ -174,7 +174,7 @@ public class TreeModel<E extends TreeItem> extends WAbstractItemModel {
     // Auxiliary
     //    
     
-    TreeItem getItem(WModelIndex index) {
+    public TreeItem getItem(WModelIndex index) {
         if (index != null) {
             TreeItem tItem = (TreeItem) index.getInternalPointer();
             if (tItem != null)
@@ -183,7 +183,7 @@ public class TreeModel<E extends TreeItem> extends WAbstractItemModel {
         return mRoot;
     }
     
-    WModelIndex index(int row, int column, WModelIndex parent)
+    public WModelIndex index(int row, int column, WModelIndex parent)
     {
         if (parent != null && parent.getColumn() != 0)
             return null;
