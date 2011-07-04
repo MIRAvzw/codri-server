@@ -42,17 +42,15 @@ public class ConfigurationEditor implements ISVNEditor {
     protected String mRepositoryDirectory = "configurations";
     private long mRevision;
     private List<Configuration> mConfigurations;
+    private String mDAVLocation;
 
 
     //
     // Construction and destruction
     //
 
-    public ConfigurationEditor() {
-        /*
-         * Utility class that will help us to transform 'deltas' sent by the
-         * server to the new file contents.
-         */
+    public ConfigurationEditor(String iDAVLocation) {
+        iDAVLocation = mDAVLocation;
         myDeltaProcessor = new SVNDeltaProcessor();
         
         mConfigurations = new ArrayList<Configuration>();
@@ -253,20 +251,21 @@ public class ConfigurationEditor implements ISVNEditor {
 
         // Read and proces the received data        
         try {
-            ConfigurationReader tReader = new ConfigurationReader(new ByteArrayInputStream(mTemporaryStream.toByteArray()));
+            ConfigurationReader tReader = new ConfigurationReader(mDAVLocation, mDataIdentifier, new ByteArrayInputStream(mTemporaryStream.toByteArray()));
             tReader.process();
             
-            for (Configuration tConfiguration : tReader.getConfigurations()) {
-                tConfiguration.setRevision(mRevision);
-                mConfigurations.add(tConfiguration);
-            }
+            if (tReader.getConfiguration() != null) {
+                tReader.getConfiguration().setRevision(mRevision);
+                mConfigurations.add(tReader.getConfiguration());
+            } else
+                throw new RepositoryException("found empty configuration file");
         }
         catch (RepositoryException e) {
             // TODO: bug in SVNKIt, the inner error does not get printed
             // http://old.nabble.com/Passing-an-exception-to-SVNException-td31171795.html
             mLogger.error("SVNKit inner exception", e);
             
-            SVNErrorMessage err = SVNErrorMessage.create(SVNErrorCode.IO_ERROR, "Could not process file contents");
+            SVNErrorMessage err = SVNErrorMessage.create(SVNErrorCode.IO_ERROR, "could not process file contents");
             throw new SVNException(err, e);
         }
         finally {

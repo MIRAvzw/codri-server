@@ -78,11 +78,11 @@ public class Repository {
         emitKioskConfigurationUpdated(tOldKioskConfiguration, iKioskConfiguration);
     }
 
-    public KioskConfiguration getKioskConfiguration(String iName) throws RepositoryException {
+    public KioskConfiguration getKioskConfiguration(String iName) {
         return mKioskConfigurations.get(iName);
     }
 
-    public KioskConfiguration lookupKioskConfiguration(UUID iUuid) throws RepositoryException {
+    public KioskConfiguration lookupKioskConfiguration(UUID iUuid) {
         if (!mKioskMapping.containsKey(iUuid))
             return null;
         return mKioskConfigurations.get(mKioskMapping.get(iUuid));

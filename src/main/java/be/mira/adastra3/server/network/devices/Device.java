@@ -4,13 +4,15 @@
  */
 package be.mira.adastra3.server.network.devices;
 
+import be.mira.adastra3.server.exceptions.DeviceException;
+import be.mira.adastra3.server.repository.configurations.Configuration;
 import java.util.UUID;
 
 /**
  *
  * @author tim
  */
-public class Device {
+abstract public class Device {
     //
     // Member data
     //
@@ -26,6 +28,13 @@ public class Device {
     public Device(UUID iUuid) {
         mUuid = iUuid;
     }
+    
+    
+    //
+    // Configuration handling
+    //
+    
+    abstract public void setConfiguration(Configuration iConfiguration) throws DeviceException;
     
     
     //

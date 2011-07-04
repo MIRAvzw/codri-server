@@ -24,7 +24,7 @@ public class SoundConfiguration extends Configuration {
     // Getters and setters
     //
     
-    Integer getVolume() {
+    public Integer getVolume() {
         if (getProperty("volume") != null)
             return (Integer) getProperty("volume");
         else

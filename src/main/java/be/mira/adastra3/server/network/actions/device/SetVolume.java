@@ -17,11 +17,8 @@ public class SetVolume extends ActionInvocation {
     public SetVolume(Service service, Integer iVolume) throws NetworkException {
         super(service.getAction("SetVolume"));
         
-        if (iVolume < 0)
-            throw new NetworkException("Cannot invoke Media.SetVolume: iVolumeValue should be an UI4");
-        
         try {
-            setInput("iVolumeValue", iVolume);
+            setInput("iVolumeValue", iVolume.toString());
         }
         catch (InvalidValueException ex) {
             throw new NetworkException("Could not invoke Media.SetVolume", ex);

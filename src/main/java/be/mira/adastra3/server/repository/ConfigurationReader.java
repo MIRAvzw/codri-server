@@ -12,10 +12,9 @@ import be.mira.adastra3.server.repository.configurations.application.MediaConfig
 import be.mira.adastra3.server.repository.configurations.DeviceConfiguration;
 import be.mira.adastra3.server.repository.configurations.KioskConfiguration;
 import be.mira.adastra3.server.repository.configurations.device.SoundConfiguration;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -37,7 +36,10 @@ public class ConfigurationReader {
     
     static private XmlPullParserFactory mParserFactory;
     static XmlPullParser mParser;
-    private List<Configuration> mConfigurations;
+    private Configuration mConfiguration;
+    private String mIdentifier;
+    private String mDAVLocation;
+    
     
     
     
@@ -45,9 +47,13 @@ public class ConfigurationReader {
     // Construction and destruction
     //
     
-    public ConfigurationReader(InputStream iStream) throws RepositoryException {
+    public ConfigurationReader(String iDAVLocation, String iIdentifier, InputStream iStream) throws RepositoryException {
+        mIdentifier = iIdentifier;
+        mDAVLocation = iDAVLocation;
+        
         try {
             // Validate the file
+            // TODO: do this within the pull parser
             String schemaLang = "http://www.w3.org/2001/XMLSchema";
             SchemaFactory factory = SchemaFactory.newInstance(schemaLang);
             Schema schema = factory.newSchema(this.getClass().getClassLoader().getResource("configuration.xsd"));
@@ -86,17 +92,20 @@ public class ConfigurationReader {
             
             // Process tags
             mParser.next();
-            while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
+            loop: while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
                 switch (mParser.getEventType()) {
                     case (XmlPullParser.END_TAG):
                         mParser.next();
-                        break;
+                        break loop;
                     case (XmlPullParser.START_TAG):
-                        if (mParser.getName().equals("root"))
-                            parseRoot();
+                        if (mParser.getName().equals("kiosk")) {
+                            if (mConfiguration != null)
+                                throw new RepositoryException("configuration file contains multiple configurations");
+                            mConfiguration = parseKioskConfiguration();
+                        }
                         else
                             throw new RepositoryException("unknown tag " + mParser.getName());
-                    break;
+                        break;
                     default:                        
                         mParser.next();
                 }
@@ -110,35 +119,14 @@ public class ConfigurationReader {
         }
     }
     
-    public List<Configuration> getConfigurations() {
-        return mConfigurations;
+    public Configuration getConfiguration() {
+        return mConfiguration;
     }
     
     
     //
     // Parsing helpers
     //
-    
-    private void parseRoot() throws RepositoryException, XmlPullParserException, IOException {
-        // Process the tags
-        mConfigurations = new ArrayList<Configuration>();
-        mParser.next();
-        loop: while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
-            switch (mParser.getEventType()) {
-                case (XmlPullParser.END_TAG):
-                    mParser.next();
-                    break loop;
-                case (XmlPullParser.START_TAG):
-                    if (mParser.getName().equals("kiosk"))
-                        mConfigurations.add(parseKioskConfiguration());
-                    else
-                        throw new RepositoryException("unknown tag " + mParser.getName());
-                    break;
-                default:                        
-                    mParser.next();
-            }
-        }
-    }
     
     private String parseTextElement()  throws RepositoryException, XmlPullParserException, IOException {   
         // Parse the contents
@@ -155,19 +143,7 @@ public class ConfigurationReader {
         return oText;
     }
     
-    private KioskConfiguration parseKioskConfiguration() throws RepositoryException, XmlPullParserException, IOException {
-        // Process the attributes
-        String tId = null;
-        for (int i = 0; i < mParser.getAttributeCount(); i++) {
-            String tAttributeName = mParser.getAttributeName(i);
-            String tAttributeValue = mParser.getAttributeValue(i);
-            
-            if (tAttributeName.equals("id"))
-                tId = tAttributeValue;
-            else
-                throw new RepositoryException("unknown attribute " + tAttributeName);
-        }
-        
+    private KioskConfiguration parseKioskConfiguration() throws RepositoryException, XmlPullParserException, IOException {        
         // Process the tags
         UUID tTarget = null;
         DeviceConfiguration tDeviceConfiguration = null;
@@ -194,7 +170,7 @@ public class ConfigurationReader {
         }
         
         // Create the object
-        KioskConfiguration tKioskConfiguration = new KioskConfiguration(tId);
+        KioskConfiguration tKioskConfiguration = new KioskConfiguration(mIdentifier);
         tKioskConfiguration.setTarget(tTarget);
         tKioskConfiguration.setApplicationConfiguration(tApplicationConfiguration);
         tKioskConfiguration.setDeviceConfiguration(tDeviceConfiguration);
@@ -294,8 +270,8 @@ public class ConfigurationReader {
                     mParser.next();
                     break loop;
                 case (XmlPullParser.START_TAG):
-                    if (mParser.getName().equals("location"))
-                        tLocation = parseTextElement();
+                    if (mParser.getName().equals("id"))
+                        tLocation = mDAVLocation + "/" + parseTextElement();
                     else
                         throw new RepositoryException("unknown tag " + mParser.getName());
                     break;
@@ -320,8 +296,8 @@ public class ConfigurationReader {
                     mParser.next();
                     break loop;
                 case (XmlPullParser.START_TAG):
-                    if (mParser.getName().equals("location"))
-                        tLocation = parseTextElement();
+                    if (mParser.getName().equals("id"))
+                        tLocation = mDAVLocation + "/" + parseTextElement();
                     else
                         throw new RepositoryException("unknown tag " + mParser.getName());
                     break;

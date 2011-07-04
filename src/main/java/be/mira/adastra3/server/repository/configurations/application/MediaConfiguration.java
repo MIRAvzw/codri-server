@@ -24,7 +24,7 @@ public class MediaConfiguration extends Configuration  {
     // Getters and setters
     //
     
-    String getLocation() {
+    public String getLocation() {
         if (getProperty("location") != null)
             return (String) getProperty("location");
         else
