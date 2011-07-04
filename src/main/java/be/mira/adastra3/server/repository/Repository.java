@@ -22,6 +22,7 @@ public class Repository {
     // Member data
     //
 
+    private String mServer;
     private Map<String, KioskConfiguration> mKioskConfigurations;
     private Map<UUID, String> mKioskMapping;
     private List<IRepositoryListener> mListeners;
@@ -54,6 +55,14 @@ public class Repository {
     //
     // Getters and setters
     //
+    
+    public String getServer() {
+        return mServer;
+    }
+    
+    public void setServer(String iServer) {
+        mServer = iServer;
+    }
     
     public void addListener(IRepositoryListener iListener) {
         mListeners.add(iListener);

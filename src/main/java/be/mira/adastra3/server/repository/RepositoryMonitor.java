@@ -64,12 +64,14 @@ public class RepositoryMonitor extends Service {
 
     public RepositoryMonitor() throws ServiceSetupException {
         DAVRepositoryFactory.setup();
+        Repository tRepository = Repository.getInstance();
 
         // DAV location
         mDAVLocation = "http://"
                 + getProperty("host", "localhost")
                 + getProperty("path", "/repository");
         getLogger().debug("SVN repository DAV location: " + mDAVLocation);
+        tRepository.setServer(mDAVLocation);
         
         // SVN repository
         try {

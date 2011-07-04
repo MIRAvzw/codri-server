@@ -13,14 +13,14 @@ import org.teleal.cling.model.types.InvalidValueException;
  *
  * @author tim
  */
-public class SetInterfaceLocation extends ActionInvocation {
-    public SetInterfaceLocation(Service service, String iInterfaceLocation) throws NetworkException {
-        super(service.getAction("SetInterfaceLocation"));
+public class SetInterface extends ActionInvocation {
+    public SetInterface(Service service, String iInterface) throws NetworkException {
+        super(service.getAction("SetInterface"));
         try {
-            setInput("iInterfaceLocationValue", iInterfaceLocation);
+            setInput("iInterfaceValue", iInterface);
         }
         catch (InvalidValueException ex) {
-            throw new NetworkException("Could not invoke Kiosk.SetInterfaceLocation", ex);
+            throw new NetworkException("Could not invoke Kiosk.SetInterface", ex);
         }
     }
 }

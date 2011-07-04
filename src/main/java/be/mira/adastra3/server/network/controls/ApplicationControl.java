@@ -8,10 +8,8 @@ import be.mira.adastra3.server.exceptions.NetworkException;
 import be.mira.adastra3.server.network.Network;
 import be.mira.adastra3.server.network.actions.application.GetInterfaceRevision;
 import be.mira.adastra3.server.network.actions.application.GetMediaRevision;
-import be.mira.adastra3.server.network.actions.application.LoadInterface;
-import be.mira.adastra3.server.network.actions.application.LoadMedia;
-import be.mira.adastra3.server.network.actions.application.SetInterfaceLocation;
-import be.mira.adastra3.server.network.actions.application.SetMediaLocation;
+import be.mira.adastra3.server.network.actions.application.SetInterface;
+import be.mira.adastra3.server.network.actions.application.SetMedia;
 import org.teleal.cling.controlpoint.ActionCallback;
 import org.teleal.cling.model.meta.RemoteService;
 import org.teleal.cling.model.types.ServiceId;
@@ -43,8 +41,8 @@ public class ApplicationControl extends Control {
     // Service actions
     //
     
-    public void SetMediaLocation(String iMediaLocation) throws NetworkException {
-        SetMediaLocation tAction = new SetMediaLocation(getService(), iMediaLocation);
+    public void SetMedia(String iMediaLocation) throws NetworkException {
+        SetMedia tAction = new SetMedia(getService(), iMediaLocation);
         
         Network.getControlPoint().execute(
                 new ActionCallback.Default(
@@ -53,18 +51,7 @@ public class ApplicationControl extends Control {
                 )
         );
     }
-    
-    public void LoadMedia() throws NetworkException {
-        LoadMedia tAction = new LoadMedia(getService());
-        
-        Network.getControlPoint().execute(
-                new ActionCallback.Default(
-                    tAction,
-                    Network.getControlPoint()
-                )
-        );        
-    }
-    
+
     public Integer GetMediaRevision() throws NetworkException {
         GetMediaRevision tAction = new GetMediaRevision(getService());
         
@@ -77,8 +64,9 @@ public class ApplicationControl extends Control {
         
         return tAction.GetMediaRevisionValue();
     }
-    public void SetInterfaceLocation(String iInterfaceLocation) throws NetworkException {
-        SetInterfaceLocation tAction = new SetInterfaceLocation(getService(), iInterfaceLocation);
+
+    public void SetInterface(String iInterfaceLocation) throws NetworkException {
+        SetInterface tAction = new SetInterface(getService(), iInterfaceLocation);
         
         Network.getControlPoint().execute(
                 new ActionCallback.Default(
@@ -86,17 +74,6 @@ public class ApplicationControl extends Control {
                     Network.getControlPoint()
                 )
         );
-    }
-    
-    public void LoadInterface() throws NetworkException {
-        LoadInterface tAction = new LoadInterface(getService());
-        
-        Network.getControlPoint().execute(
-                new ActionCallback.Default(
-                    tAction,
-                    Network.getControlPoint()
-                )
-        );        
     }
     
     public Integer GetInterfaceRevision() throws NetworkException {

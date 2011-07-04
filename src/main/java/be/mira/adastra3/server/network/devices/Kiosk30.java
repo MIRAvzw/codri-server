@@ -8,11 +8,13 @@ import be.mira.adastra3.server.exceptions.DeviceException;
 import be.mira.adastra3.server.exceptions.NetworkException;
 import be.mira.adastra3.server.network.controls.ApplicationControl;
 import be.mira.adastra3.server.network.controls.DeviceControl;
+import be.mira.adastra3.server.repository.Repository;
 import be.mira.adastra3.server.repository.configurations.ApplicationConfiguration;
 import be.mira.adastra3.server.repository.configurations.Configuration;
 import be.mira.adastra3.server.repository.configurations.DeviceConfiguration;
 import be.mira.adastra3.server.repository.configurations.KioskConfiguration;
 import be.mira.adastra3.server.repository.configurations.application.InterfaceConfiguration;
+import be.mira.adastra3.server.repository.configurations.application.MediaConfiguration;
 import java.util.UUID;
 
 /**
@@ -64,11 +66,23 @@ public class Kiosk30 extends Device {
         ApplicationConfiguration tApplicationConfiguration = iKioskConfiguration.getApplicationConfiguration();
         try {
             // TODO: check revision, e.d.
-            getApplicationControl().SetInterfaceLocation(tApplicationConfiguration.getInterfaceConfiguration().getLocation());
-            getApplicationControl().LoadInterface();
+            Repository tRepository = Repository.getInstance();
             
-            getApplicationControl().SetMediaLocation(tApplicationConfiguration.getMediaConfiguration().getLocation());
-            getApplicationControl().LoadMedia();
+            InterfaceConfiguration tInterfaceConfiguration = tApplicationConfiguration.getInterfaceConfiguration();
+            if (tInterfaceConfiguration != null) {
+                String tInterface = tRepository.getServer()
+                        + "/" + tInterfaceConfiguration.getLocation()
+                        + "/" + tInterfaceConfiguration.getId();
+                getApplicationControl().SetInterface(tInterface);
+            }
+            
+            MediaConfiguration tMediaConfiguration = tApplicationConfiguration.getMediaConfiguration();
+            if (tMediaConfiguration != null) {
+                String tMedia = tRepository.getServer()
+                        + "/" + tMediaConfiguration.getLocation()
+                        + "/" + tMediaConfiguration.getId();
+                getApplicationControl().SetMedia(tMedia);
+            }
         }
         catch (NetworkException iException) {
             throw new DeviceException("could not propagate device configuration", iException);
