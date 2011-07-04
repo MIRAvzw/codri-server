@@ -12,10 +12,18 @@ import be.mira.adastra3.server.repository.configurations.Configuration;
  */
 public class MediaConfiguration extends Configuration  {
     //
+    // Data members
+    //
+    
+    private String mId;
+    
+    
+    //
     // Construction and destruction
     //
     
-    public MediaConfiguration() {
+    public MediaConfiguration(String iId) {
+        mId = iId;
         setProperty("location", "/media/");
     }
     
@@ -23,6 +31,10 @@ public class MediaConfiguration extends Configuration  {
     //
     // Getters and setters
     //
+    
+    public String getId() {
+        return mId;
+    }
     
     public String getLocation() {
         if (getProperty("location") != null)

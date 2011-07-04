@@ -24,9 +24,7 @@ public class ApplicationConfiguration extends Configuration {
     // Construction and destruction
     //
     
-    public ApplicationConfiguration() {        
-        setMediaConfiguration(new MediaConfiguration());
-        setInterfaceConfiguration(new InterfaceConfiguration());
+    public ApplicationConfiguration() {
     }
     
     
@@ -39,8 +37,6 @@ public class ApplicationConfiguration extends Configuration {
     }
 
     public final void setInterfaceConfiguration(InterfaceConfiguration iInterface) {
-        if (iInterface == null)
-            return;
         mInterfaceConfiguration = iInterface;
     }
 
@@ -49,8 +45,6 @@ public class ApplicationConfiguration extends Configuration {
     }
 
     public final void setMediaConfiguration(MediaConfiguration iMedia) {
-        if (iMedia == null)
-            return;
         mMediaConfiguration = iMedia;
     }
 }

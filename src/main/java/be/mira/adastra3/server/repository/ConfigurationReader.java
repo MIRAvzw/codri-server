@@ -38,7 +38,6 @@ public class ConfigurationReader {
     static XmlPullParser mParser;
     private Configuration mConfiguration;
     private String mIdentifier;
-    private String mDAVLocation;
     
     
     
@@ -47,9 +46,8 @@ public class ConfigurationReader {
     // Construction and destruction
     //
     
-    public ConfigurationReader(String iDAVLocation, String iIdentifier, InputStream iStream) throws RepositoryException {
+    public ConfigurationReader(String iIdentifier, InputStream iStream) throws RepositoryException {
         mIdentifier = iIdentifier;
-        mDAVLocation = iDAVLocation;
         
         try {
             // Validate the file
@@ -262,7 +260,7 @@ public class ConfigurationReader {
     
     private InterfaceConfiguration parseApplicationInterface() throws RepositoryException, XmlPullParserException, IOException {
         // Process the tags
-        String tLocation = null;
+        String tLocation = null, tId = null;
         mParser.next();
         loop: while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
             switch (mParser.getEventType()) {
@@ -271,7 +269,9 @@ public class ConfigurationReader {
                     break loop;
                 case (XmlPullParser.START_TAG):
                     if (mParser.getName().equals("id"))
-                        tLocation = mDAVLocation + "/" + parseTextElement();
+                        tId = parseTextElement();
+                    if (mParser.getName().equals("location"))
+                        tLocation = parseTextElement();
                     else
                         throw new RepositoryException("unknown tag " + mParser.getName());
                     break;
@@ -281,14 +281,15 @@ public class ConfigurationReader {
         }
         
         // Create the object
-        InterfaceConfiguration oApplicationInterface = new InterfaceConfiguration();
-        oApplicationInterface.setLocation(tLocation);
+        InterfaceConfiguration oApplicationInterface = new InterfaceConfiguration(tId);
+        if (tLocation != null)
+            oApplicationInterface.setLocation(tLocation);
         return oApplicationInterface;
     }
     
     private MediaConfiguration parseApplicationMedia() throws RepositoryException, XmlPullParserException, IOException {
         // Process the tags
-        String tLocation = null;
+        String tLocation = null, tId = null;
         mParser.next();
         loop: while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
             switch (mParser.getEventType()) {
@@ -297,7 +298,9 @@ public class ConfigurationReader {
                     break loop;
                 case (XmlPullParser.START_TAG):
                     if (mParser.getName().equals("id"))
-                        tLocation = mDAVLocation + "/" + parseTextElement();
+                        tId = parseTextElement();
+                    if (mParser.getName().equals("location"))
+                        tLocation = parseTextElement();
                     else
                         throw new RepositoryException("unknown tag " + mParser.getName());
                     break;
@@ -307,8 +310,9 @@ public class ConfigurationReader {
         }
         
         // Create the object
-        MediaConfiguration oApplicationMedia = new MediaConfiguration();
-        oApplicationMedia.setLocation(tLocation);
+        MediaConfiguration oApplicationMedia = new MediaConfiguration(tId);
+        if (tLocation != null)
+            oApplicationMedia.setLocation(tLocation);
         return oApplicationMedia;
     }
 }

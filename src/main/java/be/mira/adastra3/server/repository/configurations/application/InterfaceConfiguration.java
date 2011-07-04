@@ -12,17 +12,29 @@ import be.mira.adastra3.server.repository.configurations.Configuration;
  */
 public class InterfaceConfiguration extends Configuration {
     //
+    // Data members
+    //
+    
+    private String mId;
+    
+    
+    //
     // Construction and destruction
     //
     
-    public InterfaceConfiguration() {
-        setProperty("location", "/interfaces/");
+    public InterfaceConfiguration(String iId) {
+        mId = iId;
+        setProperty("location", "/media/");
     }
     
     
     //
     // Getters and setters
     //
+    
+    public String getId() {
+        return mId;
+    }
     
     public String getLocation() {
         if (getProperty("location") != null)
@@ -33,5 +45,5 @@ public class InterfaceConfiguration extends Configuration {
 
     public void setLocation(String iLocation) {
         setProperty("location", iLocation);
-    }
+    } 
 }

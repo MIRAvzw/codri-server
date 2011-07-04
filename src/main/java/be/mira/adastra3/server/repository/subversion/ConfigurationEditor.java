@@ -42,15 +42,13 @@ public class ConfigurationEditor implements ISVNEditor {
     protected String mRepositoryDirectory = "configurations";
     private long mRevision;
     private List<Configuration> mConfigurations;
-    private String mDAVLocation;
 
 
     //
     // Construction and destruction
     //
 
-    public ConfigurationEditor(String iDAVLocation) {
-        iDAVLocation = mDAVLocation;
+    public ConfigurationEditor() {
         myDeltaProcessor = new SVNDeltaProcessor();
         
         mConfigurations = new ArrayList<Configuration>();
@@ -251,7 +249,7 @@ public class ConfigurationEditor implements ISVNEditor {
 
         // Read and proces the received data        
         try {
-            ConfigurationReader tReader = new ConfigurationReader(mDAVLocation, mDataIdentifier, new ByteArrayInputStream(mTemporaryStream.toByteArray()));
+            ConfigurationReader tReader = new ConfigurationReader(mDataIdentifier, new ByteArrayInputStream(mTemporaryStream.toByteArray()));
             tReader.process();
             
             if (tReader.getConfiguration() != null) {

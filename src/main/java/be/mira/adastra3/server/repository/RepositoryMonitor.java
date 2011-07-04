@@ -124,7 +124,7 @@ public class RepositoryMonitor extends Service {
             // Checkout the new configurations
             getLogger().debug("Checking out configurations");
             ISVNReporterBaton tConfigurationBaton = new DummyBaton(mSVNRevision);
-            ISVNEditor tConfigurationEditor = new ConfigurationEditor(mDAVLocation);
+            ISVNEditor tConfigurationEditor = new ConfigurationEditor();
             mSVNRepository.update(mSVNRevision, "configurations", true, tConfigurationBaton, tConfigurationEditor);
             
             // Process them
