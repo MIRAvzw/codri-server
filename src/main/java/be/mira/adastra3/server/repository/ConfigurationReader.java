@@ -12,7 +12,6 @@ import be.mira.adastra3.server.repository.configurations.application.MediaConfig
 import be.mira.adastra3.server.repository.configurations.DeviceConfiguration;
 import be.mira.adastra3.server.repository.configurations.KioskConfiguration;
 import be.mira.adastra3.server.repository.configurations.device.SoundConfiguration;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
@@ -101,8 +100,6 @@ public class ConfigurationReader {
                                 throw new RepositoryException("configuration file contains multiple configurations");
                             mConfiguration = parseKioskConfiguration();
                         }
-                        else
-                            throw new RepositoryException("unknown tag " + mParser.getName());
                         break;
                     default:                        
                         mParser.next();
@@ -159,8 +156,6 @@ public class ConfigurationReader {
                         tApplicationConfiguration = parseApplicationConfiguration();
                     else if (mParser.getName().equals("device"))
                         tDeviceConfiguration = parseDeviceConfiguration();
-                    else
-                        throw new RepositoryException("unknown tag " + mParser.getName());
                     break;
                 default:
                     mParser.next();
@@ -188,8 +183,6 @@ public class ConfigurationReader {
                 case (XmlPullParser.START_TAG):
                     if (mParser.getName().equals("sound"))
                         tSound = parseDeviceSound();
-                    else
-                        throw new RepositoryException("unknown tag " + mParser.getName());
                     break;
                 default:
                     mParser.next();
@@ -214,8 +207,6 @@ public class ConfigurationReader {
                 case (XmlPullParser.START_TAG):
                     if (mParser.getName().equals("volume"))
                         tVolume = Integer.parseInt(parseTextElement());
-                    else
-                        throw new RepositoryException("unknown tag " + mParser.getName());
                     break;
                 default:
                     mParser.next();
@@ -243,8 +234,6 @@ public class ConfigurationReader {
                         tInterface = parseApplicationInterface();
                     else if (mParser.getName().equals("media"))
                         tMedia = parseApplicationMedia();
-                    else
-                        throw new RepositoryException("unknown tag " + mParser.getName());
                     break;
                 default:
                     mParser.next();
@@ -259,8 +248,18 @@ public class ConfigurationReader {
     }
     
     private InterfaceConfiguration parseApplicationInterface() throws RepositoryException, XmlPullParserException, IOException {
+        // Process the attributes
+        String tId = null;
+        for (int i = 0; i < mParser.getAttributeCount(); i++) {
+            String tAttributeName = mParser.getAttributeName(i);
+            String tAttributeValue = mParser.getAttributeValue(i);
+            
+            if (tAttributeName.equals("id"))
+                tId = tAttributeValue;
+        }
+        
         // Process the tags
-        String tLocation = null, tId = null;
+        String tLocation = null;
         mParser.next();
         loop: while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
             switch (mParser.getEventType()) {
@@ -268,12 +267,8 @@ public class ConfigurationReader {
                     mParser.next();
                     break loop;
                 case (XmlPullParser.START_TAG):
-                    if (mParser.getName().equals("id"))
-                        tId = parseTextElement();
                     if (mParser.getName().equals("location"))
                         tLocation = parseTextElement();
-                    else
-                        throw new RepositoryException("unknown tag " + mParser.getName());
                     break;
                 default:
                     mParser.next();
@@ -288,8 +283,18 @@ public class ConfigurationReader {
     }
     
     private MediaConfiguration parseApplicationMedia() throws RepositoryException, XmlPullParserException, IOException {
+        // Process the attributes
+        String tId = null;
+        for (int i = 0; i < mParser.getAttributeCount(); i++) {
+            String tAttributeName = mParser.getAttributeName(i);
+            String tAttributeValue = mParser.getAttributeValue(i);
+            
+            if (tAttributeName.equals("id"))
+                tId = tAttributeValue;
+        }
+        
         // Process the tags
-        String tLocation = null, tId = null;
+        String tLocation = null;
         mParser.next();
         loop: while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
             switch (mParser.getEventType()) {
@@ -297,12 +302,8 @@ public class ConfigurationReader {
                     mParser.next();
                     break loop;
                 case (XmlPullParser.START_TAG):
-                    if (mParser.getName().equals("id"))
-                        tId = parseTextElement();
                     if (mParser.getName().equals("location"))
                         tLocation = parseTextElement();
-                    else
-                        throw new RepositoryException("unknown tag " + mParser.getName());
                     break;
                 default:
                     mParser.next();
