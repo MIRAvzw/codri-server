@@ -72,17 +72,17 @@ public class Kiosk30 extends Device {
                 String tInterface = tRepository.getServer()
                         + "/" + tInterfaceConfiguration.getLocation()
                         + "/" + tInterfaceConfiguration.getId();
-                getApplicationControl().LoadInterface(tInterface);
+                getApplicationControl().DownloadInterface(tInterface);
             }
-            getApplicationControl().ShowInterface();
+            getApplicationControl().LoadInterface();
             
             for (MediaConfiguration tMediaConfiguration: tApplicationConfiguration.getMediaConfigurations()) {
                 String tMedia = tRepository.getServer()
                         + "/" + tMediaConfiguration.getLocation()
                         + "/" + tMediaConfiguration.getId();
-                getApplicationControl().LoadMedia(tMedia);
+                getApplicationControl().DownloadMedia(tMedia);
             }
-            getApplicationControl().ShowMedia();
+            getApplicationControl().LoadMedia();
         }
         catch (NetworkException iException) {
             throw new DeviceException("could not propagate device configuration", iException);
