@@ -6,6 +6,8 @@ package be.mira.adastra3.server.repository.configurations;
 
 import be.mira.adastra3.server.repository.configurations.application.MediaConfiguration;
 import be.mira.adastra3.server.repository.configurations.application.InterfaceConfiguration;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -16,8 +18,8 @@ public class ApplicationConfiguration extends Configuration {
     // Data members
     //
     
-    private MediaConfiguration mMediaConfiguration;
-    private InterfaceConfiguration mInterfaceConfiguration;
+    private List<MediaConfiguration> mMediaConfigurations;
+    private List<InterfaceConfiguration> mInterfaceConfigurations;
     
     
     //
@@ -25,6 +27,8 @@ public class ApplicationConfiguration extends Configuration {
     //
     
     public ApplicationConfiguration() {
+        mInterfaceConfigurations = new ArrayList<InterfaceConfiguration>();
+        mMediaConfigurations = new ArrayList<MediaConfiguration>();
     }
     
     
@@ -32,19 +36,19 @@ public class ApplicationConfiguration extends Configuration {
     // Getters and setters
     //
 
-    public InterfaceConfiguration getInterfaceConfiguration() {
-        return mInterfaceConfiguration;
+    public List<InterfaceConfiguration> getInterfaceConfigurations() {
+        return mInterfaceConfigurations;
     }
 
-    public final void setInterfaceConfiguration(InterfaceConfiguration iInterface) {
-        mInterfaceConfiguration = iInterface;
+    public final void addInterfaceConfiguration(InterfaceConfiguration iInterface) {
+        mInterfaceConfigurations.add(iInterface);
     }
 
-    public MediaConfiguration getMediaConfiguration() {
-        return mMediaConfiguration;
+    public List<MediaConfiguration> getMediaConfigurations() {
+        return mMediaConfigurations;
     }
 
-    public final void setMediaConfiguration(MediaConfiguration iMedia) {
-        mMediaConfiguration = iMedia;
+    public final void addMediaConfiguration(MediaConfiguration iMedia) {
+        mMediaConfigurations.add(iMedia);
     }
 }

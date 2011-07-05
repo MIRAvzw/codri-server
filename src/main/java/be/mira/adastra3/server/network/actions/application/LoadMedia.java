@@ -13,14 +13,14 @@ import org.teleal.cling.model.types.InvalidValueException;
  *
  * @author tim
  */
-public class SetInterface extends ActionInvocation {
-    public SetInterface(Service service, String iInterface) throws NetworkException {
-        super(service.getAction("SetInterface"));
+public class LoadMedia extends ActionInvocation {
+    public LoadMedia(Service service, String iMedia) throws NetworkException {
+        super(service.getAction("SetMedia"));
         try {
-            setInput("iInterfaceValue", iInterface);
+            setInput("iMediaValue", iMedia);
         }
         catch (InvalidValueException ex) {
-            throw new NetworkException("Could not invoke Kiosk.SetInterface", ex);
+            throw new NetworkException("Could not invoke Media.SetMedia", ex);
         }
     }
 }

@@ -15,8 +15,8 @@ import org.teleal.cling.model.types.InvalidValueException;
  *
  * @author tim
  */
-public class GetMediaRevision extends ActionInvocation {
-    public GetMediaRevision(Service service) throws NetworkException {
+public class ShowMedia extends ActionInvocation {
+    public ShowMedia(Service service) throws NetworkException {
         super(service.getAction("GetMediaRevision"));
         try {
             /* No parameters required */

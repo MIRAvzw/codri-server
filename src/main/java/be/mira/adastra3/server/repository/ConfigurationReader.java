@@ -7,13 +7,17 @@ package be.mira.adastra3.server.repository;
 import be.mira.adastra3.server.exceptions.RepositoryException;
 import be.mira.adastra3.server.repository.configurations.ApplicationConfiguration;
 import be.mira.adastra3.server.repository.configurations.Configuration;
-import be.mira.adastra3.server.repository.configurations.application.InterfaceConfiguration;
-import be.mira.adastra3.server.repository.configurations.application.MediaConfiguration;
 import be.mira.adastra3.server.repository.configurations.DeviceConfiguration;
 import be.mira.adastra3.server.repository.configurations.KioskConfiguration;
+import be.mira.adastra3.server.repository.configurations.application.InterfaceConfiguration;
+import be.mira.adastra3.server.repository.configurations.application.InterfaceConfiguration;
+import be.mira.adastra3.server.repository.configurations.application.MediaConfiguration;
+import be.mira.adastra3.server.repository.configurations.application.MediaConfiguration;
 import be.mira.adastra3.server.repository.configurations.device.SoundConfiguration;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -221,8 +225,8 @@ public class ConfigurationReader {
     
     private ApplicationConfiguration parseApplicationConfiguration() throws RepositoryException, XmlPullParserException, IOException {
         // Process the tags
-        InterfaceConfiguration tInterface = null;
-        MediaConfiguration tMedia = null;
+        List<InterfaceConfiguration> tInterfaceConfigurations = new ArrayList<InterfaceConfiguration>();
+        List<MediaConfiguration> tMediaConfigurations = new ArrayList<MediaConfiguration>();
         mParser.next();
         loop: while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
             switch (mParser.getEventType()) {
@@ -231,9 +235,9 @@ public class ConfigurationReader {
                     break loop;
                 case (XmlPullParser.START_TAG):
                     if (mParser.getName().equals("interface"))
-                        tInterface = parseApplicationInterface();
+                        tInterfaceConfigurations.add(parseApplicationInterface());
                     else if (mParser.getName().equals("media"))
-                        tMedia = parseApplicationMedia();
+                        tMediaConfigurations.add(parseApplicationMedia());
                     break;
                 default:
                     mParser.next();
@@ -242,8 +246,10 @@ public class ConfigurationReader {
         
         // Create the object
         ApplicationConfiguration tApplicationConfiguration = new ApplicationConfiguration();
-        tApplicationConfiguration.setMediaConfiguration(tMedia);
-        tApplicationConfiguration.setInterfaceConfiguration(tInterface);
+        for (MediaConfiguration tMediaConfiguration : tMediaConfigurations)
+            tApplicationConfiguration.addMediaConfiguration(tMediaConfiguration);
+        for (InterfaceConfiguration tInterfaceConfiguration : tInterfaceConfigurations)
+            tApplicationConfiguration.addInterfaceConfiguration(tInterfaceConfiguration);
         return tApplicationConfiguration;
     }
     

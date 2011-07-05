@@ -15,8 +15,8 @@ import org.teleal.cling.model.types.InvalidValueException;
  *
  * @author tim
  */
-public class GetInterfaceRevision extends ActionInvocation {
-    public GetInterfaceRevision(Service service) throws NetworkException {
+public class ShowInterface extends ActionInvocation {
+    public ShowInterface(Service service) throws NetworkException {
         super(service.getAction("GetInterfaceRevision"));
         try {
             /* No parameters required */
