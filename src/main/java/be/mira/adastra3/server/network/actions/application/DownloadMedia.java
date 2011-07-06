@@ -15,12 +15,12 @@ import org.teleal.cling.model.types.InvalidValueException;
  */
 public class DownloadMedia extends ActionInvocation {
     public DownloadMedia(Service service, String iMedia) throws NetworkException {
-        super(service.getAction("SetMedia"));
+        super(service.getAction("DownloadMedia"));
         try {
             setInput("iMediaValue", iMedia);
         }
         catch (InvalidValueException ex) {
-            throw new NetworkException("Could not invoke Media.SetMedia", ex);
+            throw new NetworkException("Could not invoke Media.DownloadMedia", ex);
         }
     }
 }

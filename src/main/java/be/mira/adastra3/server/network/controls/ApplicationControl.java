@@ -44,44 +44,36 @@ public class ApplicationControl extends Control {
     public void DownloadMedia(String iMediaLocation) throws NetworkException {
         DownloadMedia tAction = new DownloadMedia(getService(), iMediaLocation);
         
-        Network.getControlPoint().execute(
-                new ActionCallback.Default(
-                    tAction,
-                    Network.getControlPoint()
-                )
-        );
+       new ActionCallback.Default(
+               tAction,
+               Network.getControlPoint()
+        ).run();
     }
 
     public void LoadMedia() throws NetworkException {
         LoadMedia tAction = new LoadMedia(getService());
         
-        Network.getControlPoint().execute(
-                new ActionCallback.Default(
-                    tAction,
-                    Network.getControlPoint()
-                )
-        );
+       new ActionCallback.Default(
+               tAction,
+               Network.getControlPoint()
+        ).run();
     }
 
     public void DownloadInterface(String iInterfaceLocation) throws NetworkException {
         DownloadInterface tAction = new DownloadInterface(getService(), iInterfaceLocation);
         
-        Network.getControlPoint().execute(
-                new ActionCallback.Default(
-                    tAction,
-                    Network.getControlPoint()
-                )
-        );
+       new ActionCallback.Default(
+               tAction,
+               Network.getControlPoint()
+        ).run();
     }
     
     public void LoadInterface() throws NetworkException {
         LoadInterface tAction = new LoadInterface(getService());
         
-        Network.getControlPoint().execute(
-                new ActionCallback.Default(
-                    tAction,
-                    Network.getControlPoint()
-                )
-        );
+       new ActionCallback.Default(
+               tAction,
+               Network.getControlPoint()
+        ).run();
     }
 }

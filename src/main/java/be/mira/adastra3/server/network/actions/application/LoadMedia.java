@@ -17,19 +17,12 @@ import org.teleal.cling.model.types.InvalidValueException;
  */
 public class LoadMedia extends ActionInvocation {
     public LoadMedia(Service service) throws NetworkException {
-        super(service.getAction("GetMediaRevision"));
+        super(service.getAction("LoadMedia"));
         try {
             /* No parameters required */
         }
         catch (InvalidValueException ex) {
-            throw new NetworkException("Could not invoke Media.GetMediaRevision", ex);
+            throw new NetworkException("Could not invoke Media.LoadMedia", ex);
         }
-    }
-    
-    public Integer GetMediaRevisionValue() throws NetworkException {        
-        ActionArgumentValue oVolume = getOutput("oMediaRevision");
-        if (oVolume.getDatatype().getBuiltin() != Datatype.Builtin.UI4)
-            throw new NetworkException("Invalid return type by Media.GetMediaRevision: not an UI4");
-        return (Integer) oVolume.getValue();
     }
 }
