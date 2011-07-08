@@ -71,6 +71,7 @@
         <xsd:sequence>
         </xsd:sequence>
         <xsd:attribute name="id" type="xsd:string" use="required" />
+        <xsd:attribute name="role" type="xsd:string" use="required" />
     </xsd:complexType>
 
     <xsd:complexType name="mediaType">

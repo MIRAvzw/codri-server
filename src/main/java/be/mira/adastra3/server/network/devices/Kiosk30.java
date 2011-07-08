@@ -72,7 +72,7 @@ public class Kiosk30 extends Device {
             if (tInterfaceConfiguration != null) {
                 String tInterfaceLocation = tRepository.getServer()
                         + "/interfaces/" + tInterfaceConfiguration.getId();
-                getApplicationControl().LoadInterface(tInterfaceConfiguration.getId(), tInterfaceLocation);                
+                getApplicationControl().LoadInterface(tInterfaceConfiguration.getId(), tInterfaceConfiguration.getRole(), tInterfaceLocation);                
             }
             
             MediaConfiguration tMediaConfiguration =  tApplicationConfiguration.getMediaConfiguration();

@@ -16,14 +16,16 @@ public class InterfaceConfiguration extends Configuration {
     //
     
     private String mId;
+    private String mRole;
     
     
     //
     // Construction and destruction
     //
     
-    public InterfaceConfiguration(String iId) {
+    public InterfaceConfiguration(String iId, String iRole) {
         mId = iId;
+        mRole = iRole;
     }
     
     
@@ -33,5 +35,9 @@ public class InterfaceConfiguration extends Configuration {
     
     public String getId() {
         return mId;
+    }
+    
+    public String getRole() {
+        return mRole;
     }
 }

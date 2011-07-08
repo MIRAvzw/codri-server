@@ -253,13 +253,15 @@ public class ConfigurationReader {
     
     private InterfaceConfiguration parseApplicationInterface() throws RepositoryException, XmlPullParserException, IOException {
         // Process the attributes
-        String tId = null;
+        String tId = null, tRole = null;
         for (int i = 0; i < mParser.getAttributeCount(); i++) {
             String tAttributeName = mParser.getAttributeName(i);
             String tAttributeValue = mParser.getAttributeValue(i);
             
             if (tAttributeName.equals("id"))
                 tId = tAttributeValue;
+            else if (tAttributeName.equals("role"))
+                tRole = tAttributeValue;
         }
         
         // Process the tags
@@ -277,7 +279,7 @@ public class ConfigurationReader {
         }
         
         // Create the object
-        InterfaceConfiguration oApplicationInterface = new InterfaceConfiguration(tId);
+        InterfaceConfiguration oApplicationInterface = new InterfaceConfiguration(tId, tRole);
         return oApplicationInterface;
     }
     
