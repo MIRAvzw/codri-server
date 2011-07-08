@@ -265,7 +265,6 @@ public class ConfigurationReader {
         }
         
         // Process the tags
-        String tLocation = null;
         mParser.next();
         loop: while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
             switch (mParser.getEventType()) {
@@ -273,8 +272,6 @@ public class ConfigurationReader {
                     mParser.next();
                     break loop;
                 case (XmlPullParser.START_TAG):
-                    if (mParser.getName().equals("location"))
-                        tLocation = parseTextElement();
                     break;
                 default:
                     mParser.next();
@@ -283,8 +280,6 @@ public class ConfigurationReader {
         
         // Create the object
         InterfaceConfiguration oApplicationInterface = new InterfaceConfiguration(tId);
-        if (tLocation != null)
-            oApplicationInterface.setLocation(tLocation);
         return oApplicationInterface;
     }
     
@@ -308,8 +303,6 @@ public class ConfigurationReader {
                     mParser.next();
                     break loop;
                 case (XmlPullParser.START_TAG):
-                    if (mParser.getName().equals("location"))
-                        tLocation = parseTextElement();
                     break;
                 default:
                     mParser.next();
@@ -318,8 +311,6 @@ public class ConfigurationReader {
         
         // Create the object
         MediaConfiguration oApplicationMedia = new MediaConfiguration(tId);
-        if (tLocation != null)
-            oApplicationMedia.setLocation(tLocation);
         return oApplicationMedia;
     }
 }

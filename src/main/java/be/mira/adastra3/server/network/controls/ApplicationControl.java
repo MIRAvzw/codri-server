@@ -42,7 +42,7 @@ public class ApplicationControl extends Control {
     //
     
     public void DownloadMedia(String iMediaIdentifier, String iMediaLocation) throws NetworkException {
-        DownloadMedia tAction = new DownloadMedia(getService(), iMediaLocation, iMediaLocation);
+        DownloadMedia tAction = new DownloadMedia(getService(), iMediaIdentifier, iMediaLocation);
         
        new ActionCallback.Default(
                tAction,

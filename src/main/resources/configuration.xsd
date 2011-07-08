@@ -69,14 +69,12 @@
 
     <xsd:complexType name="interfaceType">
         <xsd:sequence>
-            <xsd:element name="location" type="xsd:string" minOccurs="0" />
         </xsd:sequence>
         <xsd:attribute name="id" type="xsd:string" use="required" />
     </xsd:complexType>
 
     <xsd:complexType name="mediaType">
         <xsd:sequence>
-            <xsd:element name="location" type="xsd:string" minOccurs="0" />
         </xsd:sequence>
         <xsd:attribute name="id" type="xsd:string" use="required" />
     </xsd:complexType>

@@ -24,7 +24,6 @@ public class MediaConfiguration extends Configuration  {
     
     public MediaConfiguration(String iId) {
         mId = iId;
-        setProperty("location", "/media/");
     }
     
     
@@ -34,16 +33,5 @@ public class MediaConfiguration extends Configuration  {
     
     public String getId() {
         return mId;
-    }
-    
-    public String getLocation() {
-        if (getProperty("location") != null)
-            return (String) getProperty("location");
-        else
-            return null;
-    }
-
-    public void setLocation(String iLocation) {
-        setProperty("location", iLocation);
     }   
 }
