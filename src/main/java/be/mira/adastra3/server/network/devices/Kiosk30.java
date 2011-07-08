@@ -69,18 +69,18 @@ public class Kiosk30 extends Device {
             Repository tRepository = Repository.getInstance();
             
             for (InterfaceConfiguration tInterfaceConfiguration: tApplicationConfiguration.getInterfaceConfigurations()) {
-                String tInterface = tRepository.getServer()
+                String tInterfaceLocation = tRepository.getServer()
                         + "/" + tInterfaceConfiguration.getLocation()
                         + "/" + tInterfaceConfiguration.getId();
-                getApplicationControl().DownloadInterface(tInterface);
+                getApplicationControl().DownloadInterface(tInterfaceConfiguration.getId(), tInterfaceLocation);
             }
             getApplicationControl().LoadInterface();
             
             for (MediaConfiguration tMediaConfiguration: tApplicationConfiguration.getMediaConfigurations()) {
-                String tMedia = tRepository.getServer()
+                String tMediaLocation = tRepository.getServer()
                         + "/" + tMediaConfiguration.getLocation()
                         + "/" + tMediaConfiguration.getId();
-                getApplicationControl().DownloadMedia(tMedia);
+                getApplicationControl().DownloadMedia(tMediaConfiguration.getId(), tMediaLocation);
             }
             getApplicationControl().LoadMedia();
         }

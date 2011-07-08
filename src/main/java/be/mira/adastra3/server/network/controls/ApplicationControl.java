@@ -41,8 +41,8 @@ public class ApplicationControl extends Control {
     // Service actions
     //
     
-    public void DownloadMedia(String iMediaLocation) throws NetworkException {
-        DownloadMedia tAction = new DownloadMedia(getService(), iMediaLocation);
+    public void DownloadMedia(String iMediaIdentifier, String iMediaLocation) throws NetworkException {
+        DownloadMedia tAction = new DownloadMedia(getService(), iMediaLocation, iMediaLocation);
         
        new ActionCallback.Default(
                tAction,
@@ -59,8 +59,8 @@ public class ApplicationControl extends Control {
         ).run();
     }
 
-    public void DownloadInterface(String iInterfaceLocation) throws NetworkException {
-        DownloadInterface tAction = new DownloadInterface(getService(), iInterfaceLocation);
+    public void DownloadInterface(String iInterfaceIdentifier, String iInterfaceLocation) throws NetworkException {
+        DownloadInterface tAction = new DownloadInterface(getService(), iInterfaceIdentifier, iInterfaceLocation);
         
        new ActionCallback.Default(
                tAction,

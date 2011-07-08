@@ -14,10 +14,11 @@ import org.teleal.cling.model.types.InvalidValueException;
  * @author tim
  */
 public class DownloadInterface extends ActionInvocation {
-    public DownloadInterface(Service service, String iInterface) throws NetworkException {
+    public DownloadInterface(Service service, String iInterfaceIdentifier, String iInterfaceLocation) throws NetworkException {
         super(service.getAction("DownloadInterface"));
         try {
-            setInput("iInterfaceValue", iInterface);
+            setInput("iInterfaceIdentifierValue", iInterfaceIdentifier);
+            setInput("iInterfaceLocationValue", iInterfaceLocation);
         }
         catch (InvalidValueException ex) {
             throw new NetworkException("Could not invoke Kiosk.DownloadInterface", ex);
