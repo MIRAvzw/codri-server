@@ -62,8 +62,8 @@
     
     <xsd:complexType name="applicationType">
         <xsd:sequence>
-            <xsd:element name="interface" type="interfaceType" minOccurs="0" maxOccurs="unbounded" />
-            <xsd:element name="media" type="mediaType" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="interface" type="interfaceType" minOccurs="0" />
+            <xsd:element name="media" type="mediaType" minOccurs="0" />
         </xsd:sequence>
     </xsd:complexType>
 

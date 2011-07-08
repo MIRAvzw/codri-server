@@ -8,8 +8,8 @@ import be.mira.adastra3.server.exceptions.NetworkException;
 import be.mira.adastra3.server.network.Network;
 import be.mira.adastra3.server.network.actions.application.LoadInterface;
 import be.mira.adastra3.server.network.actions.application.LoadMedia;
-import be.mira.adastra3.server.network.actions.application.DownloadInterface;
-import be.mira.adastra3.server.network.actions.application.DownloadMedia;
+import be.mira.adastra3.server.network.actions.application.LoadInterface;
+import be.mira.adastra3.server.network.actions.application.LoadMedia;
 import org.teleal.cling.controlpoint.ActionCallback;
 import org.teleal.cling.model.meta.RemoteService;
 import org.teleal.cling.model.types.ServiceId;
@@ -41,8 +41,8 @@ public class ApplicationControl extends Control {
     // Service actions
     //
     
-    public void DownloadMedia(String iMediaIdentifier, String iMediaLocation) throws NetworkException {
-        DownloadMedia tAction = new DownloadMedia(getService(), iMediaIdentifier, iMediaLocation);
+    public void LoadMedia(String iMediaIdentifier, String iMediaLocation) throws NetworkException {
+        LoadMedia tAction = new LoadMedia(getService(), iMediaIdentifier, iMediaLocation);
         
        new ActionCallback.Default(
                tAction,
@@ -50,26 +50,8 @@ public class ApplicationControl extends Control {
         ).run();
     }
 
-    public void LoadMedia() throws NetworkException {
-        LoadMedia tAction = new LoadMedia(getService());
-        
-       new ActionCallback.Default(
-               tAction,
-               Network.getControlPoint()
-        ).run();
-    }
-
-    public void DownloadInterface(String iInterfaceIdentifier, String iInterfaceLocation) throws NetworkException {
-        DownloadInterface tAction = new DownloadInterface(getService(), iInterfaceIdentifier, iInterfaceLocation);
-        
-       new ActionCallback.Default(
-               tAction,
-               Network.getControlPoint()
-        ).run();
-    }
-    
-    public void LoadInterface() throws NetworkException {
-        LoadInterface tAction = new LoadInterface(getService());
+    public void LoadInterface(String iInterfaceIdentifier, String iInterfaceRole, String iInterfaceLocation) throws NetworkException {
+        LoadInterface tAction = new LoadInterface(getService(), iInterfaceIdentifier, iInterfaceRole, iInterfaceLocation);
         
        new ActionCallback.Default(
                tAction,

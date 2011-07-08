@@ -225,8 +225,8 @@ public class ConfigurationReader {
     
     private ApplicationConfiguration parseApplicationConfiguration() throws RepositoryException, XmlPullParserException, IOException {
         // Process the tags
-        List<InterfaceConfiguration> tInterfaceConfigurations = new ArrayList<InterfaceConfiguration>();
-        List<MediaConfiguration> tMediaConfigurations = new ArrayList<MediaConfiguration>();
+        MediaConfiguration tMediaConfiguration = null;
+        InterfaceConfiguration tInterfaceConfiguration = null;
         mParser.next();
         loop: while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
             switch (mParser.getEventType()) {
@@ -235,9 +235,9 @@ public class ConfigurationReader {
                     break loop;
                 case (XmlPullParser.START_TAG):
                     if (mParser.getName().equals("interface"))
-                        tInterfaceConfigurations.add(parseApplicationInterface());
+                        tInterfaceConfiguration = parseApplicationInterface();
                     else if (mParser.getName().equals("media"))
-                        tMediaConfigurations.add(parseApplicationMedia());
+                        tMediaConfiguration = parseApplicationMedia();
                     break;
                 default:
                     mParser.next();
@@ -246,10 +246,8 @@ public class ConfigurationReader {
         
         // Create the object
         ApplicationConfiguration tApplicationConfiguration = new ApplicationConfiguration();
-        for (MediaConfiguration tMediaConfiguration : tMediaConfigurations)
-            tApplicationConfiguration.addMediaConfiguration(tMediaConfiguration);
-        for (InterfaceConfiguration tInterfaceConfiguration : tInterfaceConfigurations)
-            tApplicationConfiguration.addInterfaceConfiguration(tInterfaceConfiguration);
+        tApplicationConfiguration.setInterfaceConfiguration(tInterfaceConfiguration);
+        tApplicationConfiguration.setMediaConfiguration(tMediaConfiguration);
         return tApplicationConfiguration;
     }
     

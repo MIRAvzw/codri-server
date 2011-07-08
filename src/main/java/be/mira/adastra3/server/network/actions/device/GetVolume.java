@@ -22,7 +22,7 @@ public class GetVolume extends ActionInvocation {
             /* No parameters required */
         }
         catch (InvalidValueException ex) {
-            throw new NetworkException("Could not invoke Media.GetVolume", ex);
+            throw new NetworkException("Could not invoke Device.GetVolume", ex);
         }
     }
     

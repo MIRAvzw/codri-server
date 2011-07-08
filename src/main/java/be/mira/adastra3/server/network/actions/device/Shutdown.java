@@ -20,7 +20,7 @@ public class Shutdown extends ActionInvocation {
             /* No parameters required */
         }
         catch (InvalidValueException ex) {
-            throw new NetworkException("Could not invoke Kiosk.Shutdown", ex);
+            throw new NetworkException("Could not invoke Device.Shutdown", ex);
         }
     }
 }

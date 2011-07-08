@@ -18,8 +18,8 @@ public class ApplicationConfiguration extends Configuration {
     // Data members
     //
     
-    private List<MediaConfiguration> mMediaConfigurations;
-    private List<InterfaceConfiguration> mInterfaceConfigurations;
+    private MediaConfiguration mMediaConfiguration;
+    private InterfaceConfiguration mInterfaceConfiguration;
     
     
     //
@@ -27,8 +27,6 @@ public class ApplicationConfiguration extends Configuration {
     //
     
     public ApplicationConfiguration() {
-        mInterfaceConfigurations = new ArrayList<InterfaceConfiguration>();
-        mMediaConfigurations = new ArrayList<MediaConfiguration>();
     }
     
     
@@ -36,19 +34,19 @@ public class ApplicationConfiguration extends Configuration {
     // Getters and setters
     //
 
-    public List<InterfaceConfiguration> getInterfaceConfigurations() {
-        return mInterfaceConfigurations;
+    public InterfaceConfiguration getInterfaceConfiguration() {
+        return mInterfaceConfiguration;
     }
 
-    public final void addInterfaceConfiguration(InterfaceConfiguration iInterface) {
-        mInterfaceConfigurations.add(iInterface);
+    public final void setInterfaceConfiguration(InterfaceConfiguration iInterfaceConfiguration) {
+        mInterfaceConfiguration = iInterfaceConfiguration;
     }
 
-    public List<MediaConfiguration> getMediaConfigurations() {
-        return mMediaConfigurations;
+    public MediaConfiguration getMediaConfiguration() {
+        return mMediaConfiguration;
     }
 
-    public final void addMediaConfiguration(MediaConfiguration iMedia) {
-        mMediaConfigurations.add(iMedia);
+    public final void setMediaConfiguration(MediaConfiguration iMediaConfiguration) {
+        mMediaConfiguration = iMediaConfiguration;
     }
 }
