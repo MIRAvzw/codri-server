@@ -5,8 +5,6 @@
 package be.mira.adastra3.server.network;
 
 import be.mira.adastra3.server.exceptions.NetworkException;
-import be.mira.adastra3.server.network.controls.DeviceControl;
-import be.mira.adastra3.server.network.controls.ApplicationControl;
 import be.mira.adastra3.server.network.devices.Device;
 import java.util.ArrayList;
 import java.util.HashMap;

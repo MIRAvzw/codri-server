@@ -8,8 +8,6 @@ import be.mira.adastra3.server.exceptions.NetworkException;
 import be.mira.adastra3.server.network.Network;
 import be.mira.adastra3.server.network.actions.application.LoadInterface;
 import be.mira.adastra3.server.network.actions.application.LoadMedia;
-import be.mira.adastra3.server.network.actions.application.LoadInterface;
-import be.mira.adastra3.server.network.actions.application.LoadMedia;
 import org.teleal.cling.controlpoint.ActionCallback;
 import org.teleal.cling.model.meta.RemoteService;
 import org.teleal.cling.model.types.ServiceId;

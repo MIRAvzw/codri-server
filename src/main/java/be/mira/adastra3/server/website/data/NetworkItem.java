@@ -47,5 +47,14 @@ public class NetworkItem extends TreeItem {
     @Override
     public int getFieldCount() {
         return 2;
-    }    
+    }
+    
+    
+    //
+    // Basic I/O
+    //
+    
+    public Device getDevice() {
+        return mDevice;
+    }
 }

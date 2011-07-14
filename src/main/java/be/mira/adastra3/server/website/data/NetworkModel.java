@@ -58,9 +58,7 @@ public class NetworkModel extends TreeModel<NetworkItem> implements INetworkList
     //
 
     @Override
-    public void doDeviceAdded(Device iDevice) {
-        System.err.println("Adding device");
-        
+    public void doDeviceAdded(Device iDevice) {        
         DeferredExecution.DEFERREES.add(new DeferredExecution() {
             Device mDevice;
             public DeferredExecution construct(Device iDevice) {
@@ -112,8 +110,8 @@ public class NetworkModel extends TreeModel<NetworkItem> implements INetworkList
     public EnumSet<ItemFlag> getFlags(WModelIndex index) {
         if (index == null)
             return EnumSet.noneOf(ItemFlag.class);
-        return EnumSet.of(ItemFlag.ItemIsSelectable);
+        if (getItem(index) instanceof NetworkItem)
+            return EnumSet.of(ItemFlag.ItemIsSelectable);
+        return EnumSet.noneOf(ItemFlag.class);
     }
-    
-    
 }
