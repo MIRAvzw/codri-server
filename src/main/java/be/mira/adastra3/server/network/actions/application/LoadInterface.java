@@ -22,7 +22,7 @@ public class LoadInterface extends ActionInvocation {
             setInput("iInterfaceLocationValue", iInterfaceLocation);
         }
         catch (InvalidValueException ex) {
-            throw new NetworkException("Could not invoke Application.LoadInterface", ex);
+            throw new NetworkException("could not invoke Application.LoadInterface", ex);
         }
     }
 }

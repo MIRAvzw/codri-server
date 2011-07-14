@@ -26,10 +26,12 @@ public class GetVolume extends ActionInvocation {
         }
     }
     
-    public Integer GetVolumeValue() throws NetworkException {        
+    public Integer GetVolumeValue() throws NetworkException {    
         ActionArgumentValue oVolume = getOutput("oVolumeValue");
-        if (oVolume.getDatatype().getBuiltin() != Datatype.Builtin.UI1)
-            throw new NetworkException("Invalid return type by Media.GetVolume: not an UI4");
+        if (oVolume == null)
+            throw new NetworkException("state variable not accessible");
+        else if (oVolume.getDatatype().getBuiltin() != Datatype.Builtin.UI1)
+            throw new NetworkException("invalid return type by Media.GetVolume (not an UI1)");
         return (Integer) oVolume.getValue();
     }
 }

@@ -21,7 +21,7 @@ public class SetVolume extends ActionInvocation {
             setInput("iVolumeValue", iVolume.toString());
         }
         catch (InvalidValueException ex) {
-            throw new NetworkException("Could not invoke Device.SetVolume", ex);
+            throw new NetworkException("could not invoke Device.SetVolume", ex);
         }
     }
 }

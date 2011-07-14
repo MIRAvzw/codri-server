@@ -21,7 +21,7 @@ public class LoadMedia extends ActionInvocation {
             setInput("iMediaLocationValue", iMediaLocation);
         }
         catch (InvalidValueException ex) {
-            throw new NetworkException("Could not invoke Application.LoadMedia", ex);
+            throw new NetworkException("could not invoke Application.LoadMedia", ex);
         }
     }
 }
