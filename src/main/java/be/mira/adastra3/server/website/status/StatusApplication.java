@@ -69,8 +69,9 @@ public class StatusApplication extends WApplication {
     }
     
     @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
+    protected void unload() {
+        quit();
+        
         mNetworkModel.detach();
         
         Logger tLogger = Logger.getRootLogger();
