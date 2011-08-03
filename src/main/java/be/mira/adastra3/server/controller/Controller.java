@@ -108,9 +108,9 @@ public class Controller extends Service implements INetworkListener, IRepository
             
             // Check if there is a configuration for this device
             KioskConfiguration tKioskConfiguration = tRepository.lookupKioskConfiguration(iDevice.getUuid());
-            getLogger().debug("Loading configuration " + tKioskConfiguration.getId() + " onto device " + iDevice.getUuid());
 
             if (tKioskConfiguration != null) {
+                getLogger().debug("Loading configuration " + tKioskConfiguration.getId() + " onto device " + iDevice.getUuid());
                 try {
                     iKiosk.setConfiguration(tKioskConfiguration);
                 }
