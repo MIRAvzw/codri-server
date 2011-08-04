@@ -44,11 +44,12 @@ public class NetworkModel extends TreeModel<NetworkItem> implements INetworkList
     }
     
     public void attach() {
+        for (Device tDevice : mNetwork.getDevices())
+            doDeviceAdded(tDevice);
         mNetwork.addListener(this);
     }
     
     public void detach() {
-        // TODO: this doesn't get called (no Finalize @ application level?)
         mNetwork.removeListener(this);
     }
     

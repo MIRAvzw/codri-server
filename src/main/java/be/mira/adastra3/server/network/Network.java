@@ -7,6 +7,7 @@ package be.mira.adastra3.server.network;
 import be.mira.adastra3.server.exceptions.NetworkException;
 import be.mira.adastra3.server.network.devices.Device;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +72,10 @@ public class Network {
     
     public UpnpService getUpnpService() {
         return mUpnpService;
+    }
+    
+    public Collection<Device> getDevices() {
+        return mDevices.values();
     }
     
     public Device getDevice(UUID iUuid) {
