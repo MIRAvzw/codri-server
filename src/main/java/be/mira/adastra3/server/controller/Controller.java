@@ -38,6 +38,9 @@ public class Controller extends Service implements INetworkListener, IRepository
     public Controller() throws ServiceSetupException {
         mNetwork = Network.getInstance();
         mRepository = Repository.getInstance();
+        
+        mNetwork.addListener(this);
+        mRepository.addListener(this);
     }
     
     
@@ -47,8 +50,6 @@ public class Controller extends Service implements INetworkListener, IRepository
 
     @Override
     public void run() throws ServiceRunException {
-        mNetwork.addListener(this);
-        mRepository.addListener(this);
     }
 
     @Override
