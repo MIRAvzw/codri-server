@@ -44,8 +44,12 @@ public class NetworkModel extends TreeModel<NetworkItem> implements INetworkList
     }
     
     public void attach() {
-        for (Device tDevice : mNetwork.getDevices())
-            doDeviceAdded(tDevice);
+        for (Device tDevice : mNetwork.getDevices()) {
+            WModelIndex tIndex = getIndex(mSectionKiosks.getRow(), 0);
+            NetworkItem tNetworkItem = new NetworkItem(tDevice, mSectionKiosks);                
+            mDevices.put(tDevice, tNetworkItem);
+            insertRows(0, Arrays.asList(tNetworkItem), tIndex);
+        }
         mNetwork.addListener(this);
     }
     
