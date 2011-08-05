@@ -42,18 +42,18 @@ public class ApplicationControl extends Control {
     public void LoadMedia(String iMediaIdentifier, String iMediaLocation) throws NetworkException {
         LoadMedia tAction = new LoadMedia(getService(), iMediaIdentifier, iMediaLocation);
         
-       new ActionCallback.Default(
-               tAction,
-               Network.getControlPoint()
+        new ActionCallback.Default(
+                tAction,
+                Network.getControlPoint()
         ).run();
     }
 
     public void LoadInterface(String iInterfaceIdentifier, String iInterfaceRole, String iInterfaceLocation) throws NetworkException {
         LoadInterface tAction = new LoadInterface(getService(), iInterfaceIdentifier, iInterfaceRole, iInterfaceLocation);
         
-       new ActionCallback.Default(
-               tAction,
-               Network.getControlPoint()
+        new ActionCallback.Default(
+                tAction,
+                Network.getControlPoint()
         ).run();
     }
 }

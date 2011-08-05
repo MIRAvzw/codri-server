@@ -10,6 +10,7 @@ import org.teleal.cling.model.action.ActionInvocation;
 import org.teleal.cling.model.meta.Service;
 import org.teleal.cling.model.types.Datatype;
 import org.teleal.cling.model.types.InvalidValueException;
+import org.teleal.cling.model.types.UnsignedIntegerOneByte;
 
 /**
  *
@@ -32,6 +33,6 @@ public class GetVolume extends ActionInvocation {
             throw new NetworkException("state variable not accessible");
         else if (oVolume.getDatatype().getBuiltin() != Datatype.Builtin.UI1)
             throw new NetworkException("invalid return type by Media.GetVolume (not an UI1)");
-        return (Integer) oVolume.getValue();
+        return (int) (long) ((UnsignedIntegerOneByte) oVolume.getValue()).getValue();
     }
 }

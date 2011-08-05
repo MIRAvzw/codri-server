@@ -8,6 +8,7 @@ import be.mira.adastra3.server.exceptions.NetworkException;
 import org.teleal.cling.model.action.ActionInvocation;
 import org.teleal.cling.model.meta.Service;
 import org.teleal.cling.model.types.InvalidValueException;
+import org.teleal.cling.model.types.UnsignedIntegerOneByte;
 
 /**
  *
@@ -18,7 +19,7 @@ public class SetVolume extends ActionInvocation {
         super(service.getAction("SetVolume"));
         
         try {
-            setInput("iVolumeValue", iVolume.toString());
+            setInput("iVolumeValue", new UnsignedIntegerOneByte(iVolume));
         }
         catch (InvalidValueException ex) {
             throw new NetworkException("could not invoke Device.SetVolume", ex);

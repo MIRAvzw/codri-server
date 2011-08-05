@@ -44,45 +44,37 @@ public class DeviceControl extends Control {
     public void Shutdown() throws NetworkException {
         Shutdown tAction = new Shutdown(getService());
         
-        Network.getControlPoint().execute(
-                new ActionCallback.Default(
-                    tAction,
-                    Network.getControlPoint()
-                )
-        );        
+        new ActionCallback.Default(
+                tAction,
+                Network.getControlPoint()
+        ).run();     
     }    
     
     public void Reboot() throws NetworkException {
         Reboot tAction = new Reboot(getService());
         
-        Network.getControlPoint().execute(
-                new ActionCallback.Default(
-                    tAction,
-                    Network.getControlPoint()
-                )
-        );
+        new ActionCallback.Default(
+                tAction,
+                Network.getControlPoint()
+        ).run();
     }
     
     public void SetVolume(Integer iVolume) throws NetworkException {        
         SetVolume tAction = new SetVolume(getService(), iVolume);
         
-        Network.getControlPoint().execute(
-                new ActionCallback.Default(
-                    tAction,
-                    Network.getControlPoint()
-                )
-        );
+        new ActionCallback.Default(
+                tAction,
+                Network.getControlPoint()
+        ).run();
     }
     
     public Integer GetVolume() throws NetworkException {
         GetVolume tAction = new GetVolume(getService());
         
-        Network.getControlPoint().execute(
-                new ActionCallback.Default(
-                    tAction,
-                    Network.getControlPoint()
-                )
-        );
+        new ActionCallback.Default(
+                tAction,
+                Network.getControlPoint()
+        ).run();
         
         return tAction.GetVolumeValue();
     }    

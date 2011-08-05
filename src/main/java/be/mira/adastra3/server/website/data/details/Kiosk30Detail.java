@@ -12,6 +12,7 @@ import eu.webtoolkit.jwt.WGroupBox;
 import eu.webtoolkit.jwt.WLabel;
 import eu.webtoolkit.jwt.WLineEdit;
 import eu.webtoolkit.jwt.WVBoxLayout;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -83,6 +84,7 @@ public class Kiosk30Detail extends WContainerWidget {
         try {
             mVolume.setText(iDevice.getDeviceControl().GetVolume().toString());
         } catch (NetworkException iException) {
+            Logger.getLogger(this.getClass()).error("could not get volume", iException);
             mVolume.setText("could not fetch volume");
         }
     }
