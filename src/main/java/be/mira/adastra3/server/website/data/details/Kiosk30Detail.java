@@ -85,6 +85,16 @@ public class Kiosk30Detail extends WContainerWidget {
         tVolumeSet.clicked().addListener(this, doVolumeSet);
         tInformationGrid.addWidget(tVolumeSet, 0, 3);
         
+        // Reboot
+        WPushButton tReboot = new WPushButton("Reboot");
+        tReboot.clicked().addListener(this, doReboot);
+        tInformationGrid.addWidget(tReboot, 1, 0);
+        
+        // Shutdown
+        WPushButton tShutdown = new WPushButton("Shutdown");
+        tReboot.clicked().addListener(this, doShutdown);
+        tInformationGrid.addWidget(tShutdown, 2, 0);
+        
         tBox.addWidget(tInformation); // redundant?
         
         return tBox;
@@ -120,9 +130,34 @@ public class Kiosk30Detail extends WContainerWidget {
         @Override
         public void trigger() {
             try {
+                debug().trigger("requesting device volume");
                 mVolume.setText(mDevice.getDeviceControl().GetVolume().toString());
             } catch (NetworkException iException) {
                 mEventError.trigger("coult not get device volume", iException);
+            }
+        }
+    };
+    
+    private Signal.Listener doReboot = new Signal.Listener() {
+        @Override
+        public void trigger() {
+            try {
+                debug().trigger("rebooting device");
+                mDevice.getDeviceControl().Reboot();
+            } catch (NetworkException iException) {
+                mEventError.trigger("coult not reboot device", iException);
+            }
+        }
+    };
+    
+    private Signal.Listener doShutdown = new Signal.Listener() {
+        @Override
+        public void trigger() {
+            try {
+                debug().trigger("shutting device down");
+                mDevice.getDeviceControl().Shutdown();
+            } catch (NetworkException iException) {
+                mEventError.trigger("coult not shutdown device", iException);
             }
         }
     };

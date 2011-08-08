@@ -15,6 +15,9 @@ VERSION 1.0
   - Allow execution of basic actions
 
 * Network subsystem
+  - Find the bug which causes kiosks to disappear from the network topology
+    This seems to be some sort of Cling timeout, as starting the workbench after
+    this happens results in a successful detection
 
 * Repository subsystem
 

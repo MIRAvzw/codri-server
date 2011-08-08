@@ -25,7 +25,6 @@ import java.util.SortedSet;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
 import org.apache.log4j.SimpleLayout;
 import org.apache.log4j.spi.LoggingEvent;
 import org.apache.log4j.spi.ThrowableInformation;
@@ -175,7 +174,7 @@ public class StatusApplication extends WApplication {
         Logger tLogger = Logger.getRootLogger();
         mLogAppender = new LogAppender(tLogText);
         mLogAppender.setLayout(new SimpleLayout());
-        mLogAppender.setThreshold(Level.DEBUG);
+        mLogAppender.setThreshold(Level.ALL);
         tLogger.addAppender(mLogAppender);
         
         return tLog;
