@@ -27,5 +27,5 @@ FUTURE
 ------
 
 * Repository subsystem
-  - Properly interpret changesets
+  - Properly interpret changesets (it be concerning configurations or media)
 

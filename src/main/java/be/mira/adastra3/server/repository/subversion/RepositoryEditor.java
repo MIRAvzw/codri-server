@@ -30,12 +30,12 @@ import org.tmatesoft.svn.core.io.diff.SVNDiffWindow;
  * 
  * @author tim
  */
-public class ConfigurationEditor implements ISVNEditor {
+public class RepositoryEditor implements ISVNEditor {
     //
     // Data members
     //
 
-    private static Logger mLogger = Logger.getLogger(ConfigurationEditor.class);
+    private static Logger mLogger = Logger.getLogger(RepositoryEditor.class);
     private ByteArrayOutputStream mTemporaryStream;
     private SVNDeltaProcessor myDeltaProcessor;
     protected String mDataIdentifier;
@@ -48,7 +48,7 @@ public class ConfigurationEditor implements ISVNEditor {
     // Construction and destruction
     //
 
-    public ConfigurationEditor() {
+    public RepositoryEditor() {
         myDeltaProcessor = new SVNDeltaProcessor();
         
         mConfigurations = new ArrayList<Configuration>();

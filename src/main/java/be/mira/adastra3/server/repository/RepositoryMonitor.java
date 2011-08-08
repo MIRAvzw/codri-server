@@ -5,7 +5,7 @@
 
 package be.mira.adastra3.server.repository;
 
-import be.mira.adastra3.server.repository.subversion.ConfigurationEditor;
+import be.mira.adastra3.server.repository.subversion.RepositoryEditor;
 import be.mira.adastra3.server.repository.subversion.DummyBaton;
 import be.mira.adastra3.server.Service;
 import be.mira.adastra3.server.exceptions.RepositoryException;
@@ -123,15 +123,16 @@ public class RepositoryMonitor extends Service {
         try {
             mSVNRevision = mSVNRepository.getLatestRevision();
 
-            // Checkout the new configurations
+            // Checkout the repository
             getLogger().debug("Checking out configurations");
             ISVNReporterBaton tConfigurationBaton = new DummyBaton(mSVNRevision);
-            ISVNEditor tConfigurationEditor = new ConfigurationEditor();
-            mSVNRepository.update(mSVNRevision, "configurations", true, tConfigurationBaton, tConfigurationEditor);
+            RepositoryEditor tRepositoryEditor = new RepositoryEditor();
+            mSVNRepository.update(mSVNRevision, "configurations", true, tConfigurationBaton, tRepositoryEditor);
             
-            // Process them
+            // Process the configurations
+            // TODO: detect the changed configurations
             Repository tRepository = Repository.getInstance();
-            List<Configuration> tConfigurations = ((ConfigurationEditor)tConfigurationEditor).getConfigurations();
+            List<Configuration> tConfigurations = tRepositoryEditor.getConfigurations();
             for (Configuration tConfiguration : tConfigurations) {
                 try {
                     // KioskConfiguration processing
@@ -157,6 +158,11 @@ public class RepositoryMonitor extends Service {
                     throw new RepositoryException("could not process configuration", iException);
                 }
             }
+            
+            // Process the media
+            // TODO: detect the changed media
+            //       this is only needed when we detect the changed configurations,
+            //       because now we reload each configuration anyhow
         }
         catch (SVNException e) {
             throw new RepositoryException("SVN checkout failed", e);
