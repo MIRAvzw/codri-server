@@ -20,7 +20,7 @@ public class GetVolumeAction extends ActionInvocation {
         super(iService.getAction("GetVolume"));
     }
     
-    public Integer getVolume() throws NetworkException {    
+    public final Integer getVolume() throws NetworkException {    
         ActionArgumentValue tVolume = getOutput("oVolumeValue");
         if (tVolume == null) {
             throw new NetworkException("state variable not accessible");

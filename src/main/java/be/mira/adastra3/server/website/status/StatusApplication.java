@@ -46,7 +46,7 @@ public class StatusApplication extends WApplication {
     private WTextArea mStatusbar;
     private final StringBuffer mStatusbarBuffer = new StringBuffer();
     
-    WTextArea mLogText;
+    private WTextArea mLogText;
     private LogAppender mLogAppender;
     private final StringBuffer mLogBuffer = new StringBuffer();
     
