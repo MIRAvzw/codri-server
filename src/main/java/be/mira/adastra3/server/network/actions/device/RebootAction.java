@@ -12,8 +12,8 @@ import org.teleal.cling.model.meta.Service;
  *
  * @author tim
  */
-public class Reboot extends ActionInvocation {
-    public Reboot(final Service iService) throws NetworkException {
+public class RebootAction extends ActionInvocation {
+    public RebootAction(final Service iService) throws NetworkException {
         super(iService.getAction("Reboot"));
     }
 }

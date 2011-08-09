@@ -12,8 +12,8 @@ import org.teleal.cling.model.meta.Service;
  *
  * @author tim
  */
-public class Shutdown extends ActionInvocation {
-    public Shutdown(final Service iService) throws NetworkException {
+public class ShutdownAction extends ActionInvocation {
+    public ShutdownAction(final Service iService) throws NetworkException {
         super(iService.getAction("Shutdown"));
     }
 }

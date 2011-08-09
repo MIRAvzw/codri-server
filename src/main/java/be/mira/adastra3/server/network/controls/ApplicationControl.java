@@ -6,8 +6,8 @@ package be.mira.adastra3.server.network.controls;
 
 import be.mira.adastra3.server.exceptions.NetworkException;
 import be.mira.adastra3.server.network.Network;
-import be.mira.adastra3.server.network.actions.application.LoadInterface;
-import be.mira.adastra3.server.network.actions.application.LoadMedia;
+import be.mira.adastra3.server.network.actions.application.LoadInterfaceAction;
+import be.mira.adastra3.server.network.actions.application.LoadMediaAction;
 import org.teleal.cling.controlpoint.ActionCallback;
 import org.teleal.cling.model.meta.RemoteService;
 import org.teleal.cling.model.types.ServiceId;
@@ -41,7 +41,7 @@ public class ApplicationControl extends Control {
     //
     
     public final void loadMedia(final String iMediaIdentifier, final String iMediaLocation) throws NetworkException {
-        LoadMedia tAction = new LoadMedia(getService(), iMediaIdentifier, iMediaLocation);
+        LoadMediaAction tAction = new LoadMediaAction(getService(), iMediaIdentifier, iMediaLocation);
         
         new ActionCallback.Default(
                 tAction,
@@ -50,7 +50,7 @@ public class ApplicationControl extends Control {
     }
 
     public final void loadInterface(final String iInterfaceIdentifier, final String iInterfaceRole, final String iInterfaceLocation) throws NetworkException {
-        LoadInterface tAction = new LoadInterface(getService(), iInterfaceIdentifier, iInterfaceRole, iInterfaceLocation);
+        LoadInterfaceAction tAction = new LoadInterfaceAction(getService(), iInterfaceIdentifier, iInterfaceRole, iInterfaceLocation);
         
         new ActionCallback.Default(
                 tAction,

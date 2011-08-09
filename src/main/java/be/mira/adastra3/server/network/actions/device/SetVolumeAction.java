@@ -14,8 +14,8 @@ import org.teleal.cling.model.types.UnsignedIntegerOneByte;
  *
  * @author tim
  */
-public class SetVolume extends ActionInvocation {
-    public SetVolume(final Service iService, final Integer iVolume) throws NetworkException {
+public class SetVolumeAction extends ActionInvocation {
+    public SetVolumeAction(final Service iService, final Integer iVolume) throws NetworkException {
         super(iService.getAction("SetVolume"));
         
         try {

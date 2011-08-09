@@ -6,10 +6,10 @@ package be.mira.adastra3.server.network.controls;
 
 import be.mira.adastra3.server.exceptions.NetworkException;
 import be.mira.adastra3.server.network.Network;
-import be.mira.adastra3.server.network.actions.device.GetVolume;
-import be.mira.adastra3.server.network.actions.device.Reboot;
-import be.mira.adastra3.server.network.actions.device.SetVolume;
-import be.mira.adastra3.server.network.actions.device.Shutdown;
+import be.mira.adastra3.server.network.actions.device.GetVolumeAction;
+import be.mira.adastra3.server.network.actions.device.RebootAction;
+import be.mira.adastra3.server.network.actions.device.SetVolumeAction;
+import be.mira.adastra3.server.network.actions.device.ShutdownAction;
 import org.teleal.cling.controlpoint.ActionCallback;
 import org.teleal.cling.model.meta.RemoteService;
 import org.teleal.cling.model.types.ServiceId;
@@ -43,7 +43,7 @@ public class DeviceControl extends Control {
     //
     
     public final void shutdown() throws NetworkException {
-        Shutdown tAction = new Shutdown(getService());
+        ShutdownAction tAction = new ShutdownAction(getService());
         
         new ActionCallback.Default(
                 tAction,
@@ -52,7 +52,7 @@ public class DeviceControl extends Control {
     }    
     
     public final void reboot() throws NetworkException {
-        Reboot tAction = new Reboot(getService());
+        RebootAction tAction = new RebootAction(getService());
         
         new ActionCallback.Default(
                 tAction,
@@ -61,7 +61,7 @@ public class DeviceControl extends Control {
     }
     
     public final void setVolume(final Integer iVolume) throws NetworkException {        
-        SetVolume tAction = new SetVolume(getService(), iVolume);
+        SetVolumeAction tAction = new SetVolumeAction(getService(), iVolume);
         
         new ActionCallback.Default(
                 tAction,
@@ -70,13 +70,13 @@ public class DeviceControl extends Control {
     }
     
     public final Integer getVolume() throws NetworkException {
-        GetVolume tAction = new GetVolume(getService());
+        GetVolumeAction tAction = new GetVolumeAction(getService());
         
         new ActionCallback.Default(
                 tAction,
                 Network.getControlPoint()
         ).run();
         
-        return tAction.GetVolumeValue();
+        return tAction.getVolume();
     }    
 }

@@ -15,12 +15,12 @@ import org.teleal.cling.model.types.UnsignedIntegerOneByte;
  *
  * @author tim
  */
-public class GetVolume extends ActionInvocation {
-    public GetVolume(final Service iService) throws NetworkException {
+public class GetVolumeAction extends ActionInvocation {
+    public GetVolumeAction(final Service iService) throws NetworkException {
         super(iService.getAction("GetVolume"));
     }
     
-    public Integer GetVolumeValue() throws NetworkException {    
+    public Integer getVolume() throws NetworkException {    
         ActionArgumentValue tVolume = getOutput("oVolumeValue");
         if (tVolume == null) {
             throw new NetworkException("state variable not accessible");
