@@ -149,6 +149,57 @@
           <target>1.6</target>
         </configuration>
       </plugin>
+  	  <plugin>
+	      <groupId>org.apache.maven.plugins</groupId>
+	      <artifactId>maven-site-plugin</artifactId>
+	      <version>3.0</version>
+	      <configuration>
+	        <reportPlugins>
+            <!-- General project information -->
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-project-info-reports-plugin</artifactId>
+            </plugin>
+            <!-- Report about violations of coding standards -->
+            <plugin>
+              <artifactId>maven-checkstyle-plugin</artifactId>
+              <configuration>
+                <configLocation>checkstyle.xml</configLocation>
+              </configuration>
+            </plugin>
+            <!-- Generate "PMD" and "CPD" reports -->
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-pmd-plugin</artifactId>
+              <configuration>
+                <linkXref>true</linkXref>
+                <sourceEncoding>utf-8</sourceEncoding>
+                <minimumTokens>100</minimumTokens>
+                <targetJdk>1.6</targetJdk>
+              </configuration>
+            </plugin>
+            <!-- Generate "JDepend" report -->
+            <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>jdepend-maven-plugin</artifactId>
+            </plugin>
+            <!-- Generate "FindBugs Report" report -->
+            <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>findbugs-maven-plugin</artifactId>
+              <configuration>
+                <threshold>Normal</threshold>
+                <effort>Default</effort>
+              </configuration>
+            </plugin>
+            <!-- Generate "JavaNCSS Report" report -->
+            <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>javancss-maven-plugin</artifactId>
+            </plugin>
+	        </reportPlugins>
+	      </configuration>
+	    </plugin>
     </plugins>
   </build>
 </project>
