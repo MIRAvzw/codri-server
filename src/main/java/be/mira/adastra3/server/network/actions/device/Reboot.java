@@ -7,20 +7,13 @@ package be.mira.adastra3.server.network.actions.device;
 import be.mira.adastra3.server.exceptions.NetworkException;
 import org.teleal.cling.model.action.ActionInvocation;
 import org.teleal.cling.model.meta.Service;
-import org.teleal.cling.model.types.InvalidValueException;
 
 /**
  *
  * @author tim
  */
 public class Reboot extends ActionInvocation {
-    public Reboot(Service service) throws NetworkException {
-        super(service.getAction("Reboot"));
-        try {
-            /* No parameters required */
-        }
-        catch (InvalidValueException ex) {
-            throw new NetworkException("could not invoke Device.Reboot", ex);
-        }
+    public Reboot(final Service iService) throws NetworkException {
+        super(iService.getAction("Reboot"));
     }
 }

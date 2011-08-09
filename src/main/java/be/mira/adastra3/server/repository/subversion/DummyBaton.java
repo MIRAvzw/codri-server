@@ -28,15 +28,15 @@ public class DummyBaton implements ISVNReporterBaton {
     // Data members
     //
 
-    private long exportRevision;
+    private long mExportRevision;
 
 
     //
     // Construction and destruction
     //
 
-    public DummyBaton(long revision) {
-        exportRevision = revision;
+    public DummyBaton(final long iRevision) {
+        mExportRevision = iRevision;
     }
 
 
@@ -45,24 +45,19 @@ public class DummyBaton implements ISVNReporterBaton {
     //
     
     @Override
-    public void report(ISVNReporter reporter) throws SVNException {
-        try {
-            /*
-             * Here empty working copy is reported.
-             *
-             * ISVNReporter includes methods that allows to report mixed-rev working copy
-             * and even let server know that some files or directories are locally missing or
-             * locked.
-             */
-            reporter.setPath("", null, exportRevision, SVNDepth.INFINITY, true);
+    public final void report(final ISVNReporter iReporter) throws SVNException {
+        /*
+         * Here empty working copy is reported.
+         *
+         * ISVNReporter includes methods that allows to report mixed-rev working copy
+         * and even let server know that some files or directories are locally missing or
+         * locked.
+         */
+        iReporter.setPath("", null, mExportRevision, SVNDepth.INFINITY, true);
 
-            /*
-             * Don't forget to finish the report!
-             */
-            reporter.finishReport();
-        } catch (SVNException svne) {
-            reporter.abortReport();
-            System.out.println("Report failed.");
-        }
+        /*
+         * Don't forget to finish the report!
+         */
+        iReporter.finishReport();
     }
 }

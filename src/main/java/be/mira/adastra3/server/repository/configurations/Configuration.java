@@ -34,24 +34,26 @@ public abstract class Configuration {
     // Getters and setters
     //
     
-    protected Object getProperty(String iName) {
-        if (mProperties.containsKey(iName))
+    protected final Object getProperty(final String iName) {
+        if (mProperties.containsKey(iName)) {
             return mProperties.get(iName);
-        else
+        } else {
             return null;
+        }
     }
     
-    protected void setProperty(String iName, Object iProperty) {
-        if (iProperty == null)
+    protected final void setProperty(final String iName, final Object iProperty) {
+        if (iProperty == null) {
             return;
+        }
         mProperties.put(iName, iProperty);
     }
     
-    public long getRevision() {
+    public final long getRevision() {
         return mRevision;
     }
     
-    public void setRevision(long iRevision) {
+    public final void setRevision(final long iRevision) {
         mRevision = iRevision;
     }
 }

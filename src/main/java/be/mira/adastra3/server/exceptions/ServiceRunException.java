@@ -10,19 +10,15 @@ package be.mira.adastra3.server.exceptions;
  * @author tim
  */
 public class ServiceRunException extends Exception {
-    public ServiceRunException() {
-        super();
+    public ServiceRunException(final Throwable iCause) {
+        super(iCause);
     }
     
-    public ServiceRunException(String iMessage) {
+    public ServiceRunException(final String iMessage) {
         super(iMessage);
     }
 
-    public ServiceRunException(String message, Throwable cause) {
-        super(message, cause);
-    }
-    
-    public ServiceRunException(Exception e) {
-        super(e);
+    public ServiceRunException(final String iMessage, final Throwable iCause) {
+        super(iMessage, iCause);
     }
 }

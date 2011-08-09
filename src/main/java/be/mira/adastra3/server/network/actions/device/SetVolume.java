@@ -15,14 +15,13 @@ import org.teleal.cling.model.types.UnsignedIntegerOneByte;
  * @author tim
  */
 public class SetVolume extends ActionInvocation {
-    public SetVolume(Service service, Integer iVolume) throws NetworkException {
-        super(service.getAction("SetVolume"));
+    public SetVolume(final Service iService, final Integer iVolume) throws NetworkException {
+        super(iService.getAction("SetVolume"));
         
         try {
             setInput("iVolumeValue", new UnsignedIntegerOneByte(iVolume));
-        }
-        catch (InvalidValueException ex) {
-            throw new NetworkException("could not invoke Device.SetVolume", ex);
+        } catch (InvalidValueException tException) {
+            throw new NetworkException("could not invoke Device.SetVolume", tException);
         }
     }
 }

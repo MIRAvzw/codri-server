@@ -21,17 +21,18 @@ public class ApplicationControl extends Control {
     // Data members
     //
     
-    public static ServiceId ServiceId = new ServiceId("mira-be", "Application:1");
+    public final static ServiceId cIdentifier = new ServiceId("mira-be", "Application:1");
     
     
     //
     // Construction and destruction
     //
 
-    public ApplicationControl(RemoteService iService) throws NetworkException {
+    public ApplicationControl(final RemoteService iService) throws NetworkException {
         super(iService);
-        if (! iService.getServiceId().equals(ServiceId))
+        if (! iService.getServiceId().equals(cIdentifier)) {
             throw new NetworkException("MediaControl instantiated for a non-MediaService");
+        }
     }
     
     
@@ -39,7 +40,7 @@ public class ApplicationControl extends Control {
     // Service actions
     //
     
-    public void LoadMedia(String iMediaIdentifier, String iMediaLocation) throws NetworkException {
+    public final void loadMedia(final String iMediaIdentifier, final String iMediaLocation) throws NetworkException {
         LoadMedia tAction = new LoadMedia(getService(), iMediaIdentifier, iMediaLocation);
         
         new ActionCallback.Default(
@@ -48,7 +49,7 @@ public class ApplicationControl extends Control {
         ).run();
     }
 
-    public void LoadInterface(String iInterfaceIdentifier, String iInterfaceRole, String iInterfaceLocation) throws NetworkException {
+    public final void loadInterface(final String iInterfaceIdentifier, final String iInterfaceRole, final String iInterfaceLocation) throws NetworkException {
         LoadInterface tAction = new LoadInterface(getService(), iInterfaceIdentifier, iInterfaceRole, iInterfaceLocation);
         
         new ActionCallback.Default(

@@ -14,15 +14,14 @@ import org.teleal.cling.model.types.InvalidValueException;
  * @author tim
  */
 public class LoadInterface extends ActionInvocation {
-    public LoadInterface(Service service, String iInterfaceIdentifier, String iInterfaceRole, String iInterfaceLocation) throws NetworkException {
-        super(service.getAction("LoadInterface"));
+    public LoadInterface(final Service iService, final String iInterfaceIdentifier, final String iInterfaceRole, final String iInterfaceLocation) throws NetworkException {
+        super(iService.getAction("LoadInterface"));
         try {
             setInput("iInterfaceIdentifierValue", iInterfaceIdentifier);
             setInput("iInterfaceRoleValue", iInterfaceRole);
             setInput("iInterfaceLocationValue", iInterfaceLocation);
-        }
-        catch (InvalidValueException ex) {
-            throw new NetworkException("could not invoke Application.LoadInterface", ex);
+        } catch (InvalidValueException tException) {
+            throw new NetworkException("could not invoke Application.LoadInterface", tException);
         }
     }
 }

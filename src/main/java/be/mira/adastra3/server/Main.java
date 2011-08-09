@@ -42,48 +42,46 @@ public class Main implements SignalHandler {
     // Member data
     //
 
-    private SignalHandler oldHandler;
+    private SignalHandler mOldHandler;
 
     //
     // Routines
     //
 
     @Override
-    public void handle(Signal signal) {
-        mLogger.info("Received signal " + signal.getName());
+    public final void handle(final Signal iSignal) {
+        LOGGER.info("Received signal " + iSignal.getName());
         
         try {
-            signalAction(signal);
+            signalAction(iSignal);
 
             // Chain back to previous handler, if one exists
-            if (oldHandler != SIG_DFL && oldHandler != SIG_IGN) {
-                oldHandler.handle(signal);
+            if (mOldHandler != SIG_DFL && mOldHandler != SIG_IGN) {
+                mOldHandler.handle(iSignal);
             }
 
-        } catch (Exception e) {
-            mLogger.error("Signal handler for signal " + signal.getName() + " failed", e);
+        } catch (Exception tException) {
+            LOGGER.error("Signal handler for signal " + iSignal.getName() + " failed", tException);
         }
     }
 
-    public void signalAction(Signal signal) {
-        mLogger.info("Handling signal " + signal.getName());
+    public final void signalAction(final Signal iSignal) {
+        LOGGER.info("Handling signal " + iSignal.getName());
 
-        if (mStatus == Status.RUNNING) {
-            mLogger.info("Stopping subsystems");
-            mStatus = Status.STOPPING;
+        if (STATUS == Status.RUNNING) {
+            LOGGER.info("Stopping subsystems");
+            STATUS = Status.STOPPING;
             stop();
 
-            mLogger.info("Exiting");
-            mStatus = Status.IDLE;
+            LOGGER.info("Exiting");
+            STATUS = Status.IDLE;
             System.exit(0);
-        }
-        else if (mStatus != Status.STOPPING) {
-            mLogger.info("Exiting");
-            mStatus = Status.IDLE;
+        } else if (STATUS != Status.STOPPING) {
+            LOGGER.info("Exiting");
+            STATUS = Status.IDLE;
             System.exit(0);
-        }
-        else {
-            mLogger.debug("Ignoring signal as the application is " + mStatus.name());
+        } else {
+            LOGGER.debug("Ignoring signal as the application is " + STATUS.name());
         }
     }
 
@@ -92,35 +90,34 @@ public class Main implements SignalHandler {
     // Static
     //
 
-    private static Map<ServiceType, Service> mSubservices;
-    private final static Map<ServiceType, String> mServiceNames;
-    private static Controller mController;
+    private static Map<ServiceType, Service> SUBSERVICES;
+    private final static Map<ServiceType, String> cServiceNames;
     static {
-        mServiceNames = new EnumMap<ServiceType, String>(ServiceType.class);
-        mServiceNames.put(ServiceType.NETWORK, "network monitor");
-        mServiceNames.put(ServiceType.REPOSITORY, "repository monitor");
-        mServiceNames.put(ServiceType.WEBSITE, "web server");
-        mServiceNames.put(ServiceType.CONTROLLER, "application controller");
+        cServiceNames = new EnumMap<ServiceType, String>(ServiceType.class);
+        cServiceNames.put(ServiceType.NETWORK, "network monitor");
+        cServiceNames.put(ServiceType.REPOSITORY, "repository monitor");
+        cServiceNames.put(ServiceType.WEBSITE, "web server");
+        cServiceNames.put(ServiceType.CONTROLLER, "application controller");
     }
-    private static Logger mLogger;
-    private static Status mStatus = Status.IDLE;
+    private static Logger LOGGER;
+    private static Status STATUS = Status.IDLE;
 
-    public static SignalHandler install(String signalName) {
-        mLogger.debug("Installing signal handler for SIG " + signalName);
+    public static SignalHandler install(final String iSignalName) {
+        LOGGER.debug("Installing signal handler for SIG " + iSignalName);
         
-        Signal diagSignal = new Signal(signalName);
-        Main instance = new Main();
-        instance.oldHandler = Signal.handle(diagSignal, instance);
-        return instance;
+        Signal tSignal = new Signal(iSignalName);
+        Main tInstance = new Main();
+        tInstance.mOldHandler = Signal.handle(tSignal, tInstance);
+        return tInstance;
     }
 
-    public static void main(String[] args) throws ServletException, LifecycleException {
+    public static void main(final String[] iParameters) throws ServletException, LifecycleException {
         //
         // Set-up
         //
 
         // Logging
-        mLogger = Logger.getLogger(Main.class);
+        LOGGER = Logger.getLogger(Main.class);
 
         // Install handlers
         Main.install("TERM");
@@ -128,12 +125,12 @@ public class Main implements SignalHandler {
         Main.install("ABRT");
 
         // Subsystems
-        mLogger.info("Initializing subsystems");
-        mStatus = Status.INITIALIZING;
+        LOGGER.info("Initializing subsystems");
+        STATUS = Status.INITIALIZING;
         if (!initialize()) {
-            mLogger.error("Some subsystems failed to initialize, bailing out");
+            LOGGER.error("Some subsystems failed to initialize, bailing out");
 
-            mStatus = Status.IDLE;
+            STATUS = Status.IDLE;
             System.exit(0);
         }
 
@@ -142,15 +139,15 @@ public class Main implements SignalHandler {
         //
 
         // Subsystems
-        mLogger.info("Starting subsystems");
-        mStatus = Status.STARTING;
+        LOGGER.info("Starting subsystems");
+        STATUS = Status.STARTING;
         if (!start()) {
-            mLogger.error("Some subsystems failed to start, bailing out");
+            LOGGER.error("Some subsystems failed to start, bailing out");
 
-            mStatus = Status.STOPPING;
+            STATUS = Status.STOPPING;
             stop();
 
-            mStatus = Status.IDLE;
+            STATUS = Status.IDLE;
             System.exit(0);
         }
 
@@ -159,33 +156,33 @@ public class Main implements SignalHandler {
         // Sleep
         //
 
-        mLogger.info("Entering main loop");
-        mStatus = Status.RUNNING;
+        LOGGER.info("Entering main loop");
+        STATUS = Status.RUNNING;
         while (true) {
             try {
                 Thread.sleep(50);
-            } catch (InterruptedException e) {
-                mLogger.warn("Main loop interrupted", e);
+            } catch (InterruptedException tException) {
+                LOGGER.warn("Main loop interrupted", tException);
                 break;
             }
         }
 
-        mLogger.info("Stopping subsystems");
-        mStatus = Status.STOPPING;
+        LOGGER.info("Stopping subsystems");
+        STATUS = Status.STOPPING;
         stop();
 
-        mLogger.info("Exiting");
-        mStatus = Status.IDLE;
+        LOGGER.info("Exiting");
+        STATUS = Status.IDLE;
         System.exit(0);
     }
 
     private static boolean initialize() {
         // Map with service objects
-        mSubservices = new EnumMap<ServiceType, Service>(ServiceType.class);
+        SUBSERVICES = new EnumMap<ServiceType, Service>(ServiceType.class);
 
         // Process all subservices
         for (ServiceType tServiceType : ServiceType.values()) {
-            mLogger.debug("Initializing the " + mServiceNames.get(tServiceType));
+            LOGGER.debug("Initializing the " + cServiceNames.get(tServiceType));
             try {
                 Service tService = null;
                 switch (tServiceType) {
@@ -203,11 +200,11 @@ public class Main implements SignalHandler {
                         tService = new Controller();
                         break;
                     default:
-                        throw new ServiceSetupException("I don't know how to initialize the " + mServiceNames.get(tServiceType));
+                        throw new ServiceSetupException("I don't know how to initialize the " + cServiceNames.get(tServiceType));
                 }
-                mSubservices.put(tServiceType, tService);
-            } catch (ServiceSetupException e) {
-                mLogger.error("Could not initialize the " + mServiceNames.get(tServiceType), e);
+                SUBSERVICES.put(tServiceType, tService);
+            } catch (ServiceSetupException tException) {
+                LOGGER.error("Could not initialize the " + cServiceNames.get(tServiceType), tException);
                 return false;
             }
         }
@@ -216,13 +213,13 @@ public class Main implements SignalHandler {
     }
 
     private static boolean start() {
-        for (ServiceType tServiceType : mSubservices.keySet()) {
-            Service tService = mSubservices.get(tServiceType);
-            mLogger.debug("Starting the " + mServiceNames.get(tServiceType));
+        for (ServiceType tServiceType : SUBSERVICES.keySet()) {
+            Service tService = SUBSERVICES.get(tServiceType);
+            LOGGER.debug("Starting the " + cServiceNames.get(tServiceType));
             try {
                 tService.run();
-            } catch (ServiceRunException e) {
-                mLogger.error("Could not start the " + mServiceNames.get(tServiceType), e);
+            } catch (ServiceRunException tException) {
+                LOGGER.error("Could not start the " + cServiceNames.get(tServiceType), tException);
                 return false;
             }
         }
@@ -231,14 +228,14 @@ public class Main implements SignalHandler {
     }
 
     private static void stop() {
-        for (ServiceType tServiceType : mSubservices.keySet()) {
-            Service tService = mSubservices.get(tServiceType);
-            mLogger.debug("Stopping the " + mServiceNames.get(tServiceType));
+        for (ServiceType tServiceType : SUBSERVICES.keySet()) {
+            Service tService = SUBSERVICES.get(tServiceType);
+            LOGGER.debug("Stopping the " + cServiceNames.get(tServiceType));
             try {
                 tService.stop();
-                mSubservices.remove(tServiceType);
-            } catch (ServiceRunException e) {
-                mLogger.error("Could not stop the " + mServiceNames.get(tServiceType), e);
+                SUBSERVICES.remove(tServiceType);
+            } catch (ServiceRunException tException) {
+                LOGGER.error("Could not stop the " + cServiceNames.get(tServiceType), tException);
             }
         }
     }

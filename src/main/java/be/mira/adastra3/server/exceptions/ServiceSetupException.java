@@ -10,20 +10,15 @@ package be.mira.adastra3.server.exceptions;
  * @author tim
  */
 public class ServiceSetupException extends Exception {
-    public ServiceSetupException() {
-        super();
+    public ServiceSetupException(final Throwable iCause) {
+        super(iCause);
     }
     
-    public ServiceSetupException(String iMessage) {
+    public ServiceSetupException(final String iMessage) {
         super(iMessage);
     }
 
-    public ServiceSetupException(String message, Throwable cause) {
-        super(message, cause);
+    public ServiceSetupException(final String iMessage, final Throwable iCause) {
+        super(iMessage, iCause);
     }
-    
-    public ServiceSetupException(Exception e) {
-        super(e);
-    }
-
 }

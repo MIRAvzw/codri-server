@@ -35,11 +35,11 @@ public class RepositoryEditor implements ISVNEditor {
     // Data members
     //
 
-    private static Logger mLogger = Logger.getLogger(RepositoryEditor.class);
+    private static Logger LOGGER = Logger.getLogger(RepositoryEditor.class);
     private ByteArrayOutputStream mTemporaryStream;
-    private SVNDeltaProcessor myDeltaProcessor;
-    protected String mDataIdentifier;
-    protected String mRepositoryDirectory = "configurations";
+    private SVNDeltaProcessor mDeltaProcessor;
+    private String mDataIdentifier;
+    private String mRepositoryDirectory = "configurations";
     private long mRevision;
     private List<Configuration> mConfigurations;
 
@@ -49,7 +49,7 @@ public class RepositoryEditor implements ISVNEditor {
     //
 
     public RepositoryEditor() {
-        myDeltaProcessor = new SVNDeltaProcessor();
+        mDeltaProcessor = new SVNDeltaProcessor();
         
         mConfigurations = new ArrayList<Configuration>();
     }
@@ -59,7 +59,7 @@ public class RepositoryEditor implements ISVNEditor {
     // Getters and setters
     //
     
-    public List<Configuration> getConfigurations() {
+    public final List<Configuration> getConfigurations() {
         return mConfigurations;
     }
 
@@ -73,17 +73,17 @@ public class RepositoryEditor implements ISVNEditor {
      * instructions will update working copy to.
      */
     @Override
-    public void targetRevision(long revision) throws SVNException {
-        mLogger.trace("Next instructions target revision " + revision);
-        mRevision = revision;
+    public final void targetRevision(final long iRevision) throws SVNException {
+        LOGGER.trace("Next instructions target revision " + iRevision);
+        mRevision = iRevision;
     }
 
     /*
      * Called before sending other instructions.
      */
     @Override
-    public void openRoot(long revision) throws SVNException {
-        mLogger.trace("Opening root at revision " + revision);
+    public final void openRoot(final long iRevision) throws SVNException {
+        LOGGER.trace("Opening root at revision " + iRevision);
     }
 
     /*
@@ -95,8 +95,8 @@ public class RepositoryEditor implements ISVNEditor {
      * This implementation creates corresponding directory below root directory.
      */
     @Override
-    public void addDir(String path, String copyFromPath, long copyFromRevision) throws SVNException {
-        mLogger.trace("Adding directory '" + path + "'");
+    public final void addDir(final String iPath, final String iCopyFromPath, final long iCopyFromRevision) throws SVNException {
+        LOGGER.trace("Adding directory '" + iPath + "'");
     }
 
     /*
@@ -109,8 +109,8 @@ public class RepositoryEditor implements ISVNEditor {
      * no 'existing' directories.
      */
     @Override
-    public void openDir(String path, long revision) throws SVNException {
-        mLogger.trace("Opening directory '" + path + "'");
+    public final void openDir(final String iPath, final long iRevision) throws SVNException {
+        LOGGER.trace("Opening directory '" + iPath + "'");
     }
 
     /*
@@ -123,8 +123,8 @@ public class RepositoryEditor implements ISVNEditor {
      * When property has to be deleted value will be 'null'.
      */
     @Override
-    public void changeDirProperty(String name, SVNPropertyValue property) throws SVNException {
-        mLogger.trace("Changing properties of directory '" + name + "'");
+    public final void changeDirProperty(final String iName, final SVNPropertyValue iProperty) throws SVNException {
+        LOGGER.trace("Changing properties of directory '" + iName + "'");
     }
 
     /*
@@ -137,35 +137,35 @@ public class RepositoryEditor implements ISVNEditor {
      * will be updated later, and for empty files may not be sent at all.
      */
     @Override
-    public void addFile(String path, String copyFromPath, long copyFromRevision) throws SVNException {
-        mLogger.trace("Adding file '" + path + "'");
-        if (copyFromPath != null ) {
-            SVNErrorMessage err = SVNErrorMessage.create(SVNErrorCode.IO_ERROR, "Current editor does not support copying files");
-            throw new SVNException(err);
+    public final void addFile(final String iPath, final String iCopyFromPath, final long iCopyFromRevision) throws SVNException {
+        LOGGER.trace("Adding file '" + iPath + "'");
+        if (iCopyFromPath != null) {
+            SVNErrorMessage tError = SVNErrorMessage.create(SVNErrorCode.IO_ERROR, "Current editor does not support copying files");
+            throw new SVNException(tError);
         }
-        File tFile = new File(path);
+        File tFile = new File(iPath);
 
         // Check if file is in the appropriate directory
         File tFileParent = tFile.getParentFile();
         if (tFileParent == null || ! tFileParent.getName().equals(mRepositoryDirectory) || tFileParent.getParentFile() != null) {
-            SVNErrorMessage err = SVNErrorMessage.create(SVNErrorCode.IO_ERROR, "File in wrong directory found");
-            throw new SVNException(err);
+            SVNErrorMessage tError = SVNErrorMessage.create(SVNErrorCode.IO_ERROR, "File in wrong directory found");
+            throw new SVNException(tError);
         }
 
         // Check extension
         int tDotPosition = tFile.getName().lastIndexOf('.');
         if (tDotPosition == -1) {
-            SVNErrorMessage err = SVNErrorMessage.create(SVNErrorCode.IO_ERROR, "File without extension found");
-            throw new SVNException(err);
+            SVNErrorMessage tError = SVNErrorMessage.create(SVNErrorCode.IO_ERROR, "File without extension found");
+            throw new SVNException(tError);
         }
         if (tDotPosition == 0) {
-            mLogger.debug("Ignoring hidden file");
+            LOGGER.debug("Ignoring hidden file");
             return;
         }
         String tFileExtension = tFile.getName().substring(tDotPosition+1);
         if (! tFileExtension.equalsIgnoreCase("xml")) {
-            SVNErrorMessage err = SVNErrorMessage.create(SVNErrorCode.IO_ERROR, "File with unknown extension found");
-            throw new SVNException(err);
+            SVNErrorMessage tError = SVNErrorMessage.create(SVNErrorCode.IO_ERROR, "File with unknown extension found");
+            throw new SVNException(tError);
         }
         String tFileBasename = tFile.getName().substring(0, tDotPosition);
 
@@ -183,9 +183,9 @@ public class RepositoryEditor implements ISVNEditor {
      * no 'existing' files.
      */
     @Override
-    public void openFile(String path, long revision) throws SVNException {
-        SVNErrorMessage err = SVNErrorMessage.create(SVNErrorCode.IO_ERROR, "Current editor does not support opening existing files");
-        throw new SVNException(err);
+    public final void openFile(final String iPath, final long iRevision) throws SVNException {
+        SVNErrorMessage tError = SVNErrorMessage.create(SVNErrorCode.IO_ERROR, "Current editor does not support opening existing files");
+        throw new SVNException(tError);
     }
 
     /*
@@ -195,7 +195,8 @@ public class RepositoryEditor implements ISVNEditor {
      * transfor file contents propertly after receiving.
      */
     @Override
-    public void changeFileProperty(String path, String name, SVNPropertyValue property) throws SVNException {
+    public final void changeFileProperty(final String iPath, final String iName, final SVNPropertyValue iProperty) throws SVNException {
+        LOGGER.trace("Changing properties of file '" + iName + "'");
     }
 
     /*
@@ -206,11 +207,12 @@ public class RepositoryEditor implements ISVNEditor {
      * like to store the result of delta application.
      */
     @Override
-    public void applyTextDelta(String path, String baseChecksum) throws SVNException {
-        if (mTemporaryStream == null)
+    public final void applyTextDelta(final String iPath, final String iBaseChecksum) throws SVNException {
+        if (mTemporaryStream == null) {
             return;
+        }
 
-        myDeltaProcessor.applyTextDelta((InputStream) null, mTemporaryStream, false);
+        mDeltaProcessor.applyTextDelta((InputStream) null, mTemporaryStream, false);
     }
 
     /*
@@ -219,22 +221,24 @@ public class RepositoryEditor implements ISVNEditor {
      * these windows for us.
      */
     @Override
-    public OutputStream textDeltaChunk(String path, SVNDiffWindow diffWindow) throws SVNException {
-        if (mTemporaryStream == null)
+    public final OutputStream textDeltaChunk(final String iPath, final SVNDiffWindow iDiffWindow) throws SVNException {
+        if (mTemporaryStream == null) {
             return null;
+        }
 
-        return myDeltaProcessor.textDeltaChunk(diffWindow);
+        return mDeltaProcessor.textDeltaChunk(iDiffWindow);
     }
 
     /*
      * Called when all diff windows (delta) is transferred.
      */
     @Override
-    public void textDeltaEnd(String path) throws SVNException {
-        if (mTemporaryStream == null)
+    public final void textDeltaEnd(final String iPath) throws SVNException {
+        if (mTemporaryStream == null) {
             return;
+        }
 
-        myDeltaProcessor.textDeltaEnd();
+        mDeltaProcessor.textDeltaEnd();
     }
 
     /*
@@ -242,10 +246,11 @@ public class RepositoryEditor implements ISVNEditor {
      * This call always matches addFile or openFile call.
      */
     @Override
-    public void closeFile(String path, String textChecksum) throws SVNException {
-        mLogger.trace("Closing file '" + path + "'");
-        if (mTemporaryStream == null)
+    public final void closeFile(final String iPath, final String iTextChecksum) throws SVNException {
+        LOGGER.trace("Closing file '" + iPath + "'");
+        if (mTemporaryStream == null) {
             return;
+        }
 
         // Read and proces the received data        
         try {
@@ -255,18 +260,17 @@ public class RepositoryEditor implements ISVNEditor {
             if (tReader.getConfiguration() != null) {
                 tReader.getConfiguration().setRevision(mRevision);
                 mConfigurations.add(tReader.getConfiguration());
-            } else
+            } else {
                 throw new RepositoryException("found empty configuration file");
-        }
-        catch (RepositoryException e) {
+            }
+        } catch (RepositoryException tException) {
             // TODO: bug in SVNKIt, the inner error does not get printed
             // http://old.nabble.com/Passing-an-exception-to-SVNException-td31171795.html
-            mLogger.error("SVNKit inner exception", e);
+            LOGGER.error("SVNKit inner exception", tException);
             
-            SVNErrorMessage err = SVNErrorMessage.create(SVNErrorCode.IO_ERROR, "could not process file contents");
-            throw new SVNException(err, e);
-        }
-        finally {
+            SVNErrorMessage tError = SVNErrorMessage.create(SVNErrorCode.IO_ERROR, "could not process file contents");
+            throw new SVNException(tError, tException);
+        } finally {
             mTemporaryStream = null;
             mDataIdentifier = null;
         }
@@ -277,8 +281,8 @@ public class RepositoryEditor implements ISVNEditor {
      * This call always matches addDir, openDir or openRoot call.
      */
     @Override
-    public void closeDir() throws SVNException {
-        mLogger.trace("Closing directory");
+    public final void closeDir() throws SVNException {
+        LOGGER.trace("Closing directory");
     }
 
     /*
@@ -286,8 +290,8 @@ public class RepositoryEditor implements ISVNEditor {
      * called during export operation.
      */
     @Override
-    public void deleteEntry(String path, long revision) throws SVNException {
-        mLogger.trace("Deleting entry '" + path + "'");
+    public final void deleteEntry(final String iPath, final long iRevision) throws SVNException {
+        LOGGER.trace("Deleting entry '" + iPath + "'");
     }
 
     /*
@@ -296,8 +300,8 @@ public class RepositoryEditor implements ISVNEditor {
      * access rights to get information on this directory (properties, children).
      */
     @Override
-    public void absentDir(String path) throws SVNException {
-        mLogger.trace("Access denied to directory '" + path + "' (will be marked as absent)");
+    public final void absentDir(final String iPath) throws SVNException {
+        LOGGER.trace("Access denied to directory '" + iPath + "' (will be marked as absent)");
     }
 
     /*
@@ -306,16 +310,16 @@ public class RepositoryEditor implements ISVNEditor {
      * access rights to get information on this file (contents, properties).
      */
     @Override
-    public void absentFile(String path) throws SVNException {
-        mLogger.trace("Access denied to file '" + path + "' (will be marked as absent)");
+    public final void absentFile(final String iPath) throws SVNException {
+        LOGGER.trace("Access denied to file '" + iPath + "' (will be marked as absent)");
     }
 
     /*
      * Called when update is completed.
      */
     @Override
-    public SVNCommitInfo closeEdit() throws SVNException {
-        mLogger.trace("Closing an edit");
+    public final SVNCommitInfo closeEdit() throws SVNException {
+        LOGGER.trace("Closing an edit");
 
         return null;
     }
@@ -325,7 +329,7 @@ public class RepositoryEditor implements ISVNEditor {
      * requests client to abort update operation.
      */
     @Override
-    public void abortEdit() throws SVNException {
-        mLogger.trace("Aborting an edit");
+    public final void abortEdit() throws SVNException {
+        LOGGER.trace("Aborting an edit");
     }
 }

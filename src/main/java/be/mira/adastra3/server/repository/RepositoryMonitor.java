@@ -19,7 +19,6 @@ import java.util.TimerTask;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
-import org.tmatesoft.svn.core.io.ISVNEditor;
 import org.tmatesoft.svn.core.io.ISVNReporterBaton;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
@@ -50,9 +49,8 @@ public class RepositoryMonitor extends Service {
             getLogger().debug("Checking SVN revision");
             try {
                 update();
-            }
-            catch (RepositoryException iException) {
-                Repository.getInstance().emitError("could not update repository", iException);
+            } catch (RepositoryException tException) {
+                Repository.getInstance().emitError("could not update repository", tException);
             }
         }
     }
@@ -77,17 +75,17 @@ public class RepositoryMonitor extends Service {
         try {
             SVNURL tSVNLocation = SVNURL.parseURIDecoded(mDAVLocation);
             mSVNRepository = SVNRepositoryFactory.create(tSVNLocation, null);
-        }
-        catch (SVNException e) {
-            throw new ServiceSetupException(e);
+        } catch (SVNException tException) {
+            throw new ServiceSetupException(tException);
         }
 
         // Monitor timer
-        Integer iInterval = Integer.parseInt(getProperty("interval", "60"));
-        if (iInterval <= 0)
+        Integer tInterval = Integer.parseInt(getProperty("interval", "60"));
+        if (tInterval <= 0) {
             throw new ServiceSetupException("Update interval out of valid range");
-        mSVNMonitorInterval = iInterval;
-        getLogger().debug("Scheduling SVN monitor with interval of " + iInterval + " seconds");
+        }
+        mSVNMonitorInterval = tInterval;
+        getLogger().debug("Scheduling SVN monitor with interval of " + tInterval + " seconds");
         mSVNMonitor = new Timer();
     }
 
@@ -97,13 +95,13 @@ public class RepositoryMonitor extends Service {
     //
 
     @Override
-    public void run() throws ServiceRunException {
+    public final void run() throws ServiceRunException {
         // Do a checkout
         getLogger().debug("Checking out the repository");
         try {
             checkout();
-        } catch (RepositoryException iException) {
-            throw new ServiceRunException("Could not perform initial checkout", iException);
+        } catch (RepositoryException tException) {
+            throw new ServiceRunException("Could not perform initial checkout", tException);
         }
 
         // Schedule the monitor
@@ -111,7 +109,7 @@ public class RepositoryMonitor extends Service {
     }
 
     @Override
-    public void stop() throws ServiceRunException {
+    public final void stop() throws ServiceRunException {
     }
 
 
@@ -119,7 +117,7 @@ public class RepositoryMonitor extends Service {
     // Auxiliary
     //
 
-    void checkout() throws RepositoryException  {
+    final void checkout() throws RepositoryException  {
         try {
             mSVNRevision = mSVNRepository.getLatestRevision();
 
@@ -143,19 +141,17 @@ public class RepositoryMonitor extends Service {
                         if (tOldKioskConfiguration == null) {
                             getLogger().debug("Configuration seems new, adding to repository");
                             tRepository.addKioskConfiguration(tKioskConfiguration);
-                        }
-                        else if (tKioskConfiguration.getRevision() > tOldKioskConfiguration.getRevision()) {
+                        } else if (tKioskConfiguration.getRevision() > tOldKioskConfiguration.getRevision()) {
                             getLogger().debug("New configuration is a more recent version of an existing configuration, updating the repository");
                             tRepository.updateKioskConfiguration(tKioskConfiguration);
-                        }
-                        else
+                        } else {
                             getLogger().debug("Configuration hasn't been updated, ignoring");
-                    }
-                    else
+                        }
+                    } else {
                         throw new RepositoryException("unknown configuration type");
-                }
-                catch (RepositoryException iException) {
-                    throw new RepositoryException("could not process configuration", iException);
+                    }
+                } catch (RepositoryException tException) {
+                    throw new RepositoryException("could not process configuration", tException);
                 }
             }
             
@@ -163,9 +159,8 @@ public class RepositoryMonitor extends Service {
             // TODO: detect the changed media
             //       this is only needed when we detect the changed configurations,
             //       because now we reload each configuration anyhow
-        }
-        catch (SVNException e) {
-            throw new RepositoryException("SVN checkout failed", e);
+        } catch (SVNException tException) {
+            throw new RepositoryException("SVN checkout failed", tException);
         }
     }
     
@@ -173,9 +168,8 @@ public class RepositoryMonitor extends Service {
         long tSVNRevision;
         try {
             tSVNRevision = mSVNRepository.getLatestRevision();
-        }
-        catch (SVNException iException) {
-            throw new RepositoryException("could not fetch SVN revision", iException);
+        } catch (SVNException tException) {
+            throw new RepositoryException("could not fetch SVN revision", tException);
         }
         
         if (tSVNRevision != mSVNRevision) {

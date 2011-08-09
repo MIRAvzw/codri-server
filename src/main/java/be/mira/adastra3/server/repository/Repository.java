@@ -17,7 +17,7 @@ import java.util.UUID;
  *
  * @author tim
  */
-public class Repository {
+public final class Repository {
     //
     // Member data
     //
@@ -32,12 +32,13 @@ public class Repository {
     // Static functionality
     //
 
-    private static Repository mInstance;
+    private static Repository INSTANCE;
 
     public static Repository getInstance() {
-        if (mInstance == null)
-            mInstance = new Repository();
-        return mInstance;
+        if (INSTANCE == null) {
+            INSTANCE = new Repository();
+        }
+        return INSTANCE;
     }
 
 
@@ -60,40 +61,43 @@ public class Repository {
         return mServer;
     }
     
-    public void setServer(String iServer) {
+    public void setServer(final String iServer) {
         mServer = iServer;
     }
     
-    public void addListener(IRepositoryListener iListener) {
+    public void addListener(final IRepositoryListener iListener) {
         mListeners.add(iListener);
     }
     
-    public void removeListener(IRepositoryListener iListener) {
+    public void removeListener(final IRepositoryListener iListener) {
         mListeners.remove(iListener);
     }
 
-    public void addKioskConfiguration(KioskConfiguration iKioskConfiguration) throws RepositoryException {
-        if (mKioskConfigurations.containsKey(iKioskConfiguration.getId()))
+    public void addKioskConfiguration(final KioskConfiguration iKioskConfiguration) throws RepositoryException {
+        if (mKioskConfigurations.containsKey(iKioskConfiguration.getId())) {
             throw new RepositoryException("configuration " + iKioskConfiguration.getId() + " already present in repository");
+        }
         mKioskConfigurations.put(iKioskConfiguration.getId(), iKioskConfiguration);
         mKioskMapping.put(iKioskConfiguration.getTarget(), iKioskConfiguration.getId());
         emitKioskConfigurationAdded(iKioskConfiguration);
     }
     
-    public void updateKioskConfiguration(KioskConfiguration iKioskConfiguration) throws RepositoryException {
-        if (! mKioskConfigurations.containsKey(iKioskConfiguration.getId()))
+    public void updateKioskConfiguration(final KioskConfiguration iKioskConfiguration) throws RepositoryException {
+        if (! mKioskConfigurations.containsKey(iKioskConfiguration.getId())) {
             throw new RepositoryException("configuration " + iKioskConfiguration.getId() + " not present in repository");
+        }
         KioskConfiguration tOldKioskConfiguration = mKioskConfigurations.put(iKioskConfiguration.getId(), iKioskConfiguration);
         emitKioskConfigurationUpdated(tOldKioskConfiguration, iKioskConfiguration);
     }
 
-    public KioskConfiguration getKioskConfiguration(String iName) {
+    public KioskConfiguration getKioskConfiguration(final String iName) {
         return mKioskConfigurations.get(iName);
     }
 
-    public KioskConfiguration lookupKioskConfiguration(UUID iUuid) {
-        if (!mKioskMapping.containsKey(iUuid))
+    public KioskConfiguration lookupKioskConfiguration(final UUID iUuid) {
+        if (!mKioskMapping.containsKey(iUuid)) {
             return null;
+        }
         return mKioskConfigurations.get(mKioskMapping.get(iUuid));
     }
     
@@ -102,25 +106,25 @@ public class Repository {
     // Signals
     //
     
-    public void emitError(String iMessage, RepositoryException iException) {
+    public void emitError(final String iMessage, final RepositoryException iException) {
         for (IRepositoryListener tListener : mListeners) {
             tListener.doRepositoryError(iMessage, iException);
         }
     }
     
-    public void emitWarning(String iMessage) {
+    public void emitWarning(final String iMessage) {
         for (IRepositoryListener tListener : mListeners) {
             tListener.doRepositoryWarning(iMessage);
         }
     }  
     
-    private void emitKioskConfigurationAdded(KioskConfiguration iKioskConfiguration) {
+    private void emitKioskConfigurationAdded(final KioskConfiguration iKioskConfiguration) {
         for (IRepositoryListener tListener : mListeners) {
             tListener.doKioskConfigurationAdded(iKioskConfiguration);
         }
     }
     
-    private void emitKioskConfigurationUpdated(KioskConfiguration iOldKioskConfiguration, KioskConfiguration iKioskConfiguration) {
+    private void emitKioskConfigurationUpdated(final KioskConfiguration iOldKioskConfiguration, final KioskConfiguration iKioskConfiguration) {
         for (IRepositoryListener tListener : mListeners) {
             tListener.doKioskConfigurationUpdated(iOldKioskConfiguration, iKioskConfiguration);
         }

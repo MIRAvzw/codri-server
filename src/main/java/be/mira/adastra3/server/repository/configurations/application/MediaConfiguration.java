@@ -22,7 +22,7 @@ public class MediaConfiguration extends Configuration  {
     // Construction and destruction
     //
     
-    public MediaConfiguration(String iId) {
+    public MediaConfiguration(final String iId) {
         mId = iId;
     }
     
@@ -31,7 +31,7 @@ public class MediaConfiguration extends Configuration  {
     // Getters and setters
     //
     
-    public String getId() {
+    public final String getId() {
         return mId;
     }   
 }

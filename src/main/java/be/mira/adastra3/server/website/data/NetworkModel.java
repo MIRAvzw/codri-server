@@ -26,7 +26,7 @@ public class NetworkModel extends TreeModel<NetworkItem> implements INetworkList
     
     private Network mNetwork = Network.getInstance();
     private SectionItem mSectionServers, mSectionKiosks;
-    Map<Device, NetworkItem> mDevices;
+    private Map<Device, NetworkItem> mDevices;
     
     
     //
@@ -43,7 +43,7 @@ public class NetworkModel extends TreeModel<NetworkItem> implements INetworkList
         mDevices = new HashMap<Device, NetworkItem>();
     }
     
-    public void attach() {
+    public final void attach() {
         for (Device tDevice : mNetwork.getDevices()) {
             WModelIndex tIndex = getIndex(mSectionKiosks.getRow(), 0);
             NetworkItem tNetworkItem = new NetworkItem(tDevice, mSectionKiosks);                
@@ -53,7 +53,7 @@ public class NetworkModel extends TreeModel<NetworkItem> implements INetworkList
         mNetwork.addListener(this);
     }
     
-    public void detach() {
+    public final void detach() {
         mNetwork.removeListener(this);
     }
     
@@ -63,13 +63,15 @@ public class NetworkModel extends TreeModel<NetworkItem> implements INetworkList
     //
 
     @Override
-    public void doDeviceAdded(Device iDevice) {        
-        DeferredExecution.DEFERREES.add(new DeferredExecution() {
-            Device mDevice;
-            public DeferredExecution construct(Device iDevice) {
+    public final void doDeviceAdded(final Device iDevice) {        
+        DeferredExecution.cDeferrees.add(new DeferredExecution() {
+            private Device mDevice;
+            
+            public DeferredExecution construct(final Device iDevice) {
                 mDevice = iDevice;
                 return this;
             }
+            
             @Override
             public void execute() {
                 WModelIndex tIndex = getIndex(mSectionKiosks.getRow(), 0);
@@ -81,13 +83,15 @@ public class NetworkModel extends TreeModel<NetworkItem> implements INetworkList
     }
 
     @Override
-    public void doDeviceRemoved(Device iDevice) {        
-        DeferredExecution.DEFERREES.add(new DeferredExecution() {
-            Device mDevice;
-            public DeferredExecution construct(Device iDevice) {
+    public final void doDeviceRemoved(final Device iDevice) {        
+        DeferredExecution.cDeferrees.add(new DeferredExecution() {
+            private Device mDevice;
+            
+            public DeferredExecution construct(final Device iDevice) {
                 mDevice = iDevice;
                 return this;
             }
+            
             @Override
             public void execute() {
                 WModelIndex tIndex = getIndex(mSectionKiosks.getRow(), 0);
@@ -99,11 +103,11 @@ public class NetworkModel extends TreeModel<NetworkItem> implements INetworkList
     }
 
     @Override
-    public void doNetworkError(String iMessage, NetworkException iException) {
+    public final void doNetworkError(final String iMessage, final NetworkException iException) {
     }
 
     @Override
-    public void doNetworkWarning(String iMessage) {
+    public final void doNetworkWarning(final String iMessage) {
     }
     
     
@@ -112,11 +116,13 @@ public class NetworkModel extends TreeModel<NetworkItem> implements INetworkList
     //
 
     @Override
-    public EnumSet<ItemFlag> getFlags(WModelIndex index) {
-        if (index == null)
+    public final EnumSet<ItemFlag> getFlags(final WModelIndex iIndex) {
+        if (iIndex == null) {
             return EnumSet.noneOf(ItemFlag.class);
-        if (getItem(index) instanceof NetworkItem)
+        } else if (getItem(iIndex) instanceof NetworkItem) {
             return EnumSet.of(ItemFlag.ItemIsSelectable);
-        return EnumSet.noneOf(ItemFlag.class);
+        } else {
+            return EnumSet.noneOf(ItemFlag.class);
+        }
     }
 }

@@ -23,19 +23,19 @@ public class NetworkDetail extends WStackedWidget {
     //
     
     // Widgets
-    WContainerWidget mDetailDummy;
-    Kiosk30Detail mDetailKiosk30;
+    private WContainerWidget mDetailDummy;
+    private Kiosk30Detail mDetailKiosk30;
     
     // Events
-    Signal2<String, Exception> mEventError;
-    Signal1<String> mEventWarning, mEventInfo, mEventDebug;
+    private Signal2<String, Exception> mEventError;
+    private Signal1<String> mEventWarning, mEventInfo, mEventDebug;
     
     //
     // Construction and destruction
     //
     
-    public NetworkDetail(WContainerWidget parent) {
-        super(parent);
+    public NetworkDetail(final WContainerWidget iParent) {
+        super(iParent);
         
         // Configure the events
         mEventError = new Signal2<String, Exception>();
@@ -67,7 +67,7 @@ public class NetworkDetail extends WStackedWidget {
         showDetail(null);        
     }
     
-    public WContainerWidget createDetailDummy(WContainerWidget iParent) {
+    private WContainerWidget createDetailDummy(final WContainerWidget iParent) {
         // Layout
         WContainerWidget tWidget = new WContainerWidget(iParent);
         
@@ -81,19 +81,19 @@ public class NetworkDetail extends WStackedWidget {
     // UI Events
     //
     
-    public Signal2<String, Exception> error() {
+    public final Signal2<String, Exception> error() {
         return mEventError;
     }
     
-    public Signal1<String> warning() {
+    public final Signal1<String> warning() {
         return mEventWarning;
     }
     
-    public Signal1<String> info() {
+    public final Signal1<String> info() {
         return mEventInfo;
     }
     
-    public Signal1<String> debug() {
+    public final Signal1<String> debug() {
         return mEventDebug;
     }
     
@@ -102,19 +102,18 @@ public class NetworkDetail extends WStackedWidget {
     // Basic I/O
     //
     
-    public void showDetail(NetworkItem iNetworkItem) {
+    public final void showDetail(final NetworkItem iNetworkItem) {
         if (iNetworkItem == null) {
             setCurrentWidget(mDetailDummy);
             return;
         }
         
-        Device iDevice = iNetworkItem.getDevice();
-        if (iDevice instanceof Kiosk30) {
-            Kiosk30 iKiosk = (Kiosk30) iDevice;
-            mDetailKiosk30.loadDevice(iKiosk);
+        Device tDevice = iNetworkItem.getDevice();
+        if (tDevice instanceof Kiosk30) {
+            Kiosk30 tKiosk = (Kiosk30) tDevice;
+            mDetailKiosk30.loadDevice(tKiosk);
             setCurrentWidget(mDetailKiosk30);
-        }
-        else {
+        } else {
             setCurrentWidget(mDetailDummy);
         }
     }
@@ -125,28 +124,28 @@ public class NetworkDetail extends WStackedWidget {
     //
     
     private class Signal1Bubbler<A1> implements Signal1.Listener<A1> {
-        Signal1<A1> mBubble;
+        private final Signal1<A1> mBubble;
         
-        public Signal1Bubbler(Signal1<A1> iBubble) {
+        public Signal1Bubbler(final Signal1<A1> iBubble) {
             mBubble = iBubble;
         }
 
         @Override
-        public void trigger(A1 arg) {
-            mBubble.trigger(arg);
+        public void trigger(final A1 iArgument) {
+            mBubble.trigger(iArgument);
         }
     }
     
     private class Signal2Bubbler<A1, A2> implements Signal2.Listener<A1, A2> {
-        Signal2<A1, A2> mBubble;
+        private final Signal2<A1, A2> mBubble;
         
-        public Signal2Bubbler(Signal2<A1, A2> iBubble) {
+        public Signal2Bubbler(final Signal2<A1, A2> iBubble) {
             mBubble = iBubble;
         }
 
         @Override
-        public void trigger(A1 arg1, A2 arg2) {
-            mBubble.trigger(arg1, arg2);
+        public void trigger(final A1 iArgument1, final A2 iArgument2) {
+            mBubble.trigger(iArgument1, iArgument2);
         }
     }
 }

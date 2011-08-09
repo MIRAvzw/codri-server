@@ -15,14 +15,14 @@ public class Control {
     // Member data
     //
     
-    RemoteService mService;
+    private RemoteService mService;
     
     
     //
     // Construction and destruction
     //
     
-    public Control(RemoteService iService) {
+    public Control(final RemoteService iService) {
         mService = iService;
     }
     
@@ -31,7 +31,7 @@ public class Control {
     // Getters and setters
     //
     
-    protected RemoteService getService() {
+    final protected RemoteService getService() {
         return mService;
     }
 }

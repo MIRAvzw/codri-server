@@ -10,16 +10,16 @@ package be.mira.adastra3.server.exceptions;
  */
 public class DeviceException extends Exception {
 
-    public DeviceException(Throwable cause) {
-        super(cause);
+    public DeviceException(final Throwable iCause) {
+        super(iCause);
     }
 
-    public DeviceException(String message, Throwable cause) {
-        super(message, cause);
+    public DeviceException(final String iMessage, final Throwable iCause) {
+        super(iMessage, iCause);
     }
 
-    public DeviceException(String message) {
-        super(message);
+    public DeviceException(final String iMessage) {
+        super(iMessage);
     }
 
     public DeviceException() {

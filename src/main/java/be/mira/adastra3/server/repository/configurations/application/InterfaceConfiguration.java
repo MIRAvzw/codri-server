@@ -23,7 +23,7 @@ public class InterfaceConfiguration extends Configuration {
     // Construction and destruction
     //
     
-    public InterfaceConfiguration(String iId, String iRole) {
+    public InterfaceConfiguration(final String iId, final String iRole) {
         mId = iId;
         mRole = iRole;
     }
@@ -33,11 +33,11 @@ public class InterfaceConfiguration extends Configuration {
     // Getters and setters
     //
     
-    public String getId() {
+    public final String getId() {
         return mId;
     }
     
-    public String getRole() {
+    public final String getRole() {
         return mRole;
     }
 }

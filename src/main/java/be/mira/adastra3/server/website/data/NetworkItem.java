@@ -22,7 +22,7 @@ public class NetworkItem extends TreeItem {
     // Construction and destruction
     //
 
-    public NetworkItem(Device iDevice, TreeItem iParent) {
+    public NetworkItem(final Device iDevice, final TreeItem iParent) {
         super(iParent);
         mDevice = iDevice;
     }
@@ -33,7 +33,7 @@ public class NetworkItem extends TreeItem {
     //
 
     @Override
-    public Object getField(int iField) {
+    public final Object getField(final int iField) {
         switch (iField) {
             case 0:
                 return mDevice.getName();
@@ -45,7 +45,7 @@ public class NetworkItem extends TreeItem {
     }
 
     @Override
-    public int getFieldCount() {
+    public final int getFieldCount() {
         return 2;
     }
     
@@ -54,7 +54,7 @@ public class NetworkItem extends TreeItem {
     // Basic I/O
     //
     
-    public Device getDevice() {
+    public final Device getDevice() {
         return mDevice;
     }
 }

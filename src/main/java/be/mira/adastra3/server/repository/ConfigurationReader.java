@@ -10,14 +10,10 @@ import be.mira.adastra3.server.repository.configurations.Configuration;
 import be.mira.adastra3.server.repository.configurations.DeviceConfiguration;
 import be.mira.adastra3.server.repository.configurations.KioskConfiguration;
 import be.mira.adastra3.server.repository.configurations.application.InterfaceConfiguration;
-import be.mira.adastra3.server.repository.configurations.application.InterfaceConfiguration;
-import be.mira.adastra3.server.repository.configurations.application.MediaConfiguration;
 import be.mira.adastra3.server.repository.configurations.application.MediaConfiguration;
 import be.mira.adastra3.server.repository.configurations.device.SoundConfiguration;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -37,8 +33,8 @@ public class ConfigurationReader {
     // Member data
     //
     
-    static private XmlPullParserFactory mParserFactory;
-    static XmlPullParser mParser;
+    private static XmlPullParserFactory PARSER_FACTORY;
+    private XmlPullParser mParser;
     private Configuration mConfiguration;
     private String mIdentifier;
     
@@ -49,34 +45,35 @@ public class ConfigurationReader {
     // Construction and destruction
     //
     
-    public ConfigurationReader(String iIdentifier, InputStream iStream) throws RepositoryException {
+    public ConfigurationReader(final String iIdentifier, final InputStream iStream) throws RepositoryException {
         mIdentifier = iIdentifier;
         
         try {
             // Validate the file
             // TODO: do this within the pull parser
-            String schemaLang = "http://www.w3.org/2001/XMLSchema";
-            SchemaFactory factory = SchemaFactory.newInstance(schemaLang);
-            Schema schema = factory.newSchema(this.getClass().getClassLoader().getResource("configuration.xsd"));
-            Validator validator = schema.newValidator();
-            validator.validate(new StreamSource(iStream));
+            String tSchemaLanguage = "http://www.w3.org/2001/XMLSchema";
+            SchemaFactory tSchemaFactory = SchemaFactory.newInstance(tSchemaLanguage);
+            Schema tSchema = tSchemaFactory.newSchema(this.getClass().getClassLoader().getResource("configuration.xsd"));
+            Validator tValidator = tSchema.newValidator();
+            tValidator.validate(new StreamSource(iStream));
             iStream.reset();
             
             // Setup the parser factory
-            if (mParserFactory == null)
-                mParserFactory = XmlPullParserFactory.newInstance();            
-            mParserFactory.setNamespaceAware(true);
-            mParserFactory.setValidating(false);
+            if (PARSER_FACTORY == null) {
+                PARSER_FACTORY = XmlPullParserFactory.newInstance();            
+            }
+            PARSER_FACTORY.setNamespaceAware(true);
+            PARSER_FACTORY.setValidating(false);
             
             // Aquire a parser
-            mParser = mParserFactory.newPullParser();
+            mParser = PARSER_FACTORY.newPullParser();
             mParser.setInput(iStream, null);
-        } catch (XmlPullParserException iException) {
-            throw new RepositoryException(iException);
-        } catch (SAXException iException) {
-            throw new RepositoryException("could not validate file", iException);
-        } catch (IOException iException) {
-            throw new RepositoryException("could not open schema", iException);
+        } catch (XmlPullParserException tException) {
+            throw new RepositoryException(tException);
+        } catch (SAXException tException) {
+            throw new RepositoryException("could not validate file", tException);
+        } catch (IOException tException) {
+            throw new RepositoryException("could not open schema", tException);
         }
     }
     
@@ -85,11 +82,12 @@ public class ConfigurationReader {
     // Public API
     //
     
-    public void process() throws RepositoryException {
+    public final void process() throws RepositoryException {
         try {
             // Setup parsing
-            if (mParser.getEventType() != XmlPullParser.START_DOCUMENT)
+            if (mParser.getEventType() != XmlPullParser.START_DOCUMENT) {
                 throw new RepositoryException("not at start of document");
+            }
             
             // Process tags
             mParser.next();
@@ -100,8 +98,9 @@ public class ConfigurationReader {
                         break loop;
                     case (XmlPullParser.START_TAG):
                         if (mParser.getName().equals("kiosk")) {
-                            if (mConfiguration != null)
+                            if (mConfiguration != null) {
                                 throw new RepositoryException("configuration file contains multiple configurations");
+                            }
                             mConfiguration = parseKioskConfiguration();
                         }
                         break;
@@ -109,16 +108,14 @@ public class ConfigurationReader {
                         mParser.next();
                 }
             }
-        }
-        catch (XmlPullParserException iException) {
-            throw new RepositoryException(iException);
-        }
-        catch (IOException iException) {
-            throw new RepositoryException(iException);
+        } catch (XmlPullParserException tException) {
+            throw new RepositoryException(tException);
+        } catch (IOException tException) {
+            throw new RepositoryException(tException);
         }
     }
     
-    public Configuration getConfiguration() {
+    public final Configuration getConfiguration() {
         return mConfiguration;
     }
     
@@ -130,16 +127,18 @@ public class ConfigurationReader {
     private String parseTextElement()  throws RepositoryException, XmlPullParserException, IOException {   
         // Parse the contents
         mParser.next();
-        if (mParser.getEventType() != XmlPullParser.TEXT)
+        if (mParser.getEventType() != XmlPullParser.TEXT) {
             throw new XmlPullParserException("asked to parse text where there is no text");
-        String oText = oText = mParser.getText();
+        }
+        String tText = mParser.getText();
         
         // If there is an end tag after the text, skip it
         mParser.next();
-        if (mParser.getEventType() == XmlPullParser.END_TAG)
+        if (mParser.getEventType() == XmlPullParser.END_TAG) {
             mParser.next();
+        }
         
-        return oText;
+        return tText;
     }
     
     private KioskConfiguration parseKioskConfiguration() throws RepositoryException, XmlPullParserException, IOException {        
@@ -154,12 +153,13 @@ public class ConfigurationReader {
                     mParser.next();
                     break loop;
                 case (XmlPullParser.START_TAG):
-                    if (mParser.getName().equals("target"))
+                    if (mParser.getName().equals("target")) {
                         tTarget = UUID.fromString(parseTextElement());
-                    else if (mParser.getName().equals("application"))
+                    } else if (mParser.getName().equals("application")) {
                         tApplicationConfiguration = parseApplicationConfiguration();
-                    else if (mParser.getName().equals("device"))
+                    } else if (mParser.getName().equals("device")) {
                         tDeviceConfiguration = parseDeviceConfiguration();
+                    }
                     break;
                 default:
                     mParser.next();
@@ -185,8 +185,9 @@ public class ConfigurationReader {
                     mParser.next();
                     break loop;
                 case (XmlPullParser.START_TAG):
-                    if (mParser.getName().equals("sound"))
+                    if (mParser.getName().equals("sound")) {
                         tSound = parseDeviceSound();
+                    }
                     break;
                 default:
                     mParser.next();
@@ -209,8 +210,9 @@ public class ConfigurationReader {
                     mParser.next();
                     break loop;
                 case (XmlPullParser.START_TAG):
-                    if (mParser.getName().equals("volume"))
+                    if (mParser.getName().equals("volume")) {
                         tVolume = Integer.parseInt(parseTextElement());
+                    }
                     break;
                 default:
                     mParser.next();
@@ -218,9 +220,9 @@ public class ConfigurationReader {
         }
         
         // Create the obhect
-        SoundConfiguration oSound = new SoundConfiguration();
-        oSound.setVolume(tVolume);
-        return oSound;
+        SoundConfiguration tSound = new SoundConfiguration();
+        tSound.setVolume(tVolume);
+        return tSound;
     }
     
     private ApplicationConfiguration parseApplicationConfiguration() throws RepositoryException, XmlPullParserException, IOException {
@@ -234,10 +236,11 @@ public class ConfigurationReader {
                     mParser.next();
                     break loop;
                 case (XmlPullParser.START_TAG):
-                    if (mParser.getName().equals("interface"))
+                    if (mParser.getName().equals("interface")) {
                         tInterfaceConfiguration = parseApplicationInterface();
-                    else if (mParser.getName().equals("media"))
+                    } else if (mParser.getName().equals("media")) {
                         tMediaConfiguration = parseApplicationMedia();
+                    }
                     break;
                 default:
                     mParser.next();
@@ -254,14 +257,15 @@ public class ConfigurationReader {
     private InterfaceConfiguration parseApplicationInterface() throws RepositoryException, XmlPullParserException, IOException {
         // Process the attributes
         String tId = null, tRole = null;
-        for (int i = 0; i < mParser.getAttributeCount(); i++) {
-            String tAttributeName = mParser.getAttributeName(i);
-            String tAttributeValue = mParser.getAttributeValue(i);
+        for (int tAttributeIndex = 0; tAttributeIndex < mParser.getAttributeCount(); tAttributeIndex++) {
+            String tAttributeName = mParser.getAttributeName(tAttributeIndex);
+            String tAttributeValue = mParser.getAttributeValue(tAttributeIndex);
             
-            if (tAttributeName.equals("id"))
+            if (tAttributeName.equals("id")) {
                 tId = tAttributeValue;
-            else if (tAttributeName.equals("role"))
+            } else if (tAttributeName.equals("role")) {
                 tRole = tAttributeValue;
+            }
         }
         
         // Process the tags
@@ -279,23 +283,23 @@ public class ConfigurationReader {
         }
         
         // Create the object
-        InterfaceConfiguration oApplicationInterface = new InterfaceConfiguration(tId, tRole);
-        return oApplicationInterface;
+        InterfaceConfiguration tApplicationInterface = new InterfaceConfiguration(tId, tRole);
+        return tApplicationInterface;
     }
     
     private MediaConfiguration parseApplicationMedia() throws RepositoryException, XmlPullParserException, IOException {
         // Process the attributes
         String tId = null;
-        for (int i = 0; i < mParser.getAttributeCount(); i++) {
-            String tAttributeName = mParser.getAttributeName(i);
-            String tAttributeValue = mParser.getAttributeValue(i);
+        for (int tAttributeIndex = 0; tAttributeIndex < mParser.getAttributeCount(); tAttributeIndex++) {
+            String tAttributeName = mParser.getAttributeName(tAttributeIndex);
+            String tAttributeValue = mParser.getAttributeValue(tAttributeIndex);
             
-            if (tAttributeName.equals("id"))
+            if (tAttributeName.equals("id")) {
                 tId = tAttributeValue;
+            }
         }
         
         // Process the tags
-        String tLocation = null;
         mParser.next();
         loop: while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
             switch (mParser.getEventType()) {
@@ -310,7 +314,7 @@ public class ConfigurationReader {
         }
         
         // Create the object
-        MediaConfiguration oApplicationMedia = new MediaConfiguration(tId);
-        return oApplicationMedia;
+        MediaConfiguration tApplicationMedia = new MediaConfiguration(tId);
+        return tApplicationMedia;
     }
 }

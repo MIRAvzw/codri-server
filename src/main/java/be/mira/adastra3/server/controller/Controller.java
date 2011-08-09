@@ -27,8 +27,8 @@ public class Controller extends Service implements INetworkListener, IRepository
     // Data members
     //
     
-    Network mNetwork;
-    Repository mRepository;
+    private Network mNetwork;
+    private Repository mRepository;
     
     
     //
@@ -49,11 +49,11 @@ public class Controller extends Service implements INetworkListener, IRepository
     //
 
     @Override
-    public void run() throws ServiceRunException {
+    public final void run() throws ServiceRunException {
     }
 
     @Override
-    public void stop() throws ServiceRunException {
+    public final void stop() throws ServiceRunException {
         mNetwork.removeListener(this);
         mRepository.removeListener(this);
     }
@@ -64,22 +64,22 @@ public class Controller extends Service implements INetworkListener, IRepository
     //
 
     @Override
-    public void doRepositoryWarning(String iMessage) {
+    public final void doRepositoryWarning(final String iMessage) {
         getLogger().warn("Repository warning: " + iMessage);
     }
 
     @Override
-    public void doRepositoryError(String iMessage, RepositoryException iException) {
+    public final void doRepositoryError(final String iMessage, final RepositoryException iException) {
         getLogger().error("Repository error: " + iMessage, iException);
     }
     
     @Override
-    public void doKioskConfigurationAdded(KioskConfiguration iKioskConfiguration) {
+    public final void doKioskConfigurationAdded(final KioskConfiguration iKioskConfiguration) {
         getLogger().info("Kiosk configuration added: " + iKioskConfiguration.getId());
     }
 
     @Override
-    public void doKioskConfigurationUpdated(KioskConfiguration iOldKioskConfiguration, KioskConfiguration iKioskConfiguration) {
+    public final void doKioskConfigurationUpdated(final KioskConfiguration iOldKioskConfiguration, final KioskConfiguration iKioskConfiguration) {
         getLogger().info("Kiosk configuration updated: " + iKioskConfiguration.getId());
     }
     
@@ -89,23 +89,22 @@ public class Controller extends Service implements INetworkListener, IRepository
     //
 
     @Override
-    public void doNetworkWarning(String iMessage) {
+    public final void doNetworkWarning(final String iMessage) {
         getLogger().warn("Network warning: " + iMessage);
     }
 
     @Override
-    public void doNetworkError(String iMessage, NetworkException iException) {
+    public final void doNetworkError(final String iMessage, final NetworkException iException) {
         getLogger().error("Network error: " + iMessage, iException);
     }
 
     @Override
-    public void doDeviceAdded(Device iDevice) {
+    public final void doDeviceAdded(final Device iDevice) {
         getLogger().info("MIRA device added to network: " + iDevice.getUuid());
         Repository tRepository = Repository.getInstance();
         
-        if (iDevice instanceof Kiosk30)
-        {
-            Kiosk30 iKiosk = (Kiosk30) iDevice;
+        if (iDevice instanceof Kiosk30) {
+            Kiosk30 tKiosk = (Kiosk30) iDevice;
             
             // Check if there is a configuration for this device
             KioskConfiguration tKioskConfiguration = tRepository.lookupKioskConfiguration(iDevice.getUuid());
@@ -113,22 +112,20 @@ public class Controller extends Service implements INetworkListener, IRepository
             if (tKioskConfiguration != null) {
                 getLogger().debug("Loading configuration " + tKioskConfiguration.getId() + " onto device " + iDevice.getUuid());
                 try {
-                    iKiosk.setConfiguration(tKioskConfiguration);
+                    tKiosk.setConfiguration(tKioskConfiguration);
+                } catch (DeviceException tException) {
+                    getLogger().warn("could not configure device", tException);
                 }
-                catch (DeviceException iException) {
-                    getLogger().warn("could not configure device", iException);
-                }
-            }
-            else
+            } else {
                 getLogger().warn("could find any configuration for device " + iDevice.getUuid() + ", it'll remain unconfigured");
-        }
-        else
+            }
+        } else {
             getLogger().warn("unknown MIRA device");
-        
+        }
     }
 
     @Override
-    public void doDeviceRemoved(Device iDevice) {
+    public final void doDeviceRemoved(final Device iDevice) {
         getLogger().info("MIRA device removed from network: " + iDevice.getUuid());
     }
 }

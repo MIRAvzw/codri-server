@@ -20,7 +20,7 @@ import org.teleal.cling.controlpoint.ControlPoint;
  *
  * @author tim
  */
-public class Network {
+public final class Network {
     //
     // Member data
     //
@@ -34,12 +34,13 @@ public class Network {
     // Static functionality
     //
 
-    private static Network mInstance;
+    private static Network INSTANCE;
 
     public static Network getInstance() {
-        if (mInstance == null)
-            mInstance = new Network();
-        return mInstance;
+        if (INSTANCE == null) {
+            INSTANCE = new Network();
+        }
+        return INSTANCE;
     }
 
 
@@ -58,11 +59,11 @@ public class Network {
     // Getters and setters
     //
     
-    public void addListener(INetworkListener iListener) {
+    public void addListener(final INetworkListener iListener) {
         mListeners.add(iListener);
     }
     
-    public void removeListener(INetworkListener iListener) {
+    public void removeListener(final INetworkListener iListener) {
         mListeners.remove(iListener);
     }
     
@@ -78,20 +79,22 @@ public class Network {
         return mDevices.values();
     }
     
-    public Device getDevice(UUID iUuid) {
+    public Device getDevice(final UUID iUuid) {
         return mDevices.get(iUuid);
     }
     
-    public void addDevice(Device iDevice) throws NetworkException{
-        if (mDevices.containsKey(iDevice.getUuid()))
+    public void addDevice(final Device iDevice) throws NetworkException{
+        if (mDevices.containsKey(iDevice.getUuid())) {
             throw new NetworkException("device " + iDevice.getUuid() + " already present in network");
+        }
         mDevices.put(iDevice.getUuid(), iDevice);
         emitDeviceAdded(iDevice);
     }
     
-    public void removeDevice(Device iDevice) throws NetworkException {
-        if (!mDevices.containsKey(iDevice.getUuid()))
+    public void removeDevice(final Device iDevice) throws NetworkException {
+        if (!mDevices.containsKey(iDevice.getUuid())) {
             throw new NetworkException("device " + iDevice.getUuid() + " not present in network");
+        }
         mDevices.remove(iDevice.getUuid());
         emitDeviceRemoved(iDevice);
     }
@@ -101,25 +104,25 @@ public class Network {
     // Signals
     //
     
-    public void emitError(String iMessage, NetworkException iException) {
+    public void emitError(final String iMessage, final NetworkException iException) {
         for (INetworkListener tListener : mListeners) {
             tListener.doNetworkError(iMessage, iException);
         }
     }
     
-    public void emitWarning(String iMessage) {
+    public void emitWarning(final String iMessage) {
         for (INetworkListener tListener : mListeners) {
             tListener.doNetworkWarning(iMessage);
         }
     }
     
-    private void emitDeviceAdded(Device iDevice) {
+    private void emitDeviceAdded(final Device iDevice) {
         for (INetworkListener tListener : mListeners) {
             tListener.doDeviceAdded(iDevice);
         }
     }
     
-    private void emitDeviceRemoved(Device iDevice) {
+    private void emitDeviceRemoved(final Device iDevice) {
         for (INetworkListener tListener : mListeners) {
             tListener.doDeviceRemoved(iDevice);
         }        

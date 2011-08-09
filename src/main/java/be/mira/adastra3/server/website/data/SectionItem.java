@@ -20,7 +20,7 @@ public class SectionItem extends TreeItem {
     // Construction and destruction
     //
     
-    public SectionItem(String iName, TreeItem iParent) {
+    public SectionItem(final String iName, final TreeItem iParent) {
         super(iParent);
         mName = iName;
     }
@@ -31,14 +31,15 @@ public class SectionItem extends TreeItem {
     //
 
     @Override
-    public Object getField(int iField) {
-        if (iField == 0)
+    public final Object getField(final int iField) {
+        if (iField == 0) {
             return mName;
+        }
         return null;
     }
 
     @Override
-    public int getFieldCount() {
+    public final int getFieldCount() {
         return 1;
     }
     

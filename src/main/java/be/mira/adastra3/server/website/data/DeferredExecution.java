@@ -12,6 +12,7 @@ import java.util.List;
  * @author tim
  */
 public interface DeferredExecution {
-    static List<DeferredExecution> DEFERREES = new ArrayList<DeferredExecution>();
-    public void execute();
+    List<DeferredExecution> cDeferrees = new ArrayList<DeferredExecution>();
+    
+    void execute();
 }

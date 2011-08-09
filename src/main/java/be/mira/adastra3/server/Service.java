@@ -34,8 +34,8 @@ public abstract class Service {
         
         try {
             mProperties = getProperties(this.getClass().getSimpleName());
-        } catch (Exception e) {
-            throw new ServiceSetupException(e);
+        } catch (Exception tException) {
+            throw new ServiceSetupException(tException);
         }
     }
 
@@ -52,11 +52,11 @@ public abstract class Service {
     // Getters and setters
     //
 
-    protected Logger getLogger() {
+    final protected Logger getLogger() {
         return mLogger;
     }
 
-    private Properties getProperties(String iBasename) throws Exception {
+    private Properties getProperties(final String iBasename) throws Exception {
         String tFilename = iBasename + ".properties";
         
         InputStream tStream = this.getClass().getClassLoader().getResourceAsStream(tFilename);
@@ -65,16 +65,16 @@ public abstract class Service {
                 return new java.util.Properties();
         }
 
-        Properties oProperties = new java.util.Properties();
+        Properties tProperties = new java.util.Properties();
         try {
-            oProperties.load(tStream);
-            return oProperties;
-        } catch (IOException e) {
-            throw e;
+            tProperties.load(tStream);
+            return tProperties;
+        } catch (IOException tException) {
+            throw tException;
         }
     }
 
-    protected final String getProperty(String iKey, String iDefaultValue) {
+    protected final String getProperty(final String iKey, final String iDefaultValue) {
         return mProperties.getProperty(iKey, iDefaultValue);
     }
 }

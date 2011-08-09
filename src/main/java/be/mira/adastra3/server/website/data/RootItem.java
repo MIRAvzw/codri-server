@@ -15,14 +15,14 @@ public class RootItem extends TreeItem {
     // Data members
     //
     
-    List<? extends Object> mHeaders;
+    private List<? extends Object> mHeaders;
     
     
     //
     // Construction and destruction
     //
 
-    public RootItem(List<? extends Object> iHeaders) {
+    public RootItem(final List<? extends Object> iHeaders) {
         mHeaders = iHeaders;
     }
     
@@ -32,12 +32,12 @@ public class RootItem extends TreeItem {
     //
 
     @Override
-    public Object getField(int iField) {
+    public final Object getField(final int iField) {
         return mHeaders.get(iField);
     }
 
     @Override
-    public int getFieldCount() {
+    public final int getFieldCount() {
         return mHeaders.size();
     }
     
@@ -46,10 +46,9 @@ public class RootItem extends TreeItem {
     // Auxiliary
     //
     
-    public SectionItem addSection(String iName) {        
-        SectionItem oSection = new SectionItem(iName, this);
-        appendChild(oSection);
-        return oSection;
-    }
-    
+    public final SectionItem addSection(final String iName) {        
+        SectionItem tSection = new SectionItem(iName, this);
+        appendChild(tSection);
+        return tSection;
+    }    
 }

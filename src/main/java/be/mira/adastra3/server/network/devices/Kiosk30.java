@@ -34,7 +34,7 @@ public class Kiosk30 extends Device {
     // Construction and destruction
     //
     
-    public Kiosk30(UUID iUuid, DeviceControl iDeviceControle, ApplicationControl iApplicationControl) {
+    public Kiosk30(final UUID iUuid, final DeviceControl iDeviceControle, final ApplicationControl iApplicationControl) {
         super(iUuid);
         
         mDeviceControl = iDeviceControle;
@@ -47,23 +47,23 @@ public class Kiosk30 extends Device {
     //
     
     @Override
-    public void setConfiguration(Configuration iConfiguration) throws DeviceException {
+    public final void setConfiguration(final Configuration iConfiguration) throws DeviceException {
         // Check the configuration type
-        if (!(iConfiguration instanceof KioskConfiguration))
+        if (!(iConfiguration instanceof KioskConfiguration)) {
             throw new DeviceException("device does not support non-kioskconfiguration propagation");
-        KioskConfiguration iKioskConfiguration = (KioskConfiguration) iConfiguration;
+        }
+        KioskConfiguration tKioskConfiguration = (KioskConfiguration) iConfiguration;
         
         // Manage the device
-        DeviceConfiguration tDeviceConfiguration = iKioskConfiguration.getDeviceConfiguration();
+        DeviceConfiguration tDeviceConfiguration = tKioskConfiguration.getDeviceConfiguration();
         try {
-            getDeviceControl().SetVolume(tDeviceConfiguration.getSoundConfiguration().getVolume());
-        }
-        catch (NetworkException iException) {
-            throw new DeviceException("could not propagate device configuration", iException);
+            getDeviceControl().setVolume(tDeviceConfiguration.getSoundConfiguration().getVolume());
+        } catch (NetworkException tException) {
+            throw new DeviceException("could not propagate device configuration", tException);
         }
         
         // Manage the application
-        ApplicationConfiguration tApplicationConfiguration = iKioskConfiguration.getApplicationConfiguration();
+        ApplicationConfiguration tApplicationConfiguration = tKioskConfiguration.getApplicationConfiguration();
         try {
             // TODO: check revision, e.d.
             Repository tRepository = Repository.getInstance();
@@ -72,18 +72,17 @@ public class Kiosk30 extends Device {
             if (tInterfaceConfiguration != null) {
                 String tInterfaceLocation = tRepository.getServer()
                         + "/interfaces/" + tInterfaceConfiguration.getId();
-                getApplicationControl().LoadInterface(tInterfaceConfiguration.getId(), tInterfaceConfiguration.getRole(), tInterfaceLocation);                
+                getApplicationControl().loadInterface(tInterfaceConfiguration.getId(), tInterfaceConfiguration.getRole(), tInterfaceLocation);                
             }
             
             MediaConfiguration tMediaConfiguration =  tApplicationConfiguration.getMediaConfiguration();
             if (tMediaConfiguration != null) {
                 String tMediaLocation = tRepository.getServer()
                         + "/media/" + tMediaConfiguration.getId();
-                getApplicationControl().LoadMedia(tMediaConfiguration.getId(), tMediaLocation);
+                getApplicationControl().loadMedia(tMediaConfiguration.getId(), tMediaLocation);
             }
-        }
-        catch (NetworkException iException) {
-            throw new DeviceException("could not propagate device configuration", iException);
+        } catch (NetworkException tException) {
+            throw new DeviceException("could not propagate device configuration", tException);
         }
     }
     
@@ -92,11 +91,11 @@ public class Kiosk30 extends Device {
     // Getters and setters
     //
     
-    public ApplicationControl getApplicationControl() {
+    public final ApplicationControl getApplicationControl() {
         return mApplicationControl;
     }
     
-    public DeviceControl getDeviceControl() {
+    public final DeviceControl getDeviceControl() {
         return mDeviceControl;
     }
 }

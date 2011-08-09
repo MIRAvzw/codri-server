@@ -24,7 +24,7 @@ public class KioskConfiguration extends Configuration {
     // Construction and destruction
     //
     
-    public KioskConfiguration(String iId) {
+    public KioskConfiguration(final String iId) {
         mId = iId;
         
         setDeviceConfiguration(new DeviceConfiguration());
@@ -36,38 +36,41 @@ public class KioskConfiguration extends Configuration {
     // Getters and setters
     //
 
-    public String getId() {
+    public final String getId() {
         return mId;
     }
 
-    public UUID getTarget() {
-        if (getProperty("target") != null)
+    public final UUID getTarget() {
+        if (getProperty("target") != null) {
             return (UUID) getProperty("target");
-        else
+        } else {
             return null;
+        }
     }
 
-    public void setTarget(UUID iTarget) {
+    public final void setTarget(final UUID iTarget) {
         setProperty("target", iTarget);
     }
 
-    public ApplicationConfiguration getApplicationConfiguration() {
+    public final ApplicationConfiguration getApplicationConfiguration() {
         return mApplicationConfiguration;
     }
 
-    public final void setApplicationConfiguration(ApplicationConfiguration iApplicationConfiguration) {
-        if (iApplicationConfiguration == null)
+    public final void setApplicationConfiguration(final ApplicationConfiguration iApplicationConfiguration) {
+        if (iApplicationConfiguration == null) {
             return;
+        }
         mApplicationConfiguration = iApplicationConfiguration;
     }
 
-    public DeviceConfiguration getDeviceConfiguration() {
+    public final DeviceConfiguration getDeviceConfiguration() {
         return mDeviceConfiguration;
     }
 
-    public final void setDeviceConfiguration(DeviceConfiguration iDeviceConfiguration) {
-        if (iDeviceConfiguration == null)
+    public final void setDeviceConfiguration(final DeviceConfiguration iDeviceConfiguration) {
+        if (iDeviceConfiguration == null) {
             return;
+        }
         mDeviceConfiguration = iDeviceConfiguration;
     }
 }

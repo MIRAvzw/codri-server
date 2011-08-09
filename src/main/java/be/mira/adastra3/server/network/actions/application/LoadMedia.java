@@ -14,14 +14,13 @@ import org.teleal.cling.model.types.InvalidValueException;
  * @author tim
  */
 public class LoadMedia extends ActionInvocation {
-    public LoadMedia(Service service, String iMediaIdentifier, String iMediaLocation) throws NetworkException {
-        super(service.getAction("LoadMedia"));
+    public LoadMedia(final Service iService, final String iMediaIdentifier, final String iMediaLocation) throws NetworkException {
+        super(iService.getAction("LoadMedia"));
         try {
             setInput("iMediaIdentifierValue", iMediaIdentifier);
             setInput("iMediaLocationValue", iMediaLocation);
-        }
-        catch (InvalidValueException ex) {
-            throw new NetworkException("could not invoke Application.LoadMedia", ex);
+        } catch (InvalidValueException tException) {
+            throw new NetworkException("could not invoke Application.LoadMedia", tException);
         }
     }
 }

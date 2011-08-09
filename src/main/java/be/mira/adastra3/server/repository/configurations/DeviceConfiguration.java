@@ -4,7 +4,6 @@
  */
 package be.mira.adastra3.server.repository.configurations;
 
-import be.mira.adastra3.server.exceptions.RepositoryException;
 import be.mira.adastra3.server.repository.configurations.device.SoundConfiguration;
 
 /**
@@ -32,13 +31,14 @@ public class DeviceConfiguration extends Configuration {
     // Getters and setters
     //
     
-    public SoundConfiguration getSoundConfiguration() {
+    public final SoundConfiguration getSoundConfiguration() {
         return mSound;
     }
     
-    public final void setSoundConfiguration(SoundConfiguration iSound) {
-        if (iSound == null)
+    public final void setSoundConfiguration(final SoundConfiguration iSound) {
+        if (iSound == null) {
             return;
+        }
         mSound = iSound;
     }
 }

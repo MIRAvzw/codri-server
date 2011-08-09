@@ -17,12 +17,12 @@ public class Status extends WtServlet {
     }
 
     @Override
-    public WApplication createApplication(WEnvironment env) {
+    public final WApplication createApplication(final WEnvironment iEnvironment) {
         /*
          * You could read information from the environment to decide whether the
          * user has permission to start a new application
          */
-        return new StatusApplication(env);
+        return new StatusApplication(iEnvironment);
     }
 }
 

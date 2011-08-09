@@ -6,7 +6,6 @@ package be.mira.adastra3.server.website.data;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 
 /**
  *
@@ -17,8 +16,8 @@ public abstract class TreeItem {
     // Data members
     //
     
-    TreeItem mParent;
-    List<TreeItem> mChildren;
+    private TreeItem mParent;
+    private List<TreeItem> mChildren;
     
     
     //
@@ -29,7 +28,7 @@ public abstract class TreeItem {
         this(null);
     }
     
-    public TreeItem(TreeItem iParent) {
+    public TreeItem(final TreeItem iParent) {
         mParent = iParent;
         mChildren = new ArrayList<TreeItem>();
     }
@@ -39,44 +38,46 @@ public abstract class TreeItem {
     // Item interface
     //
     
-    public int getRow() {
-        if (mParent != null)
+    public final int getRow() {
+        if (mParent != null) {
             return mParent.mChildren.indexOf(this);
+        }
         return 0;
     }
     
-    public TreeItem getParent() {
+    public final TreeItem getParent() {
         return mParent;
     }
     
-    public TreeItem getChild(int iRow) {
+    public final TreeItem getChild(final int iRow) {
         return mChildren.get(iRow);
     }
     
-    public int getChildCount() {
+    public final int getChildCount() {
         return mChildren.size();
     }
     
-    void appendChild(TreeItem iChild) {
+    public final void appendChild(final TreeItem iChild) {
         mChildren.add(iChild);
     }
     
-    boolean insertChildren(int position, List<? extends TreeItem> iChildren)            
-    {
-        if (position < 0 || position > mChildren.size())
+    public final boolean insertChildren(final int iPosition, final List<? extends TreeItem> iChildren) {
+        if (iPosition < 0 || iPosition > mChildren.size()) {
             return false;
+        }
         
-        mChildren.addAll(position, iChildren);
+        mChildren.addAll(iPosition, iChildren);
         return true;     
     }
     
-    boolean removeChildren(int position, int count)
-    {
-        if (position < 0 || position + count > mChildren.size())
+    public final boolean removeChildren(final int iPosition, final int iCount) {
+        if (iPosition < 0 || iPosition + iCount > mChildren.size()) {
             return false;
+        }
         
-        for (int row = 0; row < count; ++row)
-            mChildren.remove(position);
+        for (int tRow = 0; tRow < iCount; ++tRow) {
+            mChildren.remove(iPosition);
+        }
         return true;
     }
     

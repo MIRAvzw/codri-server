@@ -11,16 +11,16 @@ package be.mira.adastra3.server.exceptions;
  */
 public class RepositoryException extends Exception {
 
-    public RepositoryException(Throwable cause) {
-        super(cause);
+    public RepositoryException(final Throwable iCause) {
+        super(iCause);
     }
 
-    public RepositoryException(String message, Throwable cause) {
-        super(message, cause);
+    public RepositoryException(final String iMessage, final Throwable iCause) {
+        super(iMessage, iCause);
     }
 
-    public RepositoryException(String message) {
-        super(message);
+    public RepositoryException(final String iMessage) {
+        super(iMessage);
     }
 
     public RepositoryException() {

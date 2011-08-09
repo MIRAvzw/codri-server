@@ -9,7 +9,6 @@ import org.teleal.cling.model.action.ActionArgumentValue;
 import org.teleal.cling.model.action.ActionInvocation;
 import org.teleal.cling.model.meta.Service;
 import org.teleal.cling.model.types.Datatype;
-import org.teleal.cling.model.types.InvalidValueException;
 import org.teleal.cling.model.types.UnsignedIntegerOneByte;
 
 /**
@@ -17,22 +16,17 @@ import org.teleal.cling.model.types.UnsignedIntegerOneByte;
  * @author tim
  */
 public class GetVolume extends ActionInvocation {
-    public GetVolume(Service service) throws NetworkException {
-        super(service.getAction("GetVolume"));
-        try {
-            /* No parameters required */
-        }
-        catch (InvalidValueException ex) {
-            throw new NetworkException("Could not invoke Device.GetVolume", ex);
-        }
+    public GetVolume(final Service iService) throws NetworkException {
+        super(iService.getAction("GetVolume"));
     }
     
     public Integer GetVolumeValue() throws NetworkException {    
-        ActionArgumentValue oVolume = getOutput("oVolumeValue");
-        if (oVolume == null)
+        ActionArgumentValue tVolume = getOutput("oVolumeValue");
+        if (tVolume == null) {
             throw new NetworkException("state variable not accessible");
-        else if (oVolume.getDatatype().getBuiltin() != Datatype.Builtin.UI1)
+        } else if (tVolume.getDatatype().getBuiltin() != Datatype.Builtin.UI1) {
             throw new NetworkException("invalid return type by Media.GetVolume (not an UI1)");
-        return (int) (long) ((UnsignedIntegerOneByte) oVolume.getValue()).getValue();
+        }
+        return (int) (long) ((UnsignedIntegerOneByte) tVolume.getValue()).getValue();
     }
 }

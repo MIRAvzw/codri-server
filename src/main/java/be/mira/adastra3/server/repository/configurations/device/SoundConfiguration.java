@@ -24,14 +24,15 @@ public class SoundConfiguration extends Configuration {
     // Getters and setters
     //
     
-    public Integer getVolume() {
-        if (getProperty("volume") != null)
+    public final Integer getVolume() {
+        if (getProperty("volume") != null) {
             return (Integer) getProperty("volume");
-        else
+        } else {
             return null;
+        }
     }
 
-    public void setVolume(Integer iVolume) {
+    public final void setVolume(final Integer iVolume) {
         setProperty("volume", iVolume);
     }
 }

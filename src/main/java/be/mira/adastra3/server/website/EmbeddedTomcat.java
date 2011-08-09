@@ -40,36 +40,36 @@ public class EmbeddedTomcat extends Service {
 
         // Connector type
         Connector tConnector;
-        String iConnectorType = getProperty("type", "http");
-        if (iConnectorType.equalsIgnoreCase("http")) {
+        String tConnectorType = getProperty("type", "http");
+        if (tConnectorType.equalsIgnoreCase("http")) {
             getLogger().debug("Using HTTP connector");
             tConnector = new Connector("HTTP/1.1");
-        }
-        else if (iConnectorType.equalsIgnoreCase("ajp")) {
+        } else if (tConnectorType.equalsIgnoreCase("ajp")) {
             getLogger().debug("Using AJP connector");
             tConnector = new Connector("AJP/1.3");
-        }
-        else
+        } else {
             throw new ServiceSetupException("Unknown connector type");
+        }
         mTomcat.getService().addConnector(tConnector);
         mTomcat.setConnector(tConnector);
 
         // Port
         try {
-            Integer iPort = Integer.parseInt(getProperty("port", "8080"));
-            if (iPort <= 0 || iPort > 65536)
+            Integer tPort = Integer.parseInt(getProperty("port", "8080"));
+            if (tPort <= 0 || tPort > 65536) {
                 throw new ServiceSetupException("Server port out of valid range");
-            getLogger().debug("Using port " + iPort);
-            tConnector.setPort(iPort);
-        }
-        catch (NumberFormatException e) {
+            }
+            getLogger().debug("Using port " + tPort);
+            tConnector.setPort(tPort);
+        } catch (NumberFormatException tException) {
             throw new ServiceSetupException("Non-integer port specification");
         }
 
         // Server root
         mServerRoot = getProperty("serverroot", ".");
-        if (! new File(mServerRoot).isDirectory())
+        if (! new File(mServerRoot).isDirectory()) {
             throw new ServiceSetupException("Cannot read server root directory");
+        }
     }
 
 
@@ -77,52 +77,54 @@ public class EmbeddedTomcat extends Service {
     // Service interface
     //
 
-    public void run() throws ServiceRunException {
+    @Override
+    public final void run() throws ServiceRunException {
         try {
             mTomcat.start();
             // TODO: if the address is not in use, tomcat prints an error
             // but doesn't die (happens in a thread)!!
-        } catch (LifecycleException e) {
-            throw new ServiceRunException(e);
+        } catch (LifecycleException tException) {
+            throw new ServiceRunException(tException);
         }
     }
 
-    public void stop() throws ServiceRunException {
+    @Override
+    final public void stop() throws ServiceRunException {
         try {
             mTomcat.stop();
-        }
-        catch (LifecycleException e) {
-            throw new ServiceRunException(e);
+        } catch (LifecycleException tException) {
+            throw new ServiceRunException(tException);
         }
     }
 
 
     //
-    //
+    // Auxiliary methods
     //
 
-    public void addWebapp(String iDirectory) throws ServiceSetupException {
+    public final void addWebapp(final String iDirectory) throws ServiceSetupException {
         addWebapp(iDirectory, iDirectory);
     }
 
-    public void addWebapp(String iDirectory, String iMountpoint) throws ServiceSetupException {
+    public final void addWebapp(final String iDirectory, final String iMountpoint) throws ServiceSetupException {
         getLogger().debug("Adding webapplication '" + iDirectory + "', mounted on '" + iMountpoint + "'");
 
         File tDocumentRoot = new File(mServerRoot, "webapps/" + iDirectory);
-        if (! tDocumentRoot.isDirectory())
+        if (! tDocumentRoot.isDirectory()) {
             throw new ServiceSetupException("Webapplication root not readable");
+        }
         mTomcat.addWebapp(null, "/" + iMountpoint, tDocumentRoot.getAbsolutePath());
     }
     
-    public Wrapper addServlet(String iName, Servlet iServlet) throws ServiceSetupException {
+    public final Wrapper addServlet(final String iName, final Servlet iServlet) throws ServiceSetupException {
         return addServlet(iName, iServlet, iName);
     }
 
-    public Wrapper addServlet(String iName, Servlet iServlet, String iMountpoint) throws ServiceSetupException {
-        File docBase = new File(System.getProperty("java.io.tmpdir"));
-        Context ctxt = mTomcat.addContext("", docBase.getAbsolutePath());
-        Wrapper oWrapper = mTomcat.addServlet(ctxt, iName, iServlet);
-        ctxt.addServletMapping("/" + iMountpoint, iName);
-        return oWrapper;
+    public final Wrapper addServlet(final String iName, final Servlet iServlet, final String iMountpoint) throws ServiceSetupException {
+        File tDocumentBase = new File(System.getProperty("java.io.tmpdir"));
+        Context tContext = mTomcat.addContext("", tDocumentBase.getAbsolutePath());
+        Wrapper tWrapperWrapper = mTomcat.addServlet(tContext, iName, iServlet);
+        tContext.addServletMapping("/" + iMountpoint, iName);
+        return tWrapperWrapper;
     }
 }

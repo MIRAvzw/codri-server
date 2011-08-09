@@ -12,8 +12,8 @@ import be.mira.adastra3.server.network.devices.Device;
  * @author tim
  */
 public interface INetworkListener {
-    public void doNetworkError(String iMessage, NetworkException iException);
-    public void doNetworkWarning(String iMessage);
-    public void doDeviceAdded(Device iDevice);
-    public void doDeviceRemoved(Device iDevice);
+    void doNetworkError(String iMessage, NetworkException iException);
+    void doNetworkWarning(String iMessage);
+    void doDeviceAdded(Device iDevice);
+    void doDeviceRemoved(Device iDevice);
 }

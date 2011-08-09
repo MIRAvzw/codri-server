@@ -25,7 +25,7 @@ abstract public class Device {
     // Construction and destruction
     //
     
-    public Device(UUID iUuid) {
+    public Device(final UUID iUuid) {
         mUuid = iUuid;
     }
     
@@ -41,15 +41,15 @@ abstract public class Device {
     // Getters and setters
     //
     
-    public UUID getUuid() {
+    public final UUID getUuid() {
         return mUuid;
     }
     
-    public String getName() {
+    public final String getName() {
         return mName;
     }
     
-    public void setName(String iName) {
+    public final void setName(final String iName) {
         mName = iName;
     }
 }

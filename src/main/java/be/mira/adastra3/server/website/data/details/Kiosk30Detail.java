@@ -29,19 +29,19 @@ public class Kiosk30Detail extends WContainerWidget {
     private Kiosk30 mDevice;
     
     // Device box
-    WLineEdit mVolume;
+    private WLineEdit mVolume;
     
     // Events
-    Signal2<String, Exception> mEventError;
-    Signal1<String> mEventWarning, mEventInfo, mEventDebug;
+    private Signal2<String, Exception> mEventError;
+    private Signal1<String> mEventWarning, mEventInfo, mEventDebug;
     
     
     //
     // Construction and destruction
     //
     
-    public Kiosk30Detail(WContainerWidget parent) {
-        super(parent);
+    public Kiosk30Detail(final WContainerWidget iParent) {
+        super(iParent);
         
         // Configure the events
         mEventError = new Signal2<String, Exception>();
@@ -79,20 +79,20 @@ public class Kiosk30Detail extends WContainerWidget {
         mVolume = new WLineEdit("<volume>");
         tInformationGrid.addWidget(mVolume, 0, 1);
         WPushButton tVolumeGet = new WPushButton("Get");
-        tVolumeGet.clicked().addListener(this, doVolumeGet);
+        tVolumeGet.clicked().addListener(this, mHandlerVolumeGet);
         tInformationGrid.addWidget(tVolumeGet, 0, 2);
         WPushButton tVolumeSet = new WPushButton("Set");
-        tVolumeSet.clicked().addListener(this, doVolumeSet);
+        tVolumeSet.clicked().addListener(this, mHandlerVolumeSet);
         tInformationGrid.addWidget(tVolumeSet, 0, 3);
         
         // Reboot
         WPushButton tReboot = new WPushButton("Reboot");
-        tReboot.clicked().addListener(this, doReboot);
+        tReboot.clicked().addListener(this, mHandlerReboot);
         tInformationGrid.addWidget(tReboot, 1, 0);
         
         // Shutdown
         WPushButton tShutdown = new WPushButton("Shutdown");
-        tReboot.clicked().addListener(this, doShutdown);
+        tReboot.clicked().addListener(this, mHandlerShutdown);
         tInformationGrid.addWidget(tShutdown, 2, 0);
         
         tBox.addWidget(tInformation); // redundant?
@@ -111,53 +111,53 @@ public class Kiosk30Detail extends WContainerWidget {
     // Event handlers
     //
     
-    private Signal.Listener doVolumeSet = new Signal.Listener() {
+    private Signal.Listener mHandlerVolumeSet = new Signal.Listener() {
         @Override
         public void trigger() {
             try {
                 debug().trigger("setting device volume to " + mVolume.getText());
                 Integer tVolume = Integer.parseInt(mVolume.getText());
-                mDevice.getDeviceControl().SetVolume(tVolume);
-            } catch (NumberFormatException iException) {
-                mEventError.trigger("invalid volume specified", iException);
-            } catch (NetworkException iException) {
-                mEventError.trigger("coult not get device volume", iException);
+                mDevice.getDeviceControl().setVolume(tVolume);
+            } catch (NumberFormatException tException) {
+                mEventError.trigger("invalid volume specified", tException);
+            } catch (NetworkException tException) {
+                mEventError.trigger("coult not get device volume", tException);
             }
         }
     };
     
-    private Signal.Listener doVolumeGet = new Signal.Listener() {
+    private Signal.Listener mHandlerVolumeGet = new Signal.Listener() {
         @Override
         public void trigger() {
             try {
                 debug().trigger("requesting device volume");
-                mVolume.setText(mDevice.getDeviceControl().GetVolume().toString());
-            } catch (NetworkException iException) {
-                mEventError.trigger("coult not get device volume", iException);
+                mVolume.setText(mDevice.getDeviceControl().getVolume().toString());
+            } catch (NetworkException tException) {
+                mEventError.trigger("coult not get device volume", tException);
             }
         }
     };
     
-    private Signal.Listener doReboot = new Signal.Listener() {
+    private Signal.Listener mHandlerReboot = new Signal.Listener() {
         @Override
         public void trigger() {
             try {
                 debug().trigger("rebooting device");
-                mDevice.getDeviceControl().Reboot();
-            } catch (NetworkException iException) {
-                mEventError.trigger("coult not reboot device", iException);
+                mDevice.getDeviceControl().reboot();
+            } catch (NetworkException tException) {
+                mEventError.trigger("coult not reboot device", tException);
             }
         }
     };
     
-    private Signal.Listener doShutdown = new Signal.Listener() {
+    private Signal.Listener mHandlerShutdown = new Signal.Listener() {
         @Override
         public void trigger() {
             try {
                 debug().trigger("shutting device down");
-                mDevice.getDeviceControl().Shutdown();
-            } catch (NetworkException iException) {
-                mEventError.trigger("coult not shutdown device", iException);
+                mDevice.getDeviceControl().shutdown();
+            } catch (NetworkException tException) {
+                mEventError.trigger("coult not shutdown device", tException);
             }
         }
     };
@@ -167,19 +167,19 @@ public class Kiosk30Detail extends WContainerWidget {
     // UI Events
     //
     
-    public Signal2<String, Exception> error() {
+    public final Signal2<String, Exception> error() {
         return mEventError;
     }
     
-    public Signal1<String> warning() {
+    public final Signal1<String> warning() {
         return mEventWarning;
     }
     
-    public Signal1<String> info() {
+    public final Signal1<String> info() {
         return mEventInfo;
     }
     
-    public Signal1<String> debug() {
+    public final Signal1<String> debug() {
         return mEventDebug;
     }
     
@@ -187,9 +187,9 @@ public class Kiosk30Detail extends WContainerWidget {
     // Basic I/O
     //
     
-    public void loadDevice(Kiosk30 iDevice) {
+    public final void loadDevice(final Kiosk30 iDevice) {
         mDevice = iDevice;
         info().trigger("loading details for device '" + iDevice.getName() + "'");
-        doVolumeGet.trigger();
+        mHandlerVolumeGet.trigger();
     }
 }

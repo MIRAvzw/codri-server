@@ -38,25 +38,25 @@ public class StatusApplication extends WApplication {
     // Data members
     //
     
-    WTimer mTimer;
+    private WTimer mTimer;
     
-    WTextArea mStatusbar;
-    WTabWidget mTabs;
+    private WTextArea mStatusbar;
+    private WTabWidget mTabs;
     
-    Logger mLogger;
+    private Logger mLogger;
     
     
-    NetworkModel mNetworkModel;
-    WTreeView mNetworkView;
-    NetworkDetail mNetworkDetail;
-    LogAppender mLogAppender;
+    private NetworkModel mNetworkModel;
+    private WTreeView mNetworkView;
+    private NetworkDetail mNetworkDetail;
+    private LogAppender mLogAppender;
     
     
     //
     // Construction and destruction
     //
     
-    public StatusApplication(WEnvironment iEnvironment) {
+    public StatusApplication(final WEnvironment iEnvironment) {
         super(iEnvironment);
         mLogger = Logger.getLogger(this.getClass());
         
@@ -70,10 +70,10 @@ public class StatusApplication extends WApplication {
         mTimer.timeout().addListener(this, new Signal.Listener() {
             @Override
             public void trigger() {
-                for (DeferredExecution tDeferree : DeferredExecution.DEFERREES) {
+                for (DeferredExecution tDeferree : DeferredExecution.cDeferrees) {
                     tDeferree.execute();
                 }
-                DeferredExecution.DEFERREES.clear();
+                DeferredExecution.cDeferrees.clear();
             }            
         });
         mTimer.start();
@@ -82,7 +82,7 @@ public class StatusApplication extends WApplication {
     }
     
     @Override
-    protected void unload() {
+    protected final void unload() {
         quit();
         
         mNetworkModel.detach();
@@ -132,7 +132,7 @@ public class StatusApplication extends WApplication {
         mNetworkModel.attach();
         mNetworkView = new WTreeView(tNetwork);
         mNetworkView.setModel(mNetworkModel);
-        mNetworkView.selectionChanged().addListener(this, onSelectionChanged);
+        mNetworkView.selectionChanged().addListener(this, mHandlerSelectionChanged);
         mNetworkView.setSelectionMode(SelectionMode.SingleSelection);
         mNetworkView.setSelectionBehavior(SelectionBehavior.SelectRows);
         mNetworkView.expandToDepth(2);
@@ -141,9 +141,9 @@ public class StatusApplication extends WApplication {
         
         // Network detail
         mNetworkDetail = new NetworkDetail(tNetwork);
-        mNetworkDetail.error().addListener(this, onError);
-        mNetworkDetail.warning().addListener(this, onWarning);
-        mNetworkDetail.info().addListener(this, onInfo);
+        mNetworkDetail.error().addListener(this, mHandlerError);
+        mNetworkDetail.warning().addListener(this, mHandlerWarning);
+        mNetworkDetail.info().addListener(this, mHandlerInfo);
         tNetworkLayout.addWidget(mNetworkDetail, 0, 1);
         
         return tNetwork;
@@ -185,7 +185,7 @@ public class StatusApplication extends WApplication {
     // Event handlers
     //
     
-    private Signal.Listener onSelectionChanged = new Signal.Listener() {
+    private Signal.Listener mHandlerSelectionChanged = new Signal.Listener() {
         @Override
         public void trigger() {
             // Get the network item
@@ -193,30 +193,31 @@ public class StatusApplication extends WApplication {
             NetworkItem tNetworkItem = null;
             if (tSelected.size() == 1) {
                 TreeItem tItem = mNetworkModel.getItem(tSelected.first());
-                if (tItem instanceof NetworkItem)
+                if (tItem instanceof NetworkItem) {
                     tNetworkItem = (NetworkItem) tItem;
+                }
             }
             mNetworkDetail.showDetail(tNetworkItem);
         }        
     };
     
-    private Signal2.Listener<String, Exception> onError = new Signal2.Listener<String, Exception>() {
+    private Signal2.Listener<String, Exception> mHandlerError = new Signal2.Listener<String, Exception>() {
         @Override
-        public void trigger(String iMessage, Exception iException) {
+        public void trigger(final String iMessage, final Exception iException) {
             error(iMessage, iException);
         }            
     };
     
-    private Signal1.Listener<String> onWarning = new Signal1.Listener<String>() {
+    private Signal1.Listener<String> mHandlerWarning = new Signal1.Listener<String>() {
         @Override
-        public void trigger(String iMessage) {
+        public void trigger(final String iMessage) {
             warn(iMessage);
         }            
     };
     
-    private Signal1.Listener<String> onInfo = new Signal1.Listener<String>() {
+    private Signal1.Listener<String> mHandlerInfo = new Signal1.Listener<String>() {
         @Override
-        public void trigger(String iMessage) {
+        public void trigger(final String iMessage) {
             info(iMessage);
         }            
     };
@@ -226,17 +227,17 @@ public class StatusApplication extends WApplication {
     // Auxiliary functions
     //
     
-    private void error(String iMessage, Exception iException) {
+    private void error(final String iMessage, final Exception iException) {
         mLogger.error(iMessage, iException);
         mStatusbar.setText(mStatusbar.getText() + "Error: " + iMessage + "\n");
     }
     
-    private void warn(String iMessage) {
+    private void warn(final String iMessage) {
         mLogger.warn(iMessage);
         mStatusbar.setText(mStatusbar.getText() + "Warning: " + iMessage + "\n");        
     }
     
-    private void info(String iMessage) {
+    private void info(final String iMessage) {
         mLogger.info(iMessage);
         mStatusbar.setText(mStatusbar.getText() + "Notice: " + iMessage + "\n");        
     }
@@ -249,7 +250,7 @@ public class StatusApplication extends WApplication {
     private class LogAppender extends AppenderSkeleton {
         private WTextArea mLogText;
         
-        public LogAppender(WTextArea iLogText) {
+        public LogAppender(final WTextArea iLogText) {
             super();
             mLogText = iLogText;
             mLogText.setText("");
@@ -266,16 +267,18 @@ public class StatusApplication extends WApplication {
         }
         
         @Override
-        protected void append(LoggingEvent event) {
-            if (event != null) {
-                DeferredExecution.DEFERREES.add(new DeferredExecution() {
-                    String mMessage;
-                    ThrowableInformation mThrowableInformation;
-                    public DeferredExecution construct(String iMessage, ThrowableInformation iThrowableInformation) {
+        protected void append(final LoggingEvent iEvent) {
+            if (iEvent != null) {
+                DeferredExecution.cDeferrees.add(new DeferredExecution() {
+                    private String mMessage;
+                    private ThrowableInformation mThrowableInformation;
+                    
+                    public DeferredExecution construct(final String iMessage, final ThrowableInformation iThrowableInformation) {
                         mMessage = iMessage;
                         mThrowableInformation = iThrowableInformation;
                         return this;
                     }
+                    
                     @Override
                     public void execute() {
                         String tCurrentMessage = mLogText.getText();
@@ -284,13 +287,14 @@ public class StatusApplication extends WApplication {
                         
                         if (mThrowableInformation != null) {
                             String[] tExceptionStrings = mThrowableInformation.getThrowableStrRep();
-                            for (String tExceptionString : tExceptionStrings)
+                            for (String tExceptionString : tExceptionStrings) {
                                 tCurrentMessage += tExceptionString + "\n";
+                            }
                         }
                         
                         mLogText.setText(tCurrentMessage);
                     }
-                }.construct(getLayout().format(event), event.getThrowableInformation()));
+                }.construct(getLayout().format(iEvent), iEvent.getThrowableInformation()));
             }
         }
     }

@@ -26,7 +26,7 @@ public class TreeModel<E extends TreeItem> extends WAbstractItemModel {
     // Construction and destruction
     //
     
-    public TreeModel(List<String> iHeaders) {
+    public TreeModel(final List<String> iHeaders) {
         // Set-up tree root
         mRoot = new RootItem(iHeaders);
     }
@@ -36,7 +36,7 @@ public class TreeModel<E extends TreeItem> extends WAbstractItemModel {
     // Getters and setters
     //
     
-    public RootItem getRoot() {
+    public final RootItem getRoot() {
         return mRoot;
     }
     
@@ -46,110 +46,111 @@ public class TreeModel<E extends TreeItem> extends WAbstractItemModel {
     //
 
     @Override
-    public int getColumnCount(WModelIndex parent) {
-        if (parent != null) {
-            return ((TreeItem) (parent.getInternalPointer())).getFieldCount();
+    public final int getColumnCount(final WModelIndex iParent) {
+        if (iParent != null) {
+            return ((TreeItem) (iParent.getInternalPointer())).getFieldCount();
         } else {
             return mRoot.getFieldCount();
         }
     }
 
     @Override
-    public Object getData(WModelIndex index, int role) {
-        if (index == null) {
+    public final Object getData(final WModelIndex iIndex, final int iRole) {
+        if (iIndex == null) {
             return null;
         }
 
-        if (role != ItemDataRole.DisplayRole) {
+        if (iRole != ItemDataRole.DisplayRole) {
             return null;
         }
 
-        TreeItem item = (TreeItem) (index.getInternalPointer());
+        TreeItem tItem = (TreeItem) (iIndex.getInternalPointer());
 
-        return item.getField(index.getColumn());
+        return tItem.getField(iIndex.getColumn());
     }
 
     @Override
-    public WModelIndex getIndex(int row, int column, WModelIndex parent) {
-        if (! this.hasIndex(row, column, parent))
+    public final WModelIndex getIndex(final int iRow, final int iColumn, final WModelIndex iParent) {
+        if (! this.hasIndex(iRow, iColumn, iParent)) {
             return null;
+        }
         
         // Get the actual parent
-        TreeItem tParent;
-        if (parent != null)
-            tParent = (TreeItem) parent.getInternalPointer();
-        else
-            tParent = mRoot;
+        TreeItem tParentItem = getItem(iParent);
         
         // Get the child
-        TreeItem tChild = tParent.getChild(row);
-        if (tChild != null)
-            return createIndex(row, column, tChild);
-        else
+        TreeItem tChildItem = tParentItem.getChild(iRow);
+        if (tChildItem != null) {
+            return createIndex(iRow, iColumn, tChildItem);
+        } else {
             return null;
+        }
     }
 
     @Override
-    public WModelIndex getParent(WModelIndex index) {
-        if (index == null)
+    public final WModelIndex getParent(final WModelIndex iIndex) {
+        if (iIndex == null) {
             return null;
+        }
 
-        TreeItem childItem = getItem(index);
-        TreeItem parentItem = childItem.getParent();
+        TreeItem tChildItem = getItem(iIndex);
+        TreeItem tParentItem = tChildItem.getParent();
 
-        if (parentItem == mRoot)
+        if (tParentItem == mRoot) {
             return null;
+        }
 
-        return createIndex(parentItem.getRow(), 0, parentItem);
+        return createIndex(tParentItem.getRow(), 0, tParentItem);
     }
 
     @Override
-    public int getRowCount(WModelIndex parent) {
-        return getItem(parent).getChildCount();
+    public final int getRowCount(final WModelIndex iParent) {
+        return getItem(iParent).getChildCount();
     }
 
     @Override
-    public Object getHeaderData(int section, Orientation orientation, int role) {
-        if (orientation == Orientation.Horizontal && role == ItemDataRole.DisplayRole)
-            return mRoot.getField(section);
+    public final Object getHeaderData(final int iSection, final Orientation iOrientation, final int iRole) {
+        if (iOrientation == Orientation.Horizontal && iRole == ItemDataRole.DisplayRole) {
+            return mRoot.getField(iSection);
+        }
         return null;
     }
     
     // Custom
-    public boolean insertRows(int position, List<? extends TreeItem> items, WModelIndex parent) {
-        TreeItem parentItem = getItem(parent);
-        boolean success;
+    public final boolean insertRows(final int iPosition, final List<? extends TreeItem> iItems, final WModelIndex iParent) {
+        TreeItem tParentItem = getItem(iParent);
+        boolean tSuccess;
         
-        beginInsertRows(parent, position, position+items.size()-1);
-        success = parentItem.insertChildren(position, items);
+        beginInsertRows(iParent, iPosition, iPosition+iItems.size()-1);
+        tSuccess = tParentItem.insertChildren(iPosition, iItems);
         endInsertRows();
         
-        return success;
+        return tSuccess;
     }
     
     @Override
-    public boolean removeRows(int position, int rows, WModelIndex parent) {
-        TreeItem parentItem = getItem(parent);
-        boolean success;
+    public final boolean removeRows(final int iPosition, final int iRows, final WModelIndex iParent) {
+        TreeItem tParentItem = getItem(iParent);
+        boolean tSuccess;
         
-        beginRemoveRows(parent, position, position+rows-1);
-        success = parentItem.removeChildren(position, rows);
+        beginRemoveRows(iParent, iPosition, iPosition+iRows-1);
+        tSuccess = tParentItem.removeChildren(iPosition, iRows);
         endRemoveRows();
         
-        return success;        
+        return tSuccess;        
     }
     
-    public boolean removeRow(TreeItem iItem, WModelIndex parent) {
-        TreeItem parentItem = getItem(parent);
+    public final boolean removeRow(final TreeItem iItem, final WModelIndex iParent) {
+        TreeItem tParentItem = getItem(iParent);
         
-        for (int row = 0; row < parentItem.getChildCount(); ++row) {
-            TreeItem childItem = parentItem.getChild(row);
-            if (childItem == iItem) {
-                removeRows(childItem.getRow(), 1, parent);
+        for (int tRow = 0; tRow < tParentItem.getChildCount(); ++tRow) {
+            TreeItem tChildItem = tParentItem.getChild(tRow);
+            if (tChildItem == iItem) {
+                removeRows(tChildItem.getRow(), 1, iParent);
+                return true;
+            } else if (removeRow(iItem, getIndex(tChildItem.getRow(), 0))) {
                 return true;
             }
-            else if (removeRow(iItem, getIndex(childItem.getRow(), 0)))
-                return true;
         }
         return false;
     }
@@ -174,26 +175,13 @@ public class TreeModel<E extends TreeItem> extends WAbstractItemModel {
     // Auxiliary
     //    
     
-    public TreeItem getItem(WModelIndex index) {
-        if (index != null) {
-            TreeItem tItem = (TreeItem) index.getInternalPointer();
-            if (tItem != null)
+    public final TreeItem getItem(final WModelIndex iIndex) {
+        if (iIndex != null) {
+            TreeItem tItem = (TreeItem) iIndex.getInternalPointer();
+            if (tItem != null) {
                 return tItem;
+            }
         }
         return mRoot;
-    }
-    
-    public WModelIndex index(int row, int column, WModelIndex parent)
-    {
-        if (parent != null && parent.getColumn() != 0)
-            return null;
-        
-        TreeItem parentItem = getItem(parent);
-        TreeItem childItem = parentItem.getChild(row);
-        
-        if (childItem != null)
-            return createIndex(row, column, childItem);
-        else
-            return null;
     }
 }

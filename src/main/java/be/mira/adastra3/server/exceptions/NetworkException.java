@@ -10,16 +10,16 @@ package be.mira.adastra3.server.exceptions;
  */
 public class NetworkException extends Exception {
     
-    public NetworkException(Throwable cause) {
-        super(cause);
+    public NetworkException(final Throwable iCause) {
+        super(iCause);
     }
 
-    public NetworkException(String message, Throwable cause) {
-        super(message, cause);
+    public NetworkException(final String iMessage, final Throwable iCause) {
+        super(iMessage, iCause);
     }
 
-    public NetworkException(String message) {
-        super(message);
+    public NetworkException(final String iMessage) {
+        super(iMessage);
     }
 
     public NetworkException() {
