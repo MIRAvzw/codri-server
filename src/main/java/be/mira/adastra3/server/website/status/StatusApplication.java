@@ -38,18 +38,22 @@ public class StatusApplication extends WApplication {
     // Data members
     //
     
-    private WTimer mTimer;
+    private Logger mLogger;
     
-    private WTextArea mStatusbar;
+    private WTimer mTimer;
     private WTabWidget mTabs;
     
-    private Logger mLogger;
+    private WTextArea mStatusbar;
+    private final StringBuffer mStatusbarBuffer = new StringBuffer();
+    
+    WTextArea mLogText;
+    private LogAppender mLogAppender;
+    private final StringBuffer mLogBuffer = new StringBuffer();
     
     
     private NetworkModel mNetworkModel;
     private WTreeView mNetworkView;
     private NetworkDetail mNetworkDetail;
-    private LogAppender mLogAppender;
     
     
     //
@@ -165,14 +169,14 @@ public class StatusApplication extends WApplication {
         WGridLayout tLayout = new WGridLayout(tLog);
         
         // Text area
-        WTextArea tLogText = new WTextArea();
-        tLogText.setReadOnly(true);
-        tLogText.setSelectable(true);
-        tLayout.addWidget(tLogText);
+        mLogText = new WTextArea();
+        mLogText.setReadOnly(true);
+        mLogText.setSelectable(true);
+        tLayout.addWidget(mLogText);
         
         // Setup logging
         Logger tLogger = Logger.getRootLogger();
-        mLogAppender = new LogAppender(tLogText);
+        mLogAppender = new LogAppender();
         mLogAppender.setLayout(new SimpleLayout());
         mLogAppender.setThreshold(Level.ALL);
         tLogger.addAppender(mLogAppender);
@@ -229,17 +233,32 @@ public class StatusApplication extends WApplication {
     
     private void error(final String iMessage, final Exception iException) {
         mLogger.error(iMessage, iException);
-        mStatusbar.setText(mStatusbar.getText() + "Error: " + iMessage + "\n");
+        
+        mStatusbarBuffer.append("Error: ");
+        mStatusbarBuffer.append(iMessage);
+        mStatusbarBuffer.append("\n");
+        
+        mStatusbar.setText(mStatusbarBuffer.toString());
     }
     
     private void warn(final String iMessage) {
         mLogger.warn(iMessage);
-        mStatusbar.setText(mStatusbar.getText() + "Warning: " + iMessage + "\n");        
+        
+        mStatusbarBuffer.append("Warning: ");
+        mStatusbarBuffer.append(iMessage);
+        mStatusbarBuffer.append("\n");
+        
+        mStatusbar.setText(mStatusbarBuffer.toString());     
     }
     
     private void info(final String iMessage) {
         mLogger.info(iMessage);
-        mStatusbar.setText(mStatusbar.getText() + "Notice: " + iMessage + "\n");        
+        
+        mStatusbarBuffer.append("Info: ");
+        mStatusbarBuffer.append(iMessage);
+        mStatusbarBuffer.append("\n");
+        
+        mStatusbar.setText(mStatusbarBuffer.toString());       
     }
     
     
@@ -247,13 +266,12 @@ public class StatusApplication extends WApplication {
     // Subclasses
     //
     
-    private class LogAppender extends AppenderSkeleton {
-        private WTextArea mLogText;
+    private class LogAppender extends AppenderSkeleton {    
         
-        public LogAppender(final WTextArea iLogText) {
+
+        public LogAppender() {
             super();
-            mLogText = iLogText;
-            mLogText.setText("");
+            mLogText.setText(mLogBuffer.toString());
         }
         
         @Override
@@ -281,18 +299,17 @@ public class StatusApplication extends WApplication {
                     
                     @Override
                     public void execute() {
-                        String tCurrentMessage = mLogText.getText();
-                        
-                        tCurrentMessage += mMessage;
+                        mLogBuffer.append(mMessage);
                         
                         if (mThrowableInformation != null) {
                             String[] tExceptionStrings = mThrowableInformation.getThrowableStrRep();
                             for (String tExceptionString : tExceptionStrings) {
-                                tCurrentMessage += tExceptionString + "\n";
+                                mLogBuffer.append(tExceptionString);
+                                mLogBuffer.append("\n");
                             }
                         }
                         
-                        mLogText.setText(tCurrentMessage);
+                        mLogText.setText(mLogBuffer.toString());
                     }
                 }.construct(getLayout().format(iEvent), iEvent.getThrowableInformation()));
             }
