@@ -6,6 +6,8 @@ package be.mira.adastra3.server.website.data;
 
 import be.mira.adastra3.server.network.devices.Device;
 import be.mira.adastra3.server.network.devices.Kiosk30;
+import be.mira.adastra3.server.website.auxiliary.Signal1Bubbler;
+import be.mira.adastra3.server.website.auxiliary.Signal2Bubbler;
 import be.mira.adastra3.server.website.data.details.Kiosk30Detail;
 import eu.webtoolkit.jwt.Signal1;
 import eu.webtoolkit.jwt.Signal2;
@@ -115,37 +117,6 @@ public class NetworkDetail extends WStackedWidget {
             setCurrentWidget(mDetailKiosk30);
         } else {
             setCurrentWidget(mDetailDummy);
-        }
-    }
-    
-    
-    //
-    // Auxiliary classes
-    //
-    
-    private class Signal1Bubbler<A1> implements Signal1.Listener<A1> {
-        private final Signal1<A1> mBubble;
-        
-        public Signal1Bubbler(final Signal1<A1> iBubble) {
-            mBubble = iBubble;
-        }
-
-        @Override
-        public void trigger(final A1 iArgument) {
-            mBubble.trigger(iArgument);
-        }
-    }
-    
-    private class Signal2Bubbler<A1, A2> implements Signal2.Listener<A1, A2> {
-        private final Signal2<A1, A2> mBubble;
-        
-        public Signal2Bubbler(final Signal2<A1, A2> iBubble) {
-            mBubble = iBubble;
-        }
-
-        @Override
-        public void trigger(final A1 iArgument1, final A2 iArgument2) {
-            mBubble.trigger(iArgument1, iArgument2);
         }
     }
 }
