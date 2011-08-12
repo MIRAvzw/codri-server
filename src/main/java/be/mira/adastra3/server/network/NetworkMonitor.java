@@ -13,6 +13,8 @@ import be.mira.adastra3.server.network.controls.DeviceControl;
 import be.mira.adastra3.server.network.controls.ApplicationControl;
 import be.mira.adastra3.server.network.devices.Device;
 import be.mira.adastra3.server.network.devices.Kiosk30;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,6 +34,41 @@ import org.teleal.cling.registry.RegistryListener;
  * @author tim
  */
 public class NetworkMonitor extends Service {
+    //
+    // Data members
+    //
+    
+    private Timer mAliveMonitor;
+    private int mAliveMonitorInterval;
+    
+    //
+    // Auxiliary classes
+    //
+
+    private class Monitor extends TimerTask {
+        @Override
+        public void run() {
+            getLogger().debug("Checking device availability");
+            
+            for (Device tDevice : Network.getInstance().getDevices()) {
+                if (tDevice instanceof Kiosk30) {
+                    Kiosk30 tKiosk = (Kiosk30) tDevice;
+                    try {
+                        long tLatency = tKiosk.getDeviceControl().ping();
+                        getLogger().debug("Latency for kiosk " + tKiosk.getUuid() + ": " + tLatency + " ms");
+                    } catch (NetworkException tException) {
+                        getLogger().warn("Could not check kiosk " + tKiosk.getUuid());
+                        // TODO: mark this kiosk as temporarily unavailable
+                        //       when a new config/media gets there, we can't straight
+                        //       away send the data, but should queue it untill the
+                        //       kiosk comes back to life again (or gets completely
+                        //       unsubscribed, in which case we can drop the
+                        //       changes)
+                    }
+                }
+            }
+        }
+    }
 
     //
     // Construction and destruction
@@ -40,15 +77,23 @@ public class NetworkMonitor extends Service {
     public NetworkMonitor() throws ServiceSetupException {
         super();
         
+        // Add a listener for device registration events
         try {
-            // Add a listener for device registration events
             Network.getInstance().getUpnpService().getRegistry().addListener(
                     createRegistryListener(Network.getInstance().getUpnpService())
             );
-
         } catch (Exception tException) {
             throw new ServiceSetupException(tException);
         }
+
+        // Monitor timer
+        Integer tInterval = Integer.parseInt(getProperty("interval", "60"));
+        if (tInterval <= 0) {
+            throw new ServiceSetupException("Update interval out of valid range");
+        }
+        mAliveMonitorInterval = tInterval;
+        getLogger().debug("Scheduling SVN monitor with interval of " + tInterval + " seconds");
+        mAliveMonitor = new Timer();
     }
 
 
@@ -58,16 +103,18 @@ public class NetworkMonitor extends Service {
 
     @Override
     public final void run() throws ServiceRunException {
+        // Broadcast a search message for all devices
         try {
-            // Broadcast a search message for all devices
             getLogger().debug("Looking for devices");
             Network.getInstance().getUpnpService().getControlPoint().search(
                     new STAllHeader()
             );
-
         } catch (Exception tException) {
             throw new ServiceRunException(tException);
         }
+
+        // Schedule the monitor
+        mAliveMonitor.schedule(new Monitor(), 0, mAliveMonitorInterval * 1000);
     }
 
     @Override

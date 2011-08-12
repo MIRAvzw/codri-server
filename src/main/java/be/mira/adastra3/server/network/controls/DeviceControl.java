@@ -7,6 +7,7 @@ package be.mira.adastra3.server.network.controls;
 import be.mira.adastra3.server.exceptions.NetworkException;
 import be.mira.adastra3.server.network.Network;
 import be.mira.adastra3.server.network.actions.device.GetVolumeAction;
+import be.mira.adastra3.server.network.actions.device.EchoAction;
 import be.mira.adastra3.server.network.actions.device.RebootAction;
 import be.mira.adastra3.server.network.actions.device.SetVolumeAction;
 import be.mira.adastra3.server.network.actions.device.ShutdownAction;
@@ -49,7 +50,7 @@ public class DeviceControl extends Control {
                 tAction,
                 Network.getControlPoint()
         ).run();     
-    }    
+    }
     
     public final void reboot() throws NetworkException {
         RebootAction tAction = new RebootAction(getService());
@@ -58,6 +59,17 @@ public class DeviceControl extends Control {
                 tAction,
                 Network.getControlPoint()
         ).run();
+    }
+    
+    public final String echo(String iEcho) throws NetworkException {
+        EchoAction tAction = new EchoAction(getService(), iEcho);
+        
+        new ActionCallback.Default(
+                tAction,
+                Network.getControlPoint()
+        ).run();
+        
+        return tAction.getEcho();
     }
     
     public final void setVolume(final Integer iVolume) throws NetworkException {        
@@ -78,5 +90,22 @@ public class DeviceControl extends Control {
         ).run();
         
         return tAction.getVolume();
-    }    
+    }
+    
+    
+    //
+    // Meta-actions
+    //
+    
+    public final long ping() throws NetworkException { 
+        long tStart = System.currentTimeMillis();
+        String tEcho = echo("ping");
+        long tEnd = System.currentTimeMillis();
+        
+        if (! tEcho.equals("ping")) {
+            throw new NetworkException("echo service returned invalid response");
+        }
+        
+        return tEnd - tStart;
+    }
 }
