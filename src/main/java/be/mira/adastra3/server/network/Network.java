@@ -79,7 +79,10 @@ public final class Network {
         return mDevices.values();
     }
     
-    public Device getDevice(final UUID iUuid) {
+    public Device getDevice(final UUID iUuid) throws NetworkException {
+        if (! mDevices.containsKey(iUuid) || mDevices.get(iUuid) == null) {
+            throw new NetworkException("device " + iUuid + " not found in network");
+        }
         return mDevices.get(iUuid);
     }
     

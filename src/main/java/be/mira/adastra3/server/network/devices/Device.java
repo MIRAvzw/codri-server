@@ -6,6 +6,7 @@ package be.mira.adastra3.server.network.devices;
 
 import be.mira.adastra3.server.exceptions.DeviceException;
 import be.mira.adastra3.server.repository.configurations.Configuration;
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -19,6 +20,7 @@ abstract public class Device {
     
     private UUID mUuid;
     private String mName;
+    private Date mMark;
     
     
     //
@@ -27,6 +29,7 @@ abstract public class Device {
     
     public Device(final UUID iUuid) {
         mUuid = iUuid;
+        setMark();
     }
     
     
@@ -51,5 +54,17 @@ abstract public class Device {
     
     public final void setName(final String iName) {
         mName = iName;
+    }
+    
+    public final void setMark() {
+        mMark = new Date();
+    }
+    
+    public final Date getMark() {
+        return mMark;
+    }
+    
+    public final long getMarkDelta() {
+        return (new Date().getTime()) - mMark.getTime();
     }
 }

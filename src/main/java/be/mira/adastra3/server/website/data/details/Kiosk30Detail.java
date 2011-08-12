@@ -16,6 +16,7 @@ import eu.webtoolkit.jwt.WLabel;
 import eu.webtoolkit.jwt.WLineEdit;
 import eu.webtoolkit.jwt.WPushButton;
 import eu.webtoolkit.jwt.WVBoxLayout;
+import java.text.SimpleDateFormat;
 
 /**
  *
@@ -29,7 +30,7 @@ public class Kiosk30Detail extends WContainerWidget {
     private Kiosk30 mDevice;
     
     // Device box
-    private WLineEdit mVolume;
+    private WLineEdit mVolume, mLatency, mMark;
     
     // Events
     private Signal2<String, Exception> mEventError;
@@ -85,15 +86,32 @@ public class Kiosk30Detail extends WContainerWidget {
         tVolumeSet.clicked().addListener(this, mHandlerVolumeSet);
         tInformationGrid.addWidget(tVolumeSet, 0, 3);
         
+        // Latency
+        tInformationGrid.addWidget(new WLabel("Latency"), 1, 0);
+        mLatency = new WLineEdit("<volume>");
+        mLatency.setReadOnly(true);
+        tInformationGrid.addWidget(mLatency, 1, 1);
+        WPushButton tLatencyGet = new WPushButton("Ping");
+        tLatencyGet.clicked().addListener(this, mHandlerLatencyGet);
+        tInformationGrid.addWidget(tLatencyGet, 1, 2);
+        
+        // Mark time
+        tInformationGrid.addWidget(new WLabel("Last contact"), 2, 0);
+        mMark = new WLineEdit("<volume>");
+        mMark.setReadOnly(true);
+        tInformationGrid.addWidget(mMark, 2, 1);
+        // TODO: update hook
+        
+        
         // Reboot
         WPushButton tReboot = new WPushButton("Reboot");
         tReboot.clicked().addListener(this, mHandlerReboot);
-        tInformationGrid.addWidget(tReboot, 1, 0);
+        tInformationGrid.addWidget(tReboot, 3, 0);
         
         // Shutdown
         WPushButton tShutdown = new WPushButton("Shutdown");
         tReboot.clicked().addListener(this, mHandlerShutdown);
-        tInformationGrid.addWidget(tShutdown, 2, 0);
+        tInformationGrid.addWidget(tShutdown, 4, 0);
         
         tBox.addWidget(tInformation); // redundant?
         
@@ -135,6 +153,26 @@ public class Kiosk30Detail extends WContainerWidget {
             } catch (NetworkException tException) {
                 mEventError.trigger("coult not get device volume", tException);
             }
+        }
+    };
+    
+    private Signal.Listener mHandlerLatencyGet = new Signal.Listener() {
+        @Override
+        public void trigger() {
+            try {
+                debug().trigger("measuring device latency");
+                mLatency.setText(String.valueOf(mDevice.getDeviceControl().ping()) + " ms");
+            } catch (NetworkException tException) {
+                mEventError.trigger("coult not measure device latency", tException);
+            }
+        }
+    };
+    
+    private Signal.Listener mHandlerMarkGet = new Signal.Listener() {
+        @Override
+        public void trigger() {
+            debug().trigger("getting device mark");
+            mMark.setText((new SimpleDateFormat()).format(mDevice.getMark()));
         }
     };
     
@@ -191,5 +229,7 @@ public class Kiosk30Detail extends WContainerWidget {
         mDevice = iDevice;
         info().trigger("loading details for device '" + iDevice.getName() + "'");
         mHandlerVolumeGet.trigger();
+        mHandlerLatencyGet.trigger();
+        mHandlerMarkGet.trigger();
     }
 }
