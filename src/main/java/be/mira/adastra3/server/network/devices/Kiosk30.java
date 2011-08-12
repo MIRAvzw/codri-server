@@ -13,7 +13,6 @@ import be.mira.adastra3.server.repository.configurations.ApplicationConfiguratio
 import be.mira.adastra3.server.repository.configurations.Configuration;
 import be.mira.adastra3.server.repository.configurations.DeviceConfiguration;
 import be.mira.adastra3.server.repository.configurations.KioskConfiguration;
-import be.mira.adastra3.server.repository.configurations.application.InterfaceConfiguration;
 import be.mira.adastra3.server.repository.configurations.application.MediaConfiguration;
 import java.util.UUID;
 
@@ -67,13 +66,6 @@ public class Kiosk30 extends Device {
         try {
             // TODO: check revision, e.d.
             Repository tRepository = Repository.getInstance();
-            
-            InterfaceConfiguration tInterfaceConfiguration = tApplicationConfiguration.getInterfaceConfiguration();
-            if (tInterfaceConfiguration != null) {
-                String tInterfaceLocation = tRepository.getServer()
-                        + "/interfaces/" + tInterfaceConfiguration.getId();
-                getApplicationControl().loadInterface(tInterfaceConfiguration.getId(), tInterfaceConfiguration.getRole(), tInterfaceLocation);                
-            }
             
             MediaConfiguration tMediaConfiguration =  tApplicationConfiguration.getMediaConfiguration();
             if (tMediaConfiguration != null) {

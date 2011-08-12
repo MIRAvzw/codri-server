@@ -9,7 +9,6 @@ import be.mira.adastra3.server.repository.configurations.ApplicationConfiguratio
 import be.mira.adastra3.server.repository.configurations.Configuration;
 import be.mira.adastra3.server.repository.configurations.DeviceConfiguration;
 import be.mira.adastra3.server.repository.configurations.KioskConfiguration;
-import be.mira.adastra3.server.repository.configurations.application.InterfaceConfiguration;
 import be.mira.adastra3.server.repository.configurations.application.MediaConfiguration;
 import be.mira.adastra3.server.repository.configurations.device.SoundConfiguration;
 import java.io.IOException;
@@ -228,7 +227,6 @@ public class ConfigurationReader {
     private ApplicationConfiguration parseApplicationConfiguration() throws RepositoryException, XmlPullParserException, IOException {
         // Process the tags
         MediaConfiguration tMediaConfiguration = null;
-        InterfaceConfiguration tInterfaceConfiguration = null;
         mParser.next();
         loop: while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
             switch (mParser.getEventType()) {
@@ -236,9 +234,7 @@ public class ConfigurationReader {
                     mParser.next();
                     break loop;
                 case (XmlPullParser.START_TAG):
-                    if (mParser.getName().equals("interface")) {
-                        tInterfaceConfiguration = parseApplicationInterface();
-                    } else if (mParser.getName().equals("media")) {
+                    if (mParser.getName().equals("media")) {
                         tMediaConfiguration = parseApplicationMedia();
                     }
                     break;
@@ -249,42 +245,8 @@ public class ConfigurationReader {
         
         // Create the object
         ApplicationConfiguration tApplicationConfiguration = new ApplicationConfiguration();
-        tApplicationConfiguration.setInterfaceConfiguration(tInterfaceConfiguration);
         tApplicationConfiguration.setMediaConfiguration(tMediaConfiguration);
         return tApplicationConfiguration;
-    }
-    
-    private InterfaceConfiguration parseApplicationInterface() throws RepositoryException, XmlPullParserException, IOException {
-        // Process the attributes
-        String tId = null, tRole = null;
-        for (int tAttributeIndex = 0; tAttributeIndex < mParser.getAttributeCount(); tAttributeIndex++) {
-            String tAttributeName = mParser.getAttributeName(tAttributeIndex);
-            String tAttributeValue = mParser.getAttributeValue(tAttributeIndex);
-            
-            if (tAttributeName.equals("id")) {
-                tId = tAttributeValue;
-            } else if (tAttributeName.equals("role")) {
-                tRole = tAttributeValue;
-            }
-        }
-        
-        // Process the tags
-        mParser.next();
-        loop: while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
-            switch (mParser.getEventType()) {
-                case (XmlPullParser.END_TAG):
-                    mParser.next();
-                    break loop;
-                case (XmlPullParser.START_TAG):
-                    break;
-                default:
-                    mParser.next();
-            }
-        }
-        
-        // Create the object
-        InterfaceConfiguration tApplicationInterface = new InterfaceConfiguration(tId, tRole);
-        return tApplicationInterface;
     }
     
     private MediaConfiguration parseApplicationMedia() throws RepositoryException, XmlPullParserException, IOException {

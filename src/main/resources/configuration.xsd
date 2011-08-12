@@ -62,16 +62,8 @@
     
     <xsd:complexType name="applicationType">
         <xsd:sequence>
-            <xsd:element name="interface" type="interfaceType" minOccurs="0" />
             <xsd:element name="media" type="mediaType" minOccurs="0" />
         </xsd:sequence>
-    </xsd:complexType>
-
-    <xsd:complexType name="interfaceType">
-        <xsd:sequence>
-        </xsd:sequence>
-        <xsd:attribute name="id" type="xsd:string" use="required" />
-        <xsd:attribute name="role" type="xsd:string" use="required" />
     </xsd:complexType>
 
     <xsd:complexType name="mediaType">

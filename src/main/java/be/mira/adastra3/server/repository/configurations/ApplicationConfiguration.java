@@ -5,7 +5,6 @@
 package be.mira.adastra3.server.repository.configurations;
 
 import be.mira.adastra3.server.repository.configurations.application.MediaConfiguration;
-import be.mira.adastra3.server.repository.configurations.application.InterfaceConfiguration;
 
 /**
  *
@@ -17,7 +16,6 @@ public class ApplicationConfiguration extends Configuration {
     //
     
     private MediaConfiguration mMediaConfiguration;
-    private InterfaceConfiguration mInterfaceConfiguration;
     
     
     //
@@ -31,14 +29,6 @@ public class ApplicationConfiguration extends Configuration {
     //
     // Getters and setters
     //
-
-    public final InterfaceConfiguration getInterfaceConfiguration() {
-        return mInterfaceConfiguration;
-    }
-
-    public final void setInterfaceConfiguration(final InterfaceConfiguration iInterfaceConfiguration) {
-        mInterfaceConfiguration = iInterfaceConfiguration;
-    }
 
     public final MediaConfiguration getMediaConfiguration() {
         return mMediaConfiguration;
