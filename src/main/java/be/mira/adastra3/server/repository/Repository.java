@@ -94,9 +94,9 @@ public final class Repository {
         return mKioskConfigurations.get(iName);
     }
 
-    public KioskConfiguration lookupKioskConfiguration(final UUID iUuid) {
+    public KioskConfiguration lookupKioskConfiguration(final UUID iUuid) throws RepositoryException {
         if (!mKioskMapping.containsKey(iUuid)) {
-            return null;
+            throw new RepositoryException("Kiosk configuration for device '" + iUuid + "' not found");
         }
         return mKioskConfigurations.get(mKioskMapping.get(iUuid));
     }

@@ -13,7 +13,6 @@ import be.mira.adastra3.server.exceptions.ServiceSetupException;
 import be.mira.adastra3.server.network.INetworkListener;
 import be.mira.adastra3.server.network.Network;
 import be.mira.adastra3.server.network.devices.Device;
-import be.mira.adastra3.server.network.devices.Kiosk30;
 import be.mira.adastra3.server.repository.IRepositoryListener;
 import be.mira.adastra3.server.repository.Repository;
 import be.mira.adastra3.server.repository.configurations.KioskConfiguration;
@@ -76,11 +75,33 @@ public class Controller extends Service implements INetworkListener, IRepository
     @Override
     public final void doKioskConfigurationAdded(final KioskConfiguration iKioskConfiguration) {
         getLogger().info("Kiosk configuration added: " + iKioskConfiguration.getId());
+        
+        // Check if there is a valid target device, and if so push the configuration
+        Device tDevice = null;
+        try {
+            tDevice = Network.getInstance().getDevice(iKioskConfiguration.getTarget());
+            tDevice.setConfiguration(iKioskConfiguration);
+        } catch (NetworkException tException) {
+            getLogger().warn("Configuration " + iKioskConfiguration.getId() + " does not target a valid device");
+        } catch (DeviceException tException) {
+            getLogger().error("Could not push configuration " + iKioskConfiguration.getId() + " to target device '" + tDevice.getUuid() + "'", tException);
+        }
     }
 
     @Override
     public final void doKioskConfigurationUpdated(final KioskConfiguration iOldKioskConfiguration, final KioskConfiguration iKioskConfiguration) {
         getLogger().info("Kiosk configuration updated: " + iKioskConfiguration.getId());
+        
+        // Check if there is a valid target device, and if so update the configuration
+        Device tDevice = null;
+        try {
+            tDevice = Network.getInstance().getDevice(iKioskConfiguration.getTarget());
+            tDevice.setConfiguration(iKioskConfiguration);
+        } catch (NetworkException tException) {
+            getLogger().warn("Configuration " + iKioskConfiguration.getId() + " does not target a valid device");
+        } catch (DeviceException tException) {
+            getLogger().error("Could not update configuration " + iKioskConfiguration.getId() + " on target device '" + tDevice.getUuid() + "'", tException);
+        }
     }
     
     
@@ -102,25 +123,16 @@ public class Controller extends Service implements INetworkListener, IRepository
     public final void doDeviceAdded(final Device iDevice) {
         getLogger().info("MIRA device added to network: " + iDevice.getUuid());
         Repository tRepository = Repository.getInstance();
-        
-        if (iDevice instanceof Kiosk30) {
-            Kiosk30 tKiosk = (Kiosk30) iDevice;
             
-            // Check if there is a configuration for this device
+        // Check if there is a configuration for this device
+        try {
             KioskConfiguration tKioskConfiguration = tRepository.lookupKioskConfiguration(iDevice.getUuid());
-
-            if (tKioskConfiguration != null) {
-                getLogger().debug("Loading configuration " + tKioskConfiguration.getId() + " onto device " + iDevice.getUuid());
-                try {
-                    tKiosk.setConfiguration(tKioskConfiguration);
-                } catch (DeviceException tException) {
-                    getLogger().warn("could not configure device", tException);
-                }
-            } else {
-                getLogger().warn("could find any configuration for device " + iDevice.getUuid() + ", it'll remain unconfigured");
-            }
-        } else {
-            getLogger().warn("unknown MIRA device");
+            getLogger().debug("Loading configuration " + tKioskConfiguration.getId() + " onto device " + iDevice.getUuid());
+            iDevice.setConfiguration(tKioskConfiguration);
+        } catch (RepositoryException tException) {
+            getLogger().warn("could find any configuration for device " + iDevice.getUuid() + ", it'll remain unconfigured");
+        } catch (DeviceException tException) {
+            getLogger().error("could not configure device", tException);
         }
     }
 

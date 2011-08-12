@@ -46,7 +46,6 @@ public class RepositoryMonitor extends Service {
     private class Monitor extends TimerTask {
         @Override
         public void run() {
-            getLogger().debug("Checking SVN revision");
             try {
                 update();
             } catch (RepositoryException tException) {
@@ -118,11 +117,11 @@ public class RepositoryMonitor extends Service {
     //
 
     final void checkout() throws RepositoryException  {
+        getLogger().info("Checking out the repository");
         try {
             mSVNRevision = mSVNRepository.getLatestRevision();
 
             // Checkout the repository
-            getLogger().debug("Checking out configurations");
             ISVNReporterBaton tConfigurationBaton = new DummyBaton(mSVNRevision);
             RepositoryEditor tRepositoryEditor = new RepositoryEditor();
             mSVNRepository.update(mSVNRevision, "configurations", true, tConfigurationBaton, tRepositoryEditor);
@@ -165,6 +164,8 @@ public class RepositoryMonitor extends Service {
     }
     
     private void update() throws RepositoryException {
+        getLogger().info("Checking the repository for changes");
+        
         long tSVNRevision;
         try {
             tSVNRevision = mSVNRepository.getLatestRevision();

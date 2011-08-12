@@ -21,6 +21,8 @@ VERSION 1.0
   - Preserve offline kiosks
 
 * Repository subsystem
+  - GetMediaRevision & GetConfigurationRevision, zo geen redundant loads @
+    checkout
 
 
 VERSION 2.0
