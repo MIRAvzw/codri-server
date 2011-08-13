@@ -6,6 +6,7 @@ package be.mira.adastra3.server.network.controls;
 
 import be.mira.adastra3.server.exceptions.NetworkException;
 import be.mira.adastra3.server.network.Network;
+import be.mira.adastra3.server.network.actions.application.GetMediaAction;
 import be.mira.adastra3.server.network.actions.application.LoadMediaAction;
 import org.teleal.cling.controlpoint.ActionCallback;
 import org.teleal.cling.model.meta.RemoteService;
@@ -36,15 +37,54 @@ public class ApplicationControl extends Control {
     
     
     //
+    // Auxiliary classes
+    //
+    
+    public final static class Media {
+        // Data members
+        private String mIdentifier;
+        private String mLocation;
+        
+        // Construction
+        public Media(final String iIdentifier, final String iLocation) {
+            mIdentifier = iIdentifier;
+            mLocation = iLocation;
+        }
+        
+        // Getters and setters
+        public final String getIdentifier() {
+            return mIdentifier;
+        }
+        public final String getLocation() {
+            return mLocation;
+        }
+    }
+    
+    
+    //
     // Service actions
     //
     
-    public final void loadMedia(final String iMediaIdentifier, final String iMediaLocation) throws NetworkException {
-        LoadMediaAction tAction = new LoadMediaAction(getService(), iMediaIdentifier, iMediaLocation);
+    public final void loadMedia(final Media iMedia) throws NetworkException {
+        LoadMediaAction tAction = new LoadMediaAction(getService(), iMedia.getIdentifier(), iMedia.getLocation());
         
         new ActionCallback.Default(
                 tAction,
                 Network.getControlPoint()
         ).run();
+    }
+    
+    public final Media getMedia() throws NetworkException {
+        GetMediaAction tAction = new GetMediaAction(getService());
+        
+        new ActionCallback.Default(
+                tAction,
+                Network.getControlPoint()
+        ).run();
+        
+        return new Media(
+                tAction.getIdentifier(),
+                tAction.getLocation()
+        );
     }
 }
