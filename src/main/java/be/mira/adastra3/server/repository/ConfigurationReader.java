@@ -11,13 +11,16 @@ import be.mira.adastra3.server.repository.configurations.DeviceConfiguration;
 import be.mira.adastra3.server.repository.configurations.KioskConfiguration;
 import be.mira.adastra3.server.repository.configurations.application.MediaConfiguration;
 import be.mira.adastra3.server.repository.configurations.device.SoundConfiguration;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.UUID;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
+import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -36,6 +39,7 @@ public class ConfigurationReader {
     private XmlPullParser mParser;
     private Configuration mConfiguration;
     private String mIdentifier;
+    private Logger mLogger = Logger.getLogger(ConfigurationReader.class);
     
     
     
@@ -44,35 +48,43 @@ public class ConfigurationReader {
     // Construction and destruction
     //
     
-    public ConfigurationReader(final String iIdentifier, final InputStream iStream) throws RepositoryException {
+    public ConfigurationReader(final String iIdentifier, final File iConfigurationFile) throws RepositoryException {
         mIdentifier = iIdentifier;
         
-        try {
             // Validate the file
             // TODO: do this within the pull parser
+        try {
             String tSchemaLanguage = "http://www.w3.org/2001/XMLSchema";
             SchemaFactory tSchemaFactory = SchemaFactory.newInstance(tSchemaLanguage);
             Schema tSchema = tSchemaFactory.newSchema(this.getClass().getClassLoader().getResource("configuration.xsd"));
             Validator tValidator = tSchema.newValidator();
-            tValidator.validate(new StreamSource(iStream));
-            iStream.reset();
-            
-            // Setup the parser factory
-            if (PARSER_FACTORY == null) {
-                PARSER_FACTORY = XmlPullParserFactory.newInstance();            
-            }
-            PARSER_FACTORY.setNamespaceAware(true);
-            PARSER_FACTORY.setValidating(false);
-            
-            // Aquire a parser
-            mParser = PARSER_FACTORY.newPullParser();
-            mParser.setInput(iStream, null);
-        } catch (XmlPullParserException tException) {
-            throw new RepositoryException(tException);
+            tValidator.validate(new StreamSource(iConfigurationFile));
         } catch (SAXException tException) {
             throw new RepositoryException("could not validate file", tException);
         } catch (IOException tException) {
             throw new RepositoryException("could not open schema", tException);
+        }
+        
+        // Setup the parser factory
+        try {
+            if (PARSER_FACTORY == null) {
+                PARSER_FACTORY = XmlPullParserFactory.newInstance();     
+
+                PARSER_FACTORY.setNamespaceAware(true);
+                PARSER_FACTORY.setValidating(false);       
+            }
+        } catch (XmlPullParserException tException) {
+            throw new RepositoryException("could not set-up the pull parser", tException);
+        }
+        
+        // Parse the file
+        try {    
+            mParser = PARSER_FACTORY.newPullParser();
+            mParser.setInput(new FileInputStream(iConfigurationFile), null);
+        } catch (XmlPullParserException tException) {
+            throw new RepositoryException("could not parse configuration file", tException);
+        } catch (FileNotFoundException tException) {
+            throw new RepositoryException("could not open configuration file", tException);
         }
     }
     
