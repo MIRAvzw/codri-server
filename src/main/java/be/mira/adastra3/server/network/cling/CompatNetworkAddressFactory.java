@@ -170,4 +170,9 @@ public class CompatNetworkAddressFactory extends NetworkAddressFactoryImpl {
         System.out.printf("\n");
 
     }
+    
+    @Override
+    public byte[] getHardwareAddress(InetAddress inetAddress) {
+        return null;
+    }
 }

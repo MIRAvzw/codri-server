@@ -7,10 +7,14 @@ import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.repository.RepositoryMonitor;
 import be.mira.adastra3.server.website.EmbeddedTomcat;
 import java.util.EnumMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 import javax.servlet.ServletException;
 import org.apache.catalina.LifecycleException;
+import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 /**
  * Hello world!
@@ -81,7 +85,20 @@ public class Main {
         //
 
         // Logging
+        BasicConfigurator.configure();
         LOGGER = Logger.getLogger(Main.class);
+        try {
+            Iterator tKeyIterator = Service.getConfiguration().getKeys("log4j");
+            Properties tLoggingProperties = new Properties();
+            while (tKeyIterator.hasNext()) {
+                String tKey = (String) tKeyIterator.next();
+                String tValue = Service.getConfiguration().getString(tKey);
+                tLoggingProperties.put(tKey, tValue);
+            }
+            PropertyConfigurator.configure(tLoggingProperties);
+        } catch (ServiceSetupException tException) {
+            LOGGER.warn("Could not configure the logging subsystem, using a very basic configuration", tException);
+        }
 
         // Subsystems
         LOGGER.info("Initializing subsystems");

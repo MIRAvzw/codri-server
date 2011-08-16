@@ -63,7 +63,7 @@ public class RepositoryMonitor extends Service {
 
     public RepositoryMonitor() throws ServiceSetupException {
         // Repository protocol
-        String tProtocol = getProperty("protocol", "http");
+        String tProtocol = getConfiguration().getString("repository.protocol");
         if (tProtocol.equalsIgnoreCase("http")) {
             DAVRepositoryFactory.setup();
         } else if (tProtocol.equalsIgnoreCase("svn")) {
@@ -77,9 +77,9 @@ public class RepositoryMonitor extends Service {
 
         // Repository location
         Repository tRepository = Repository.getInstance();
-        mDAVLocation = getProperty("protocol", "http") + "://"
-                + getProperty("host", "localhost")
-                + getProperty("path", "/repository");
+        mDAVLocation = tProtocol + "://"
+                + getConfiguration().getString("repository.host")
+                + getConfiguration().getString("repository.path");
         getLogger().debug("SVN repository DAV location: " + mDAVLocation);
         tRepository.setServer(mDAVLocation);
         
@@ -92,7 +92,7 @@ public class RepositoryMonitor extends Service {
         }
 
         // Monitor timer
-        Integer tInterval = Integer.parseInt(getProperty("interval", "60"));
+        Integer tInterval = getConfiguration().getInt("repository.interval");
         if (tInterval <= 0) {
             throw new ServiceSetupException("Update interval out of valid range");
         }

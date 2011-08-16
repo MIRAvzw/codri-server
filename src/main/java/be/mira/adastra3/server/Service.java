@@ -7,11 +7,11 @@ package be.mira.adastra3.server;
 
 import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration.SystemConfiguration;
 import org.apache.log4j.Logger;
 
 /**
@@ -23,8 +23,32 @@ public abstract class Service {
     // Data members
     //
     
-    private Properties mProperties;
+    private static CompositeConfiguration mConfiguration;
     private Logger mLogger;
+    
+    
+    //
+    // Static functionality
+    //
+    
+    public static Configuration getConfiguration() throws ServiceSetupException {
+        if (mConfiguration == null) {
+            mConfiguration = new CompositeConfiguration();
+            mConfiguration.addConfiguration(new SystemConfiguration());
+            try {
+                mConfiguration.addConfiguration(new PropertiesConfiguration("server.properties"));
+            } catch (ConfigurationException tException) {
+                // Do nothing
+            }
+            try {
+                mConfiguration.addConfiguration(new PropertiesConfiguration("defaults.properties"));
+            } catch (ConfigurationException tException) {
+                throw new ServiceSetupException("could not load defaults", tException);
+            }
+        }
+        
+        return mConfiguration;
+    }
     
     
     //
@@ -33,18 +57,6 @@ public abstract class Service {
 
     public Service() throws ServiceSetupException {
         mLogger = Logger.getLogger(this.getClass());
-        
-        try {
-            // HACK
-            String tClassName = this.getClass().getSimpleName();
-            if (System.getProperty("java.vendor").equals("GNU Classpath")) {
-                tClassName = tClassName.substring(tClassName.lastIndexOf(".")+1);
-            }
-            
-            mProperties = getProperties(tClassName);
-        } catch (Exception tException) {
-            throw new ServiceSetupException(tException);
-        }
     }
 
     //
@@ -62,32 +74,5 @@ public abstract class Service {
 
     final protected Logger getLogger() {
         return mLogger;
-    }
-
-    private Properties getProperties(final String iBasename) throws Exception {
-        String tFilename = iBasename + ".properties";
-        
-        // Load 
-        InputStream tStream = this.getClass().getClassLoader().getResourceAsStream(tFilename);
-        if (tStream == null) {
-            try {
-                tStream = new FileInputStream("/etc/MIRA/" + tFilename);
-            } catch (FileNotFoundException tException) {
-                getLogger().warn("Could not open properties file '" + tFilename + "'");
-                return new java.util.Properties();
-            }
-        }
-
-        Properties tProperties = new java.util.Properties();
-        try {
-            tProperties.load(tStream);
-            return tProperties;
-        } catch (IOException tException) {
-            throw tException;
-        }
-    }
-
-    protected final String getProperty(final String iKey, final String iDefaultValue) {
-        return mProperties.getProperty(iKey, iDefaultValue);
     }
 }

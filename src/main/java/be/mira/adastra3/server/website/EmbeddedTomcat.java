@@ -38,13 +38,13 @@ public class EmbeddedTomcat extends Service {
         
         mTomcat = new Tomcat();
 
-        // Connector type
+        // Connector protocol
         Connector tConnector;
-        String tConnectorType = getProperty("type", "http");
-        if (tConnectorType.equalsIgnoreCase("http")) {
+        String tConnectorProtocol = getConfiguration().getString("website.protocol");
+        if (tConnectorProtocol.equalsIgnoreCase("http")) {
             getLogger().debug("Using HTTP connector");
             tConnector = new Connector("HTTP/1.1");
-        } else if (tConnectorType.equalsIgnoreCase("ajp")) {
+        } else if (tConnectorProtocol.equalsIgnoreCase("ajp")) {
             getLogger().debug("Using AJP connector");
             tConnector = new Connector("AJP/1.3");
         } else {
@@ -55,7 +55,7 @@ public class EmbeddedTomcat extends Service {
 
         // Port
         try {
-            Integer tPort = Integer.parseInt(getProperty("port", "8080"));
+            Integer tPort = getConfiguration().getInt("website.port");
             if (tPort <= 0 || tPort > 65536) {
                 throw new ServiceSetupException("Server port out of valid range");
             }
@@ -66,7 +66,7 @@ public class EmbeddedTomcat extends Service {
         }
 
         // Server root
-        mServerRoot = getProperty("serverroot", ".");
+        mServerRoot = getConfiguration().getString("website.root");
         if (! new File(mServerRoot).isDirectory()) {
             throw new ServiceSetupException("Cannot read server root directory");
         }
