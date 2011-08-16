@@ -58,13 +58,13 @@ public class RepositoryMonitor extends Service {
             try {
                 // Get the data
                 getLogger().debug("Checking the SVN repository for changes");
-                long tCurrentRevision = mSVNRevision;
+                long tPreviousRevision = mSVNRevision;
                 getData();
                 
                 // Check for changes
-                if (mSVNRevision != tCurrentRevision)
+                if (mSVNRevision != tPreviousRevision)
                 {
-                    getLogger().debug("Repository has updated to revision " + mSVNRevision + ", rereading the data");
+                    getLogger().debug("Repository has updated from revision " + tPreviousRevision + " to " + mSVNRevision + ", rereading the data");
                     processData();
                 }
             } catch (RepositoryException tException) {
