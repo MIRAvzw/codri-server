@@ -102,29 +102,11 @@ public class EmbeddedTomcat extends Service {
     // Auxiliary methods
     //
 
-    public final void addWebapp(final String iDirectory) throws ServiceSetupException {
-        addWebapp(iDirectory, iDirectory);
-    }
-
-    public final void addWebapp(final String iDirectory, final String iMountpoint) throws ServiceSetupException {
-        getLogger().debug("Adding webapplication '" + iDirectory + "', mounted on '" + iMountpoint + "'");
-
-        File tDocumentRoot = new File(mServerRoot, "webapps/" + iDirectory);
-        if (! tDocumentRoot.isDirectory()) {
-            throw new ServiceSetupException("Webapplication root not readable");
-        }
-        mTomcat.addWebapp(null, "/" + iMountpoint, tDocumentRoot.getAbsolutePath());
-    }
-    
-    public final Wrapper addServlet(final String iName, final Servlet iServlet) throws ServiceSetupException {
-        return addServlet(iName, iServlet, iName);
-    }
-
     public final Wrapper addServlet(final String iName, final Servlet iServlet, final String iMountpoint) throws ServiceSetupException {
         File tDocumentBase = new File(System.getProperty("java.io.tmpdir"));
-        Context tContext = mTomcat.addContext("", tDocumentBase.getAbsolutePath());
+        Context tContext = mTomcat.addContext("/" + iMountpoint, tDocumentBase.getAbsolutePath());
         Wrapper tWrapperWrapper = mTomcat.addServlet(tContext, iName, iServlet);
-        tContext.addServletMapping("/" + iMountpoint, iName);
+        tContext.addServletMapping("/*", iName);
         return tWrapperWrapper;
     }
 }

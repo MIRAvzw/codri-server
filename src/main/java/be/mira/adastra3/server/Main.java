@@ -6,7 +6,6 @@ import be.mira.adastra3.server.exceptions.ServiceSetupException;
 import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.repository.RepositoryMonitor;
 import be.mira.adastra3.server.website.EmbeddedTomcat;
-import java.io.IOException;
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -169,7 +168,7 @@ public class Main {
                         break;
                     case WEBSITE:
                         tService = new EmbeddedTomcat();
-                        ((EmbeddedTomcat)tService).addWebapp("status");
+                        ((EmbeddedTomcat)tService).addServlet("Status page", new be.mira.adastra3.server.website.Status(), "status");
                         break;
                     case NETWORK:
                         tService = new NetworkMonitor();
