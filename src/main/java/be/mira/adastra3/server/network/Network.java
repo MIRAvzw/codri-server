@@ -50,6 +50,7 @@ public final class Network {
     //
 
     private Network() {
+        // HACK
         if (System.getProperty("java.vendor").equals("Oracle Corporation")) {
             mDevices = new HashMap<UUID, Device>();
             mUpnpService = new UpnpServiceImpl();

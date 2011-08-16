@@ -19,6 +19,8 @@ import java.util.TimerTask;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
+import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory;
+import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.io.ISVNReporterBaton;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
@@ -60,11 +62,22 @@ public class RepositoryMonitor extends Service {
     //
 
     public RepositoryMonitor() throws ServiceSetupException {
-        DAVRepositoryFactory.setup();
-        Repository tRepository = Repository.getInstance();
+        // Repository protocol
+        String tProtocol = getProperty("protocol", "http");
+        if (tProtocol.equalsIgnoreCase("http")) {
+            DAVRepositoryFactory.setup();
+        } else if (tProtocol.equalsIgnoreCase("svn")) {
+            SVNRepositoryFactoryImpl.setup();
+        } else if (tProtocol.equalsIgnoreCase("file")) {
+            FSRepositoryFactory.setup();
+        }
+        else {
+            throw new ServiceSetupException("Invalid protocol specification '" + tProtocol + "'");
+        }
 
-        // DAV location
-        mDAVLocation = "http://"
+        // Repository location
+        Repository tRepository = Repository.getInstance();
+        mDAVLocation = getProperty("protocol", "http") + "://"
                 + getProperty("host", "localhost")
                 + getProperty("path", "/repository");
         getLogger().debug("SVN repository DAV location: " + mDAVLocation);
