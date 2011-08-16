@@ -23,6 +23,8 @@ VERSION 1.0
 * Repository subsystem
   - GetMediaRevision & GetConfigurationRevision, zo geen redundant loads @
     checkout
+    + wie checkt? server? methodes zelfde signatuur geven
+  - SVN locking
 
 
 VERSION 2.0
