@@ -6,12 +6,14 @@ import be.mira.adastra3.server.exceptions.ServiceSetupException;
 import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.repository.RepositoryMonitor;
 import be.mira.adastra3.server.website.EmbeddedTomcat;
+import java.io.IOException;
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import javax.servlet.ServletException;
 import org.apache.catalina.LifecycleException;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -92,7 +94,7 @@ public class Main {
             Properties tLoggingProperties = new Properties();
             while (tKeyIterator.hasNext()) {
                 String tKey = (String) tKeyIterator.next();
-                String tValue = Service.getConfiguration().getString(tKey);
+                String tValue = StringUtils.join(Service.getConfiguration().getStringArray(tKey), ", ");
                 tLoggingProperties.put(tKey, tValue);
             }
             PropertyConfigurator.configure(tLoggingProperties);
