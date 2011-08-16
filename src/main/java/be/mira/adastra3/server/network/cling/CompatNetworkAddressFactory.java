@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.log4j.Logger;
 import org.teleal.cling.transport.impl.NetworkAddressFactoryImpl;
 
 /**
@@ -54,6 +55,8 @@ public class CompatNetworkAddressFactory extends NetworkAddressFactoryImpl {
     private final static Pattern mAddressBroadcast = Pattern.compile("Bcast:(\\d{1,3}.\\d{1,3}.\\d{1,3}.\\d{1,3})");
     private final static Pattern mAddressMask = Pattern.compile("Mask:(\\d{1,3}.\\d{1,3}.\\d{1,3}.\\d{1,3})");
     private final static Pattern mAddressInet6 = Pattern.compile("inet6 addr: ([\\p{XDigit}:]+)\\/(\\d+)");
+    
+    private Logger mLogger = Logger.getLogger(CompatNetworkAddressFactory.class);
 
     public CompatNetworkAddressFactory() throws InitializationException {
         super();
@@ -66,6 +69,7 @@ public class CompatNetworkAddressFactory extends NetworkAddressFactoryImpl {
     @Override
     public List<InterfaceAddress> getInterfaceAddresses(NetworkInterface iInterface) {
         List<InterfaceAddress> tAddresses = new ArrayList<InterfaceAddress>();
+        mLogger.warn("Extremely expensive call to compatible getInterfaceAddresses");
 
         Inet4Address tInet4Address = null, tInet4Broadcast = null, tInet4Netmask = null;
         Inet6Address tInet6Address = null;
