@@ -11,14 +11,12 @@ import java.util.Map;
 import javax.servlet.ServletException;
 import org.apache.catalina.LifecycleException;
 import org.apache.log4j.Logger;
-import sun.misc.Signal;
-import sun.misc.SignalHandler;
 
 /**
  * Hello world!
  *
  */
-public class Main implements SignalHandler {
+public class Main {
     //
     // Auxiliary classes
     //
@@ -39,35 +37,10 @@ public class Main implements SignalHandler {
     }
 
     //
-    // Member data
-    //
-
-    private SignalHandler mOldHandler;
-
-    //
     // Routines
     //
-
-    @Override
-    public final void handle(final Signal iSignal) {
-        LOGGER.info("Received signal " + iSignal.getName());
-        
-        try {
-            signalAction(iSignal);
-
-            // Chain back to previous handler, if one exists
-            if (mOldHandler != SIG_DFL && mOldHandler != SIG_IGN) {
-                mOldHandler.handle(iSignal);
-            }
-
-        } catch (Exception tException) {
-            LOGGER.error("Signal handler for signal " + iSignal.getName() + " failed", tException);
-        }
-    }
-
-    public final void signalAction(final Signal iSignal) {
-        LOGGER.info("Handling signal " + iSignal.getName());
-
+    
+    public final void quit() {
         if (STATUS == Status.RUNNING) {
             LOGGER.info("Stopping subsystems");
             STATUS = Status.STOPPING;
@@ -81,7 +54,7 @@ public class Main implements SignalHandler {
             STATUS = Status.IDLE;
             System.exit(0);
         } else {
-            LOGGER.debug("Ignoring signal as the application is " + STATUS.name());
+            LOGGER.debug("Ignoring call to quit() as the application is " + STATUS.name());
         }
     }
 
@@ -102,15 +75,6 @@ public class Main implements SignalHandler {
     private static Logger LOGGER;
     private static Status STATUS = Status.IDLE;
 
-    public static SignalHandler install(final String iSignalName) {
-        LOGGER.debug("Installing signal handler for SIG " + iSignalName);
-        
-        Signal tSignal = new Signal(iSignalName);
-        Main tInstance = new Main();
-        tInstance.mOldHandler = Signal.handle(tSignal, tInstance);
-        return tInstance;
-    }
-
     public static void main(final String[] iParameters) throws ServletException, LifecycleException {
         //
         // Set-up
@@ -118,11 +82,6 @@ public class Main implements SignalHandler {
 
         // Logging
         LOGGER = Logger.getLogger(Main.class);
-
-        // Install handlers
-        Main.install("TERM");
-        Main.install("INT");
-        Main.install("ABRT");
 
         // Subsystems
         LOGGER.info("Initializing subsystems");

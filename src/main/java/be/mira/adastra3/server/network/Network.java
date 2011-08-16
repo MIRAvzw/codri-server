@@ -4,6 +4,7 @@
  */
 package be.mira.adastra3.server.network;
 
+import be.mira.adastra3.server.network.cling.CompatUpnpServiceConfiguration;
 import be.mira.adastra3.server.exceptions.NetworkException;
 import be.mira.adastra3.server.network.devices.Device;
 import java.util.ArrayList;
@@ -49,9 +50,17 @@ public final class Network {
     //
 
     private Network() {
-        mDevices = new HashMap<UUID, Device>();
-        mUpnpService = new UpnpServiceImpl();
-        mListeners = new ArrayList<INetworkListener>();
+        if (System.getProperty("java.vendor").equals("Oracle Corporation")) {
+            mDevices = new HashMap<UUID, Device>();
+            mUpnpService = new UpnpServiceImpl();
+            mListeners = new ArrayList<INetworkListener>();            
+        } else if (System.getProperty("java.vendor").equals("GNU Classpath")) {
+            mDevices = new HashMap<UUID, Device>();
+            mUpnpService = new UpnpServiceImpl(new CompatUpnpServiceConfiguration());
+            mListeners = new ArrayList<INetworkListener>();           
+        } else {
+            throw new RuntimeException("Unknown Java vendor '" + System.getProperty("java.vendor") + "'");
+        }
     }
 
 
