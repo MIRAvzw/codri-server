@@ -11,10 +11,7 @@ import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;
 import be.mira.adastra3.server.repository.configurations.Configuration;
 import be.mira.adastra3.server.repository.configurations.KioskConfiguration;
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -25,6 +22,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.validator.UrlValidator;
 import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.Depth;
 import org.tigris.subversion.javahl.Info2;
@@ -40,7 +38,7 @@ public class RepositoryMonitor extends Service {
     // Data members
     //
 
-    private URL mSVNLocation;
+    private String mSVNLocation;
     private File mSVNCheckout;
     private SVNClient mSVNClient;
     private long mSVNRevision;
@@ -85,10 +83,11 @@ public class RepositoryMonitor extends Service {
             throw new ServiceSetupException("checkout path does not exist or is not writable");
         
         // Subversion location
-        try {
-            mSVNLocation = new URL(getConfiguration().getString("repository.location"));
-        } catch (MalformedURLException tException) {
-            throw new ServiceSetupException("repository location is not a valid URL", tException);
+        String[] tLocationSchemes = {"http", "https", "file", "svn"};
+        UrlValidator tLocationValidator = new UrlValidator(tLocationSchemes);
+        mSVNLocation = getConfiguration().getString("repository.location");
+        if (!tLocationValidator.isValid(mSVNLocation)) {
+            throw new ServiceSetupException("repository location is not a valid URL");
         }
         mSVNClient = new SVNClient();
 
@@ -238,11 +237,11 @@ public class RepositoryMonitor extends Service {
         }
     }
 
-    private long checkoutRepository(final URL iLocation, final File iCheckout) throws RepositoryException  {
+    private long checkoutRepository(final String iLocation, final File iCheckout) throws RepositoryException  {
         try
         {
             long tRevision = mSVNClient.checkout(
-                    iLocation.toString(),
+                    iLocation,
                     iCheckout.getAbsolutePath(),
                     Revision.HEAD,
                     Revision.HEAD,
