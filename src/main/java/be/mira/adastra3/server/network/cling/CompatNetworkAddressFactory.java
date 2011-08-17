@@ -56,6 +56,8 @@ public class CompatNetworkAddressFactory extends NetworkAddressFactoryImpl {
     private final static Pattern mAddressMask = Pattern.compile("Mask:(\\d{1,3}.\\d{1,3}.\\d{1,3}.\\d{1,3})");
     private final static Pattern mAddressInet6 = Pattern.compile("inet6 addr: ([\\p{XDigit}:]+)\\/(\\d+)");
     
+    List<InterfaceAddress> mInterfaceAddresses = null;
+    
     private Logger mLogger = Logger.getLogger(CompatNetworkAddressFactory.class);
 
     public CompatNetworkAddressFactory() throws InitializationException {
@@ -68,71 +70,80 @@ public class CompatNetworkAddressFactory extends NetworkAddressFactoryImpl {
 
     @Override
     public List<InterfaceAddress> getInterfaceAddresses(NetworkInterface iInterface) {
-        List<InterfaceAddress> tAddresses = new ArrayList<InterfaceAddress>();
-        mLogger.warn("Extremely expensive call to compatible getInterfaceAddresses");
+        if (mInterfaceAddresses == null) {
+            mInterfaceAddresses = new ArrayList<InterfaceAddress>();
+            mLogger.warn("Extremely expensive call to compatible getInterfaceAddresses");
 
-        Inet4Address tInet4Address = null, tInet4Broadcast = null, tInet4Netmask = null;
-        Inet6Address tInet6Address = null;
-        short tInet6Prefixlength = 64;
+            // Set-up objects
+            Inet4Address tInet4Address = null, tInet4Broadcast = null, tInet4Netmask = null;
+            Inet6Address tInet6Address = null;
+            short tInet6Prefixlength = 64;
 
-        Runtime r = Runtime.getRuntime();
-        try {
-            Process p = r.exec("ifconfig " + iInterface.getName());
-            InputStream in = p.getInputStream();
-            BufferedInputStream buf = new BufferedInputStream(in);
-            InputStreamReader inread = new InputStreamReader(buf);
-            BufferedReader bufferedreader = new BufferedReader(inread);
-
-            String line;
-            while ((line = bufferedreader.readLine()) != null) {
-                Matcher tAddressInet4 = mAddressInet4.matcher(line);
-                if (tAddressInet4.find()) {
-                    tInet4Address = (Inet4Address) InetAddress.getByName(tAddressInet4.group(1));;
-                }
-                Matcher tAddressBroadcast = mAddressBroadcast.matcher(line);
-                if (tAddressBroadcast.find()) {
-                    tInet4Broadcast = (Inet4Address) InetAddress.getByName(tAddressBroadcast.group(1));
-                }
-                Matcher tAddressMask = mAddressMask.matcher(line);
-                if (tAddressMask.find()) {
-                    tInet4Netmask = (Inet4Address) InetAddress.getByName(tAddressMask.group(1));
-                }
-                Matcher tAddressInet6 = mAddressInet6.matcher(line);
-                if (tAddressInet6.find()) {
-                    tInet6Address = (Inet6Address) InetAddress.getByName(tAddressInet6.group(1));
-                    tInet6Prefixlength = Short.parseShort(tAddressInet6.group(2));
-                }
-            }
-
+            // Process ifconfig output
+            Runtime r = Runtime.getRuntime();
             try {
-                if (p.waitFor() != 0) {
-                    return null;
+                // Execute
+                Process tProcess = r.exec("ifconfig " + iInterface.getName());
+                InputStream tProcessStream = tProcess.getInputStream();
+                BufferedInputStream tProcessBufferedStream = new BufferedInputStream(tProcessStream);
+                InputStreamReader tProcessReader = new InputStreamReader(tProcessBufferedStream);
+                BufferedReader tProcessBufferedReadet = new BufferedReader(tProcessReader);
+
+                // Read
+                String tLine;
+                while ((tLine = tProcessBufferedReadet.readLine()) != null) {
+                    Matcher tAddressInet4 = mAddressInet4.matcher(tLine);
+                    if (tAddressInet4.find()) {
+                        tInet4Address = (Inet4Address) InetAddress.getByName(tAddressInet4.group(1));;
+                    }
+                    Matcher tAddressBroadcast = mAddressBroadcast.matcher(tLine);
+                    if (tAddressBroadcast.find()) {
+                        tInet4Broadcast = (Inet4Address) InetAddress.getByName(tAddressBroadcast.group(1));
+                    }
+                    Matcher tAddressMask = mAddressMask.matcher(tLine);
+                    if (tAddressMask.find()) {
+                        tInet4Netmask = (Inet4Address) InetAddress.getByName(tAddressMask.group(1));
+                    }
+                    Matcher tAddressInet6 = mAddressInet6.matcher(tLine);
+                    if (tAddressInet6.find()) {
+                        tInet6Address = (Inet6Address) InetAddress.getByName(tAddressInet6.group(1));
+                        tInet6Prefixlength = Short.parseShort(tAddressInet6.group(2));
+                    }
                 }
-            } catch (InterruptedException e) {
+
+                // Check the return value
+                try {
+                    if (tProcess.waitFor() != 0) {
+                        mLogger.warn("ifconfig didn't return success");
+                        return null;
+                    }
+                } catch (InterruptedException tException) {
+                        mLogger.warn("Call to ifconfig got interrupted", tException);
+                    return null;
+                } finally {
+                    // Close streams
+                    tProcessBufferedReadet.close();
+                    tProcessReader.close();
+                    tProcessBufferedStream.close();
+                    tProcessStream.close();
+                }
+            } catch (IOException tException) {
+                mLogger.warn("Could not get a hook to the runtime environment", tException);
                 return null;
-            } finally {
-                bufferedreader.close();
-                inread.close();
-                buf.close();
-                in.close();
             }
-        } catch (IOException e) {
-            return null;
+
+            // Construct some objects
+            if (tInet6Address != null) {
+                InterfaceAddress tInet6 = new InterfaceAddress(tInet6Address, tInet6Prefixlength);
+                mInterfaceAddresses.add(tInet6);
+            }
+            if (tInet4Address != null) {
+                InterfaceAddress tInet4 = new InterfaceAddress(tInet4Address, tInet4Broadcast, tInet4Netmask);
+                mInterfaceAddresses.add(tInet4);
+            }
         }
 
-        Class tInterfaceAddressClass = InterfaceAddress.class;
-
-        // Construct some objects
-        if (tInet6Address != null) {
-            InterfaceAddress tInet6 = new InterfaceAddress(tInet6Address, tInet6Prefixlength);
-            tAddresses.add(tInet6);
-        }
-        if (tInet4Address != null) {
-            InterfaceAddress tInet4 = new InterfaceAddress(tInet4Address, tInet4Broadcast, tInet4Netmask);
-            tAddresses.add(tInet4);
-        }
-
-        return tAddresses;
+        return mInterfaceAddresses;
     }
 
     static void displayInterfaceInformation(NetworkInterface netint) throws SocketException {

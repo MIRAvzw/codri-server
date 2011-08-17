@@ -150,9 +150,9 @@ public class RepositoryMonitor extends Service {
                 tExistingRevision = updateRepository(mSVNCheckout);              
             }
         } catch (RepositoryException tException) {
-            throw new RepositoryException("could not download the repository");
+            throw new RepositoryException("could not download the repository", tException);
         } catch (IOException tException) {
-            throw new RepositoryException("could not clean the existing (and seemingly invalid) copy of the repository");
+            throw new RepositoryException("could not clean the existing (and seemingly invalid) copy of the repository", tException);
         }
         mSVNRevision = tExistingRevision;
     }
