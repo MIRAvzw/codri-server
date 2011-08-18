@@ -68,6 +68,15 @@ public class RepositoryMonitor extends Service {
             }
         }
     }
+    
+    public class ConfigurationFilter implements FilenameFilter {
+      protected Pattern mPattern = Pattern.compile("\\.xml$", Pattern.CASE_INSENSITIVE);
+
+      @Override
+      public boolean accept(File iDirectory, String iFilename) {
+          return mPattern.matcher(iFilename).find();
+      }
+    }
 
 
     //
@@ -142,7 +151,7 @@ public class RepositoryMonitor extends Service {
         try {
             if (tExistingRevision == -1) {
                 FileUtils.cleanDirectory(mSVNCheckout);
-                tExistingRevision = checkoutRepository(mSVNLocation, mSVNCheckout);            
+                tExistingRevision = checkoutRepository(mSVNCheckout, mSVNLocation);            
             } else {
                 tExistingRevision = updateRepository(mSVNCheckout);              
             }
@@ -163,6 +172,7 @@ public class RepositoryMonitor extends Service {
         for (File tConfigurationFile: tConfigurationDirectory.listFiles(new ConfigurationFilter())) {
             // Generate an identifier
             String tName = tConfigurationFile.getName();
+            getLogger().trace("Processing '" + tName + "'");
             int tDotPosition = tName.lastIndexOf('.');
             String tNameSimple = tName.substring(0, tDotPosition);
             
@@ -235,7 +245,7 @@ public class RepositoryMonitor extends Service {
         }
     }
 
-    private long checkoutRepository(final String iLocation, final File iCheckout) throws RepositoryException  {
+    private long checkoutRepository(final File iCheckout, final String iLocation) throws RepositoryException  {
         try
         {
             long tRevision = mSVNClient.checkout(
@@ -269,19 +279,5 @@ public class RepositoryMonitor extends Service {
         } catch (ClientException tException) {
             throw new RepositoryException("could not update the repository", tException);
         }
-    }
-    
-    
-    //
-    // Auxiliary
-    //
-    
-    public class ConfigurationFilter implements FilenameFilter {
-      protected Pattern mPattern = Pattern.compile("\\.xml$", Pattern.CASE_INSENSITIVE);
-
-      @Override
-      public boolean accept(File iDirectory, String iFilename) {
-          return mPattern.matcher(iFilename).find();
-      }
     }
 }

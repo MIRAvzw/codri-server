@@ -6,8 +6,11 @@ package be.mira.adastra3.server.network.controls;
 
 import be.mira.adastra3.server.exceptions.NetworkException;
 import be.mira.adastra3.server.network.Network;
+import be.mira.adastra3.server.network.actions.application.GetConfigurationRevisionAction;
 import be.mira.adastra3.server.network.actions.application.GetMediaAction;
+import be.mira.adastra3.server.network.actions.application.GetMediaRevisionAction;
 import be.mira.adastra3.server.network.actions.application.LoadMediaAction;
+import be.mira.adastra3.server.network.actions.application.SetConfigurationRevisionAction;
 import org.teleal.cling.controlpoint.ActionCallback;
 import org.teleal.cling.model.meta.RemoteService;
 import org.teleal.cling.model.types.ServiceId;
@@ -64,6 +67,37 @@ public class ApplicationControl extends Control {
     //
     // Service actions
     //
+    
+    public final long getConfigurationRevision() throws NetworkException {
+        GetConfigurationRevisionAction tAction = new GetConfigurationRevisionAction(getService());
+        
+        new ActionCallback.Default(
+                tAction,
+                Network.getControlPoint()
+        ).run();
+        
+        return tAction.getConfigurationRevision();
+    }
+    
+    public final void setConfigurationRevision(long iConfigurationRevision) throws NetworkException {
+        SetConfigurationRevisionAction tAction = new SetConfigurationRevisionAction(getService(), iConfigurationRevision);
+        
+        new ActionCallback.Default(
+                tAction,
+                Network.getControlPoint()
+        ).run();
+    }
+    
+    public final long getMediaRevision() throws NetworkException {
+        GetMediaRevisionAction tAction = new GetMediaRevisionAction(getService());
+        
+        new ActionCallback.Default(
+                tAction,
+                Network.getControlPoint()
+        ).run();
+        
+        return tAction.getMediaRevision();
+    }
     
     public final void loadMedia(final Media iMedia) throws NetworkException {
         LoadMediaAction tAction = new LoadMediaAction(getService(), iMedia.getIdentifier(), iMedia.getLocation());

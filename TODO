@@ -7,6 +7,7 @@ VERSION 1.0
   - Unify logging (informational message when big things happen, debug messages
     for all events, and trace messages for individual actions; but how to apply
     this in auxiliary systems?)
+  - Syslog logging
 
 * Application controller
   - Verify that devices get configurer properly on all required actions (new
@@ -25,6 +26,7 @@ VERSION 1.0
     checkout
     + wie checkt? server? methodes zelfde signatuur geven
   - SVN locking
+  - Integrated validation & parsing (plus no use of internal scheme stuff)
 
 
 VERSION 2.0
