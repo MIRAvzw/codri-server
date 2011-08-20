@@ -34,7 +34,7 @@ public class Kiosk30Detail extends WContainerWidget {
     private WLineEdit mDeviceVolume, mDeviceLatency, mDeviceMark;
     
     // Application box
-    private WLineEdit mApplicationMediaIdentifier, mApplicationMediaLocation;
+    private WLineEdit mApplicationMediaIdentifier, mApplicationMediaLocation, mApplicationMediaRevision;
     
     // Events
     private Signal2<String, Exception> mEventError;
@@ -128,15 +128,20 @@ public class Kiosk30Detail extends WContainerWidget {
         WGridLayout tInformationGrid = new WGridLayout(tInformation);
         tInformation.setLayout(tInformationGrid); // redundant?
         
-        // Volume
-        tInformationGrid.addWidget(new WLabel("Media"), 0, 0);
+        // Media
+        tInformationGrid.addWidget(new WLabel("Media identifier"), 0, 0);
         mApplicationMediaIdentifier = new WLineEdit();
         tInformationGrid.addWidget(mApplicationMediaIdentifier, 0, 1);
+        tInformationGrid.addWidget(new WLabel("Media location"), 1, 0);
         mApplicationMediaLocation = new WLineEdit();
         tInformationGrid.addWidget(mApplicationMediaLocation, 1, 1);
         WPushButton tMediaLoad = new WPushButton("Load");
         tMediaLoad.clicked().addListener(this, mHandlerApplicationMediaSet);
         tInformationGrid.addWidget(tMediaLoad, 1, 2);
+        tInformationGrid.addWidget(new WLabel("Media revision"), 2, 0);
+        mApplicationMediaRevision = new WLineEdit();
+        mApplicationMediaRevision.setReadOnly(true);
+        tInformationGrid.addWidget(mApplicationMediaRevision, 2, 1);
         
         tBox.addWidget(tInformation); // redundant?
         
@@ -226,6 +231,7 @@ public class Kiosk30Detail extends WContainerWidget {
                 ApplicationControl.Media tMedia = mDevice.getApplicationControl().getMedia();
                 mApplicationMediaIdentifier.setText(tMedia.getIdentifier());
                 mApplicationMediaLocation.setText(tMedia.getLocation());
+                mApplicationMediaRevision.setText(String.valueOf(tMedia.getRevision()));
             } catch (NetworkException tException) {
                 mEventError.trigger("coult not get media parameters", tException);
             }
@@ -239,9 +245,10 @@ public class Kiosk30Detail extends WContainerWidget {
                 debug().trigger("loading media parameters");
                 ApplicationControl.Media tMedia = new ApplicationControl.Media(
                         mApplicationMediaIdentifier.getText(),
-                        mApplicationMediaLocation.getText()
+                        mApplicationMediaLocation.getText(),
+                        ApplicationControl.Media.LATEST
                 );
-                mDevice.getApplicationControl().loadMedia(tMedia);
+                mDevice.getApplicationControl().setMedia(tMedia);
             } catch (NetworkException tException) {
                 mEventError.trigger("coult not load media parameters", tException);
             }
