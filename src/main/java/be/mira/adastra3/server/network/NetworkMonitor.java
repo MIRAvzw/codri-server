@@ -139,7 +139,9 @@ public class NetworkMonitor extends Service {
                     // Remove the device
                     try {
                         Entity tDevice = tNetwork.getDevice(tUuid); 
-                        tNetwork.removeDevice(tDevice);
+                        if (tDevice != null) {
+                            tNetwork.removeDevice(tDevice);
+                        }
                     } catch (NetworkException tException) {
                         tNetwork.emitError("could not remove a MIRA device", tException);
                     }
@@ -163,11 +165,9 @@ public class NetworkMonitor extends Service {
                     }
                     
                     // Update the device
-                    try {
-                        Entity tDevice = tNetwork.getDevice(tUuid);
+                    Entity tDevice = tNetwork.getDevice(tUuid);
+                    if (tDevice != null) {
                         tDevice.setMark();
-                    } catch (NetworkException tException) {
-                        tNetwork.emitError("could not update a MIRA device", tException);
                     }
                 }
             }

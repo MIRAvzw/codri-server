@@ -13,6 +13,7 @@ import be.mira.adastra3.server.repository.configurations.Configuration;
 import be.mira.adastra3.server.repository.configurations.KioskConfiguration;
 import be.mira.adastra3.server.repository.configurations.objects.DeviceConfiguration;
 import be.mira.adastra3.server.repository.configurations.objects.MediaConfiguration;
+import be.mira.adastra3.server.repository.media.Media;
 import java.util.UUID;
 
 /**
@@ -83,18 +84,34 @@ public class Kiosk extends Entity {
     }
     
     public final void setMediaConfiguration(final MediaConfiguration iMediaConfiguration) throws DeviceException {
+        Repository tRepository = Repository.getInstance();
+
+        // Not pushing the media location here because that is taken care of
+        // by setMedia
+        // TODO: this is fugly
+        // TODO: how to fix this? Don't push configuration through device control!
+    }
+    
+    
+    //
+    // Media handling
+    //
+    
+    public final void setMedia(final Media iMedia) throws DeviceException {        
+        long tOldMediaRevision;
         try {
-            Repository tRepository = Repository.getInstance();
-            
-            String tIdentifier =  iMediaConfiguration.getName();
-            if (tIdentifier != null) {
-                String tLocation = tRepository.getServer()
-                        + "/media/" + tIdentifier;
-                getMediaControl().setLocation(tLocation);
+            tOldMediaRevision = getMediaControl().getRevision();
+        } catch(NetworkException tException) {
+            throw new DeviceException("could not check media revision", tException);
+        }
+        
+        if (iMedia.getRevision() != tOldMediaRevision) {
+            try {
+                getMediaControl().setLocation(iMedia.getLocation());
+            } catch (NetworkException tException) {
+                throw new DeviceException("could not set the media location", tException);
             }
-        } catch (NetworkException tException) {
-            throw new DeviceException("could not push the device settings", tException);
-        }        
+        }
     }
     
     

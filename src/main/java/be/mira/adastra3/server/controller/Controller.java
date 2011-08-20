@@ -13,11 +13,14 @@ import be.mira.adastra3.server.exceptions.ServiceSetupException;
 import be.mira.adastra3.server.network.INetworkListener;
 import be.mira.adastra3.server.network.Network;
 import be.mira.adastra3.server.network.entities.Entity;
+import be.mira.adastra3.server.network.entities.Kiosk;
 import be.mira.adastra3.server.repository.IRepositoryListener;
 import be.mira.adastra3.server.repository.Repository;
 import be.mira.adastra3.server.repository.configurations.Configuration;
 import be.mira.adastra3.server.repository.configurations.KioskConfiguration;
 import be.mira.adastra3.server.repository.media.Media;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -82,9 +85,11 @@ public class Controller extends Service implements INetworkListener, IRepository
         Entity tDevice = null;
         try {
             tDevice = Network.getInstance().getDevice(iConfiguration.getTarget());
-            tDevice.setConfiguration(iConfiguration);
-        } catch (NetworkException tException) {
-            getLogger().warn("Configuration " + iConfiguration.getId() + " does not target a valid device");
+            if (tDevice != null) {
+                tDevice.setConfiguration(iConfiguration);
+            } else {
+                getLogger().warn("Configuration " + iConfiguration.getId() + " does not target a valid device");
+            }
         } catch (DeviceException tException) {
             getLogger().error("Could not push configuration " + iConfiguration.getId() + " to target device '" + tDevice.getUuid() + "'", tException);
         }
@@ -98,9 +103,11 @@ public class Controller extends Service implements INetworkListener, IRepository
         Entity tDevice = null;
         try {
             tDevice = Network.getInstance().getDevice(iConfiguration.getTarget());
-            tDevice.setConfiguration(iConfiguration);
-        } catch (NetworkException tException) {
-            getLogger().warn("Configuration " + iConfiguration.getId() + " does not target a valid device");
+            if (tDevice != null) {
+                tDevice.setConfiguration(iConfiguration);
+            } else {
+                getLogger().warn("Configuration " + iConfiguration.getId() + " does not target a valid device");
+            }
         } catch (DeviceException tException) {
             getLogger().error("Could not update configuration " + iConfiguration.getId() + " on target device '" + tDevice.getUuid() + "'", tException);
         }
@@ -117,14 +124,44 @@ public class Controller extends Service implements INetworkListener, IRepository
     public final void doMediaAdded(final Media iMedia) {
         getLogger().info("Media added: " + iMedia.getId());
         
-        // TODO
+        List<KioskConfiguration> tKioskConfigurations = findKioskConfigurationsByMedia(iMedia);
+        if (tKioskConfigurations.size() == 0) {
+            getLogger().warn("Media " + iMedia.getId() + " is not referred to by any configuration");
+        }
+        for (KioskConfiguration tKioskConfiguration: tKioskConfigurations) {
+            Entity tEntity = Network.getInstance().getDevice(tKioskConfiguration.getTarget());
+            if (tEntity != null) {
+                getLogger().debug("Media "
+                        + iMedia.getId()
+                        + " is in use by network entity "
+                        + tEntity.getName() +
+                        ", resubmitting");
+                if (tEntity instanceof Kiosk) {
+                    ((Kiosk)tEntity).setMedia(iMedia);
+                } else {
+                    getLogger().error("Cannot update media, unknown network entity");
+                }
+            }
+        }
     }
 
     @Override
     public final void doMediaUpdated(final Media iOldMedia, final Media iMedia) {
         getLogger().info("Media updated: " + iMedia.getId());
         
-        // TODO
+        for (KioskConfiguration tKioskConfiguration: findKioskConfigurationsByMedia(iMedia)) {
+            Entity tEntity = Network.getInstance().getDevice(tKioskConfiguration.getTarget());
+            if (tEntity != null) {
+                getLogger().debug("Media is in use by network entity "
+                        + tEntity.getName() +
+                        ", resubmitting");
+                if (tEntity instanceof Kiosk) {
+                    ((Kiosk)tEntity).setMedia(iMedia);
+                } else {
+                    getLogger().error("Cannot update media, unknown network entity");
+                }
+            }
+        }
     }
     
     @Override
@@ -132,6 +169,21 @@ public class Controller extends Service implements INetworkListener, IRepository
         getLogger().info("Media removed: " + iMedia.getId());
         
         // TODO
+    }
+    
+    private List<KioskConfiguration> findKioskConfigurationsByMedia(final Media iMedia) {
+        List<KioskConfiguration> tKioskConfigurations = new ArrayList<KioskConfiguration>();
+        
+        for (Configuration tConfiguration: Repository.getInstance().getAllConfigurations()) {
+            if (tConfiguration instanceof KioskConfiguration) {
+                KioskConfiguration tKioskConfiguration = (KioskConfiguration) tConfiguration;
+                if (tKioskConfiguration.getMediaConfiguration().getName().equals(iMedia.getId())) {
+                    tKioskConfigurations.add(tKioskConfiguration);
+                }
+            }
+        }
+        
+        return tKioskConfigurations;
     }
     
     

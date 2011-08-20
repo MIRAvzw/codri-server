@@ -203,6 +203,11 @@ public class RepositoryMonitor extends Service {
     }
     
     public final void processConfigurations() throws RepositoryException {
+        // TODO: the actual diff code in processConfigurations and processMedia
+        //       is more or less the same, maybe move the getRevision interface
+        //       from Media & Configuration to RepositoryEntry, and deduplicate
+        //       the diff code?
+        
         // Read the configurations
         getLogger().debug("Reading configurations");
         Map<String, Configuration> tConfigurations = new HashMap<String, Configuration>();
