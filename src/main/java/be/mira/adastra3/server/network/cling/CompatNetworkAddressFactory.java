@@ -143,6 +143,7 @@ public class CompatNetworkAddressFactory extends NetworkAddressFactoryImpl {
             }
         }
 
+        mLogger.warn("Using cached result for extremely expensive call to compatible getInterfaceAddresses");
         return mInterfaceAddresses;
     }
 
