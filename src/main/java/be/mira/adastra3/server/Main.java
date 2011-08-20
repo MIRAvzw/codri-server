@@ -24,11 +24,12 @@ public class Main {
     // Auxiliary classes
     //
 
-    private enum Status {
+    public enum Status {
         IDLE,
         INITIALIZING,
         STARTING,
         RUNNING,
+        INTERRUPTED,
         STOPPING
     }
 
@@ -39,33 +40,13 @@ public class Main {
         CONTROLLER
     }
 
-    //
-    // Routines
-    //
-    
-    public final void quit() {
-        if (STATUS == Status.RUNNING) {
-            LOGGER.info("Stopping subsystems");
-            STATUS = Status.STOPPING;
-            stop();
-
-            LOGGER.info("Exiting");
-            STATUS = Status.IDLE;
-            System.exit(0);
-        } else if (STATUS != Status.STOPPING) {
-            LOGGER.info("Exiting");
-            STATUS = Status.IDLE;
-            System.exit(0);
-        } else {
-            LOGGER.debug("Ignoring call to quit() as the application is " + STATUS.name());
-        }
-    }
-
 
     //
     // Static
     //
 
+    private static Main MAIN = new Main();
+    
     private static Map<ServiceType, Service> SUBSERVICES;
     private final static Map<ServiceType, String> cServiceNames;
     static {
@@ -75,17 +56,20 @@ public class Main {
         cServiceNames.put(ServiceType.WEBSITE, "web server");
         cServiceNames.put(ServiceType.CONTROLLER, "application controller");
     }
+    
     private static Logger LOGGER;
-    private static Status STATUS = Status.IDLE;
 
     public static void main(final String[] iParameters) {
         //
-        // Set-up
+        // Initialisation
         //
+        
+        MAIN.setStatus(Status.INITIALIZING);
 
         // Logging
         BasicConfigurator.configure();
         LOGGER = Logger.getLogger(Main.class);
+        LOGGER.info("Initializing logging");
         try {
             Iterator tKeyIterator = Service.getConfiguration().getKeys("log4j");
             Properties tLoggingProperties = new Properties();
@@ -101,11 +85,10 @@ public class Main {
 
         // Subsystems
         LOGGER.info("Initializing subsystems");
-        STATUS = Status.INITIALIZING;
         if (!initialize()) {
             LOGGER.error("Some subsystems failed to initialize, bailing out");
 
-            STATUS = Status.IDLE;
+            MAIN.setStatus(Status.IDLE);
             System.exit(0);
         }
 
@@ -115,14 +98,14 @@ public class Main {
 
         // Subsystems
         LOGGER.info("Starting subsystems");
-        STATUS = Status.STARTING;
+        MAIN.setStatus(Status.STARTING);
         if (!start()) {
             LOGGER.error("Some subsystems failed to start, bailing out");
 
-            STATUS = Status.STOPPING;
+            MAIN.setStatus(Status.STOPPING);
             stop();
 
-            STATUS = Status.IDLE;
+            MAIN.setStatus(Status.IDLE);
             System.exit(0);
         }
 
@@ -130,24 +113,31 @@ public class Main {
         //
         // Sleep
         //
+        
+        if (MAIN.getStatus() != Status.STARTING) {
+            LOGGER.error("Main application state inconsistency detected, bailing out");   
 
-        LOGGER.info("Entering main loop");
-        STATUS = Status.RUNNING;
-        while (true) {
+            MAIN.setStatus(Status.STOPPING);
+            stop();
+
+            MAIN.setStatus(Status.IDLE);
+            System.exit(0);         
+        } else {
+            LOGGER.info("Entering main loop");
+            MAIN.setStatus(Status.RUNNING);
             try {
-                Thread.sleep(50);
+                MAIN.startLoop();
             } catch (InterruptedException tException) {
                 LOGGER.warn("Main loop interrupted", tException);
-                break;
             }
         }
 
         LOGGER.info("Stopping subsystems");
-        STATUS = Status.STOPPING;
+        MAIN.setStatus(Status.STOPPING);
         stop();
 
         LOGGER.info("Exiting");
-        STATUS = Status.IDLE;
+        MAIN.setStatus(Status.IDLE);
         System.exit(0);
     }
 
@@ -213,5 +203,30 @@ public class Main {
                 LOGGER.error("Could not stop the " + cServiceNames.get(tServiceType), tException);
             }
         }
+    }
+    
+    
+    //
+    // Mainloop handling
+    //
+    
+    private Status mStatus = Status.IDLE;
+    
+    public final synchronized void startLoop() throws InterruptedException {
+        wait();
+    }
+
+    // TODO: use this, from a fatal() hook or whatever
+    public final synchronized void stopLoop() {
+        mStatus = Status.INTERRUPTED;
+        notify();
+    }
+    
+    public final synchronized Status getStatus() {
+        return mStatus;
+    }
+    
+    public final synchronized void setStatus(final Status iStatus) {
+        mStatus = iStatus;
     }
 }
