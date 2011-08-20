@@ -15,7 +15,6 @@ public class DeviceConfiguration {
     // Data members
     //
     
-    private UUID mIdentifier;
     private SoundConfiguration mSoundConfiguration;
     
     
@@ -23,8 +22,7 @@ public class DeviceConfiguration {
     // Constructors
     //
     
-    public DeviceConfiguration(final UUID iIdentifier, SoundConfiguration iSoundConfiguration) {
-        mIdentifier = iIdentifier;
+    public DeviceConfiguration(SoundConfiguration iSoundConfiguration) {
         mSoundConfiguration = iSoundConfiguration;
     }
     
@@ -32,10 +30,6 @@ public class DeviceConfiguration {
     //
     // Getters
     //
-    
-    public UUID getIdentifier() {
-        return mIdentifier;
-    }
     
     public SoundConfiguration getSoundConfiguration() {
         return mSoundConfiguration;

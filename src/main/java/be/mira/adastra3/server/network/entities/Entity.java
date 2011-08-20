@@ -34,6 +34,13 @@ abstract public class Entity {
     
     
     //
+    // Configuration handling
+    //
+    
+    public abstract void setConfiguration(Configuration iConfiguration) throws DeviceException;
+    
+    
+    //
     // Getters and setters
     //
     

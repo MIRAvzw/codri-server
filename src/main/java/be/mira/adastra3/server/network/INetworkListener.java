@@ -14,6 +14,6 @@ import be.mira.adastra3.server.network.entities.Entity;
 public interface INetworkListener {
     void doNetworkError(String iMessage, NetworkException iException);
     void doNetworkWarning(String iMessage);
-    void doDeviceAdded(Entity iDevice);
-    void doDeviceRemoved(Entity iDevice);
+    void doEntityAdded(Entity iDevice);
+    void doEntityRemoved(Entity iDevice);
 }

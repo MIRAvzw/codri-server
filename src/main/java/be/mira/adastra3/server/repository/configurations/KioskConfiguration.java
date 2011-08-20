@@ -6,6 +6,7 @@ package be.mira.adastra3.server.repository.configurations;
 
 import be.mira.adastra3.server.repository.configurations.objects.DeviceConfiguration;
 import be.mira.adastra3.server.repository.configurations.objects.MediaConfiguration;
+import java.util.UUID;
 
 /**
  *
@@ -24,8 +25,8 @@ public final class KioskConfiguration extends Configuration {
     // Construction and destruction
     //
     
-    public KioskConfiguration(final String iId, final DeviceConfiguration iDeviceConfiguration, final MediaConfiguration iMediaConfiguration) {
-        super(iId);
+    public KioskConfiguration(final String iId, final UUID iTarget, final DeviceConfiguration iDeviceConfiguration, final MediaConfiguration iMediaConfiguration) {
+        super(iId, iTarget);
         mDeviceConfiguration = iDeviceConfiguration;
         mMediaConfiguration = iMediaConfiguration;
     }

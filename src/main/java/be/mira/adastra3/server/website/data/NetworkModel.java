@@ -63,7 +63,7 @@ public class NetworkModel extends TreeModel<NetworkItem> implements INetworkList
     //
 
     @Override
-    public final void doDeviceAdded(final Entity iDevice) {        
+    public final void doEntityAdded(final Entity iDevice) {        
         DeferredExecution.cDeferrees.add(new DeferredExecution() {
             private Entity mDevice;
             
@@ -83,7 +83,7 @@ public class NetworkModel extends TreeModel<NetworkItem> implements INetworkList
     }
 
     @Override
-    public final void doDeviceRemoved(final Entity iDevice) {        
+    public final void doEntityRemoved(final Entity iDevice) {        
         DeferredExecution.cDeferrees.add(new DeferredExecution() {
             private Entity mDevice;
             

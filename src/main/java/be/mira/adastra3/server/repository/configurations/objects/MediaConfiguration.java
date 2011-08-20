@@ -13,15 +13,15 @@ public class MediaConfiguration {
     // Data members
     //
     
-    private String mIdentifier;
+    private String mName;
     
     
     //
     // Constructors
     //
     
-    public MediaConfiguration(final String iIdentifier) {
-        mIdentifier = iIdentifier;
+    public MediaConfiguration(final String iName) {
+        mName = iName;
     }
     
     
@@ -29,7 +29,7 @@ public class MediaConfiguration {
     // Getters
     //
     
-    public String getIdentifier() {
-        return mIdentifier;
+    public String getName() {
+        return mName;
     }    
 }

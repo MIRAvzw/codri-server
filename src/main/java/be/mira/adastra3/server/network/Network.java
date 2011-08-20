@@ -131,13 +131,13 @@ public final class Network {
     
     private void emitDeviceAdded(final Entity iDevice) {
         for (INetworkListener tListener : mListeners) {
-            tListener.doDeviceAdded(iDevice);
+            tListener.doEntityAdded(iDevice);
         }
     }
     
     private void emitDeviceRemoved(final Entity iDevice) {
         for (INetworkListener tListener : mListeners) {
-            tListener.doDeviceRemoved(iDevice);
+            tListener.doEntityRemoved(iDevice);
         }        
     }
 }

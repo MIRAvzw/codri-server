@@ -150,24 +150,24 @@ public class Controller extends Service implements INetworkListener, IRepository
     }
 
     @Override
-    public final void doDeviceAdded(final Entity iDevice) {
-        getLogger().info("MIRA device added to network: " + iDevice.getUuid());
+    public final void doEntityAdded(final Entity iEntity) {
+        getLogger().info("MIRA network entity added: " + iEntity.getUuid());
         Repository tRepository = Repository.getInstance();
             
-        // Check if there is a configuration for this device
+        // Check if there is a configuration for this entity
         try {
             Configuration tConfiguration = null;
             for (Configuration tAvailableConfiguration: tRepository.getConfigurations()) {
-                if (tAvailableConfiguration.getTarget() == iDevice.getUuid()) {
+                if (tAvailableConfiguration.getTarget() == iEntity.getUuid()) {
                     tConfiguration = tAvailableConfiguration;
                     break;
                 }
             }
             if (tConfiguration == null) {
-                getLogger().warn("Couldn't find any configuration for device " + iDevice.getUuid() + ", it'll remain unconfigured");
+                getLogger().warn("Couldn't find any configuration for device " + iEntity.getUuid() + ", it'll remain unconfigured");
             } else {
-                getLogger().debug("Loading configuration " + tConfiguration.getId() + " onto device " + iDevice.getUuid());
-                iDevice.setConfiguration(tConfiguration);
+                getLogger().debug("Loading configuration " + tConfiguration.getId() + " onto device " + iEntity.getUuid());
+                iEntity.setConfiguration(tConfiguration);
             }
         } catch (DeviceException tException) {
             getLogger().error("could not configure device", tException);
@@ -175,7 +175,7 @@ public class Controller extends Service implements INetworkListener, IRepository
     }
 
     @Override
-    public final void doDeviceRemoved(final Entity iDevice) {
-        getLogger().info("MIRA device removed from network: " + iDevice.getUuid());
+    public final void doEntityRemoved(final Entity iEntity) {
+        getLogger().info("MIRA network entity removed: " + iEntity.getUuid());
     }
 }

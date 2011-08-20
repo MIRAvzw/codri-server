@@ -17,11 +17,24 @@
     
     <xsd:complexType name="configurationType">
         <xsd:sequence>
+            <xsd:element name="target" type="UuidType" minOccurs="0" />
             <xsd:element name="device" type="deviceType" minOccurs="0" />
             <xsd:element name="media" type="mediaType" minOccurs="0" />
         </xsd:sequence>
-        <xsd:attribute name="type" type="xsd:string" use="required" />
+        <xsd:attribute name="type" type="typeType" use="required" />
     </xsd:complexType>
+    
+    <xsd:simpleType name="UuidType">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}" />
+        </xsd:restriction>
+    </xsd:simpleType>
+    
+    <xsd:simpleType name="typeType">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="kiosk"/>
+        </xsd:restriction>
+    </xsd:simpleType>
     
     
     <!--
@@ -34,14 +47,7 @@
         <xsd:sequence>
             <xsd:element name="sound" type="soundType" minOccurs="0" />     
         </xsd:sequence>
-        <xsd:attribute name="id" type="UuidType" use="required" />
     </xsd:complexType>
-    
-    <xsd:simpleType name="UuidType">
-        <xsd:restriction base="xsd:string">
-            <xsd:pattern value="[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}" />
-        </xsd:restriction>
-    </xsd:simpleType>
 
     <xsd:complexType name="soundType">
         <xsd:sequence>
@@ -63,7 +69,7 @@
 
     <xsd:complexType name="mediaType">
         <xsd:sequence>
+            <xsd:element name="name" type="xsd:string" />    
         </xsd:sequence>
-        <xsd:attribute name="id" type="xsd:string" use="required" />
     </xsd:complexType>
 </xsd:schema>
