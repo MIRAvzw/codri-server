@@ -4,7 +4,7 @@
  */
 package be.mira.adastra3.server.repository.configurations.objects;
 
-import java.util.UUID;
+import be.mira.adastra3.server.repository.configurations.Configuration;
 
 /**
  *

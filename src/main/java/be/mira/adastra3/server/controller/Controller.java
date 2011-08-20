@@ -66,6 +66,9 @@ public class Controller extends Service implements INetworkListener, IRepository
     //
     // Repository listener interface
     //
+    
+    // TODO: the doRepository as well as doMedia(Update|Added) functions are
+    //       quite similar, it would be nice to deduplicate this code
 
     @Override
     public final void doRepositoryWarning(final String iMessage) {
@@ -131,15 +134,22 @@ public class Controller extends Service implements INetworkListener, IRepository
         for (KioskConfiguration tKioskConfiguration: tKioskConfigurations) {
             Entity tEntity = Network.getInstance().getDevice(tKioskConfiguration.getTarget());
             if (tEntity != null) {
-                getLogger().debug("Media "
-                        + iMedia.getId()
-                        + " is in use by network entity "
-                        + tEntity.getName() +
-                        ", resubmitting");
-                if (tEntity instanceof Kiosk) {
-                    ((Kiosk)tEntity).setMedia(iMedia);
-                } else {
-                    getLogger().error("Cannot update media, unknown network entity");
+                try {
+                    getLogger().debug("Media "
+                            + iMedia.getId()
+                            + " is in use by network entity "
+                            + tEntity.getName() +
+                            ", resubmitting");
+                    if (tEntity instanceof Kiosk) {
+                        ((Kiosk)tEntity).setMedia(iMedia);
+                    } else {
+                        getLogger().error("Cannot update media, unknown network entity");
+                    }
+                } catch (DeviceException tException) {
+                    getLogger().error("Could not set media "
+                            + iMedia.getId()
+                            + " on device "
+                            + tEntity.getName());
                 }
             }
         }
@@ -149,16 +159,29 @@ public class Controller extends Service implements INetworkListener, IRepository
     public final void doMediaUpdated(final Media iOldMedia, final Media iMedia) {
         getLogger().info("Media updated: " + iMedia.getId());
         
-        for (KioskConfiguration tKioskConfiguration: findKioskConfigurationsByMedia(iMedia)) {
+        List<KioskConfiguration> tKioskConfigurations = findKioskConfigurationsByMedia(iMedia);
+        if (tKioskConfigurations.size() == 0) {
+            getLogger().warn("Media " + iMedia.getId() + " is not referred to by any configuration");
+        }
+        for (KioskConfiguration tKioskConfiguration: tKioskConfigurations) {
             Entity tEntity = Network.getInstance().getDevice(tKioskConfiguration.getTarget());
             if (tEntity != null) {
-                getLogger().debug("Media is in use by network entity "
-                        + tEntity.getName() +
-                        ", resubmitting");
-                if (tEntity instanceof Kiosk) {
-                    ((Kiosk)tEntity).setMedia(iMedia);
-                } else {
-                    getLogger().error("Cannot update media, unknown network entity");
+                try {
+                    getLogger().debug("Media "
+                            + iMedia.getId()
+                            + " is in use by network entity "
+                            + tEntity.getName() +
+                            ", resubmitting");
+                    if (tEntity instanceof Kiosk) {
+                        ((Kiosk)tEntity).setMedia(iMedia);
+                    } else {
+                        getLogger().error("Cannot update media, unknown network entity");
+                    }
+                } catch (DeviceException tException) {
+                    getLogger().error("Could not set media "
+                            + iMedia.getId()
+                            + " on device "
+                            + tEntity.getName());
                 }
             }
         }
