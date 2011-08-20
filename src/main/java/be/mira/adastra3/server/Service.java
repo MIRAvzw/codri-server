@@ -36,7 +36,7 @@ public abstract class Service {
             mConfiguration = new CompositeConfiguration();
             mConfiguration.addConfiguration(new SystemConfiguration());
             try {
-                mConfiguration.addConfiguration(new PropertiesConfiguration("server.properties"));
+                mConfiguration.addConfiguration(new PropertiesConfiguration("aa3server.properties"));
             } catch (ConfigurationException tException) {
                 // Do nothing
             }

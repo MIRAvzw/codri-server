@@ -5,13 +5,11 @@ import be.mira.adastra3.server.network.NetworkMonitor;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;
 import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.repository.RepositoryMonitor;
-import be.mira.adastra3.server.website.EmbeddedTomcat;
+import be.mira.adastra3.server.website.ServletServer;
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
-import javax.servlet.ServletException;
-import org.apache.catalina.LifecycleException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
@@ -80,7 +78,7 @@ public class Main {
     private static Logger LOGGER;
     private static Status STATUS = Status.IDLE;
 
-    public static void main(final String[] iParameters) throws ServletException, LifecycleException {
+    public static void main(final String[] iParameters) {
         //
         // Set-up
         //
@@ -167,8 +165,8 @@ public class Main {
                         tService = new RepositoryMonitor();
                         break;
                     case WEBSITE:
-                        tService = new EmbeddedTomcat();
-                        ((EmbeddedTomcat)tService).addServlet("Status page", new be.mira.adastra3.server.website.Status(), "status");
+                        tService = new ServletServer();
+                        ((ServletServer)tService).addServlet(new be.mira.adastra3.server.website.Status(), "/status/*");
                         break;
                     case NETWORK:
                         tService = new NetworkMonitor();
