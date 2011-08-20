@@ -209,7 +209,7 @@ public class RepositoryMonitor extends Service {
                         + tOldConfiguration.getId()
                         + "seems to have been deleted (last known rev "
                         + tOldConfiguration.getRevision()
-                        + ", removing from repository");
+                        + "), removing from repository");
                 tRepository.removeConfiguration(tOldConfiguration);
                 
             }
@@ -222,7 +222,7 @@ public class RepositoryMonitor extends Service {
                             + tConfiguration.getId()
                             + "seems new (rev "
                             + tConfiguration.getRevision()
-                            + ", adding to repository");
+                            + "), adding to repository");
                     tRepository.addConfiguration(tConfiguration);
                 } else if (tConfiguration.getRevision() > tOldConfiguration.getRevision()) {
                     getLogger().debug("Configuration "
@@ -230,8 +230,8 @@ public class RepositoryMonitor extends Service {
                             + " is a more recent version (rev "
                             + tConfiguration.getRevision()
                             + ") of an existing configuration (rev "
-                            + tOldConfiguration.getRevision() + 
-                            "), updating the repository");
+                            + tOldConfiguration.getRevision()
+                            + "), updating the repository");
                     tRepository.updateConfiguration(tConfiguration);
                 }
             } catch (RepositoryException tException) {
