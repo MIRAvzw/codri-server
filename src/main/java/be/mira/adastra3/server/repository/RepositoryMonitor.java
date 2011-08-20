@@ -241,7 +241,7 @@ public class RepositoryMonitor extends Service {
             if (! tConfigurations.containsKey(tOldConfiguration.getId())) {
                 getLogger().debug("Configuration "
                         + tOldConfiguration.getId()
-                        + "seems to have been deleted (last known rev "
+                        + " seems to have been deleted (last known rev "
                         + tOldConfiguration.getRevision()
                         + "), removing from repository");
                 tRepository.removeConfiguration(tOldConfiguration);
@@ -254,7 +254,7 @@ public class RepositoryMonitor extends Service {
                 if (tOldConfiguration == null) {
                     getLogger().debug("Configuration "
                             + tConfiguration.getId()
-                            + "seems new (rev "
+                            + " seems new (rev "
                             + tConfiguration.getRevision()
                             + "), adding to repository");
                     tRepository.addConfiguration(tConfiguration);
@@ -304,7 +304,7 @@ public class RepositoryMonitor extends Service {
             if (! tAllMedia.containsKey(tOldMedia.getId())) {
                 getLogger().debug("Media "
                         + tOldMedia.getId()
-                        + "seems to have been deleted (last known rev "
+                        + " seems to have been deleted (last known rev "
                         + tOldMedia.getRevision()
                         + "), removing from repository");
                 tRepository.removeMedia(tOldMedia);
@@ -316,7 +316,7 @@ public class RepositoryMonitor extends Service {
                 if (tOldMedia == null) {
                     getLogger().debug("Media "
                             + tMedia.getId()
-                            + "seems new (rev "
+                            + " seems new (rev "
                             + tMedia.getRevision()
                             + "), adding to repository");
                     tRepository.addMedia(tMedia);
@@ -348,7 +348,7 @@ public class RepositoryMonitor extends Service {
                     mSVNLocation + "/" + iPath,
                     Revision.HEAD,
                     Revision.HEAD,
-                    1,
+                    Depth.empty,
                     null,
                     new InfoCallback() {
                         @Override
@@ -371,7 +371,7 @@ public class RepositoryMonitor extends Service {
                     mSVNLocation + "/" + iPath,
                     Revision.HEAD,
                     Revision.HEAD,
-                    2,
+                    Depth.immediates,
                     null,
                     new InfoCallback() {
                         @Override

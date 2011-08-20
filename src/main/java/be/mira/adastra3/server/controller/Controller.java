@@ -68,7 +68,7 @@ public class Controller extends Service implements INetworkListener, IRepository
     //
     
     // TODO: the doRepository as well as doMedia(Update|Added) functions are
-    //       quite similar, it would be nice to deduplicate this code
+    //       quite similar, it would be nice to deduplicate this code&
 
     @Override
     public final void doRepositoryWarning(final String iMessage) {
