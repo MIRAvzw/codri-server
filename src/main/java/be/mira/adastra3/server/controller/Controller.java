@@ -157,7 +157,7 @@ public class Controller extends Service implements INetworkListener, IRepository
         // Check if there is a configuration for this entity
         try {
             Configuration tConfiguration = null;
-            for (Configuration tAvailableConfiguration: tRepository.getConfigurations()) {
+            for (Configuration tAvailableConfiguration: tRepository.getAllConfigurations()) {
                 if (tAvailableConfiguration.getTarget() == iEntity.getUuid()) {
                     tConfiguration = tAvailableConfiguration;
                     break;

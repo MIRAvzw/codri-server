@@ -10,6 +10,7 @@ import be.mira.adastra3.server.exceptions.RepositoryException;
 import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;
 import be.mira.adastra3.server.repository.configurations.Configuration;
+import be.mira.adastra3.server.repository.media.Media;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -46,7 +47,6 @@ public class RepositoryMonitor extends Service {
     
     private long mConfigurationRevision;
     private long mMediaRevision;
-    private Map<String, Long> mMediaRevisions;
 
 
     //
@@ -113,6 +113,7 @@ public class RepositoryMonitor extends Service {
         if (!tLocationMatcher.find()) {
             throw new ServiceSetupException("repository location '" + mSVNLocation + "' is not a valid URL");
         }
+        Repository.getInstance().setServer(mSVNLocation);
         mSVNClient = new SVNClient();
 
         // Monitor timer
@@ -123,9 +124,6 @@ public class RepositoryMonitor extends Service {
         mSVNMonitorInterval = tInterval;
         getLogger().debug("Scheduling SVN monitor with interval of " + tInterval + " seconds");
         mSVNMonitor = new Timer();
-        
-        // Media revisions
-        mMediaRevisions = new HashMap<String, Long>();
     }
 
 
@@ -223,9 +221,9 @@ public class RepositoryMonitor extends Service {
             ConfigurationReader tReader = new ConfigurationReader(tNameSimple, tConfigurationFile);
             tReader.process();
             if (tReader.getConfiguration() != null) {
-                tReader.getConfiguration().setRevision(tConfigurationRevision);
                 Configuration tConfiguration = tReader.getConfiguration();
-                tConfigurations.put(tConfiguration.getId(), tReader.getConfiguration());
+                tConfiguration.setRevision(tConfigurationRevision);
+                tConfigurations.put(tConfiguration.getId(), tConfiguration);
             } else {
                 throw new RepositoryException("found empty configuration file");
             }
@@ -234,7 +232,7 @@ public class RepositoryMonitor extends Service {
         // Submit the configurations
         getLogger().debug("Submitting changed configurations");
         Repository tRepository = Repository.getInstance();
-        for (Configuration tOldConfiguration: tRepository.getConfigurations()) {
+        for (Configuration tOldConfiguration: tRepository.getAllConfigurations()) {
             if (! tConfigurations.containsKey(tOldConfiguration.getId())) {
                 getLogger().debug("Configuration "
                         + tOldConfiguration.getId()
@@ -280,34 +278,56 @@ public class RepositoryMonitor extends Service {
         return getPathRevision("media");
     }
     
-    public final void processMedia() throws RepositoryException {
-        // TODO: maybe but in Repository as well?
-        
-        // Get the media names
+    public final void processMedia() throws RepositoryException {        
+        // List the media
         getLogger().debug("Listing media");
-        Map<String, Long> tMedia = getChildrenRevisions("media");
-        for (String tMediaIdentifier: tMedia.keySet()) {
-            Long tMediaRevision = tMedia.get(tMediaIdentifier);
-            Long tOldMediaRevision = mMediaRevisions.get(tMediaIdentifier);
-            if (tOldMediaRevision == null) {
+        Map<String, Media> tAllMedia = new HashMap<String, Media>();
+        Map<String, Long> tPathEntries = getChildrenRevisions("media");
+        for (String tName: tPathEntries.keySet()) {
+            long tRevision = tPathEntries.get(tName);
+            String tLocation = Repository.getInstance().getServer() + "/media/" + tName;
+            
+            Media tMedia = new Media(tName, tLocation);
+            tMedia.setRevision(tRevision);
+            tAllMedia.put(tName, tMedia);
+        }
+        
+        // Submit the media        
+        getLogger().debug("Submitting media");
+        Repository tRepository = Repository.getInstance();
+        for (Media tOldMedia: tRepository.getAllMedia()) {
+            if (! tAllMedia.containsKey(tOldMedia.getId())) {
                 getLogger().debug("Media "
-                        + tMediaIdentifier
-                        + "seems new (rev "
-                        + tMediaRevision
-                        + "), trying to update");
-                // TODO
-                //tRepository.addConfiguration(tConfiguration);
-            } else if (tMediaRevision > tOldMediaRevision) {
-                getLogger().debug("Media "
-                        + tMediaIdentifier
-                        + " is a more recent version (rev "
-                        + tMediaRevision
-                        + ") of an existing configuration (rev "
-                        + tOldMediaRevision
-                        + "), updating the repository");
-                // TODO
-                //tRepository.updateConfiguration(tConfiguration);
-            }   
+                        + tOldMedia.getId()
+                        + "seems to have been deleted (last known rev "
+                        + tOldMedia.getRevision()
+                        + "), removing from repository");
+                tRepository.removeMedia(tOldMedia);
+            }
+        }
+        for (Media tMedia : tAllMedia.values()) {
+            try {
+                Media tOldMedia = tRepository.getMedia(tMedia.getId());
+                if (tOldMedia == null) {
+                    getLogger().debug("Media "
+                            + tMedia.getId()
+                            + "seems new (rev "
+                            + tMedia.getRevision()
+                            + "), adding to repository");
+                    tRepository.addMedia(tMedia);
+                } else if (tMedia.getRevision() > tOldMedia.getRevision()) {
+                    getLogger().debug("Configuration "
+                            + tMedia.getId()
+                            + " is a more recent version (rev "
+                            + tMedia.getRevision()
+                            + ") of an existing media (rev "
+                            + tOldMedia.getRevision()
+                            + "), updating the repository");
+                    tRepository.updateMedia(tMedia);
+                }
+            } catch (RepositoryException tException) {
+                throw new RepositoryException("could not process media", tException);
+            }
         }
     }
 

@@ -75,7 +75,7 @@ public final class Repository {
         mListeners.remove(iListener);
     }
     
-    public Collection<Configuration> getConfigurations() {
+    public Collection<Configuration> getAllConfigurations() {
         return mConfigurations.values();
     }
 
@@ -107,7 +107,7 @@ public final class Repository {
         emitConfigurationRemoved(iConfiguration);
     }
     
-    public Collection<Media> getMedias() {
+    public Collection<Media> getAllMedia() {
         return mMedia.values();
     }
 
