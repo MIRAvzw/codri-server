@@ -14,6 +14,7 @@ public class Media {
     //
     
     private String mId;
+    private String mLocation;
     private Long mRevision;
     
     
@@ -21,8 +22,9 @@ public class Media {
     // Construction and destruction
     //
     
-    public Media(final String iId) {
+    public Media(final String iId, final String iLocation) {
         mId = iId;
+        mLocation = iLocation;
     }
     
     
@@ -32,6 +34,10 @@ public class Media {
 
     public final String getId() {
         return mId;
+    }
+    
+    public final String getLocation() {
+        return mLocation;
     }
     
     public final long getRevision() {

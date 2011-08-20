@@ -7,6 +7,7 @@ package be.mira.adastra3.server.website.data.details;
 import be.mira.adastra3.server.exceptions.NetworkException;
 import be.mira.adastra3.server.network.controls.ApplicationControl;
 import be.mira.adastra3.server.network.devices.Kiosk30;
+import be.mira.adastra3.server.repository.media.Media;
 import eu.webtoolkit.jwt.Signal;
 import eu.webtoolkit.jwt.Signal1;
 import eu.webtoolkit.jwt.Signal2;
@@ -228,8 +229,8 @@ public class Kiosk30Detail extends WContainerWidget {
         public void trigger() {
             try {
                 debug().trigger("getting media");
-                ApplicationControl.Media tMedia = mDevice.getApplicationControl().getMedia();
-                mApplicationMediaIdentifier.setText(tMedia.getIdentifier());
+                Media tMedia = mDevice.getApplicationControl().getMedia();
+                mApplicationMediaIdentifier.setText(tMedia.getId());
                 mApplicationMediaLocation.setText(tMedia.getLocation());
                 mApplicationMediaRevision.setText(String.valueOf(tMedia.getRevision()));
             } catch (NetworkException tException) {
@@ -243,10 +244,9 @@ public class Kiosk30Detail extends WContainerWidget {
         public void trigger() {
             try {
                 debug().trigger("loading media parameters");
-                ApplicationControl.Media tMedia = new ApplicationControl.Media(
+                Media tMedia = new Media(
                         mApplicationMediaIdentifier.getText(),
-                        mApplicationMediaLocation.getText(),
-                        ApplicationControl.Media.LATEST
+                        mApplicationMediaLocation.getText()
                 );
                 mDevice.getApplicationControl().setMedia(tMedia);
             } catch (NetworkException tException) {

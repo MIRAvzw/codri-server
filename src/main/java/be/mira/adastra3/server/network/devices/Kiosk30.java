@@ -14,6 +14,7 @@ import be.mira.adastra3.server.repository.configurations.Kiosk30Configuration;
 import be.mira.adastra3.server.repository.configurations.objects.ApplicationConfiguration;
 import be.mira.adastra3.server.repository.configurations.objects.DeviceConfiguration;
 import be.mira.adastra3.server.repository.configurations.objects.MediaConfiguration;
+import be.mira.adastra3.server.repository.media.Media;
 import java.util.UUID;
 
 /**
@@ -81,10 +82,9 @@ public class Kiosk30 extends Device {
             if (tMediaConfiguration != null) {
                 String tMediaLocation = tRepository.getServer()
                         + "/media/" + tMediaConfiguration.getIdentifier();
-                ApplicationControl.Media tMedia = new ApplicationControl.Media(
+                Media tMedia = new Media(
                         tMediaConfiguration.getIdentifier(),
-                        tMediaLocation,
-                        ApplicationControl.Media.LATEST);
+                        tMediaLocation);
                 getApplicationControl().setMedia(tMedia);
             }
         } catch (NetworkException tException) {

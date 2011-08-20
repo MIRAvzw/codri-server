@@ -10,6 +10,7 @@ import be.mira.adastra3.server.network.actions.application.GetConfigurationRevis
 import be.mira.adastra3.server.network.actions.application.GetMediaAction;
 import be.mira.adastra3.server.network.actions.application.SetMediaAction;
 import be.mira.adastra3.server.network.actions.application.SetConfigurationRevisionAction;
+import be.mira.adastra3.server.repository.media.Media;
 import org.teleal.cling.controlpoint.ActionCallback;
 import org.teleal.cling.model.meta.RemoteService;
 import org.teleal.cling.model.types.ServiceId;
@@ -39,39 +40,6 @@ public class ApplicationControl extends Control {
     
     
     //
-    // Auxiliary classes
-    //
-    
-    public final static class Media {
-        // Data members
-        private String mIdentifier;
-        private String mLocation;
-        private long mRevision;
-        
-        // Static members
-        public final static long LATEST = -1;   // TODO: actually use this
-        
-        // Construction
-        public Media(final String iIdentifier, final String iLocation, final long iRevision) {
-            mIdentifier = iIdentifier;
-            mLocation = iLocation;
-            mRevision = iRevision;
-        }
-        
-        // Getters and setters
-        public final String getIdentifier() {
-            return mIdentifier;
-        }
-        public final String getLocation() {
-            return mLocation;
-        }
-        public final long getRevision() {
-            return mRevision;
-        }
-    }
-    
-    
-    //
     // Service actions
     //
     
@@ -96,7 +64,7 @@ public class ApplicationControl extends Control {
     }
     
     public final void setMedia(final Media iMedia) throws NetworkException {
-        SetMediaAction tAction = new SetMediaAction(getService(), iMedia.getIdentifier(), iMedia.getLocation());
+        SetMediaAction tAction = new SetMediaAction(getService(), iMedia.getId(), iMedia.getLocation());
         
         // TODO: use iMedia.Revision
         
@@ -114,10 +82,11 @@ public class ApplicationControl extends Control {
                 Network.getControlPoint()
         ).run();
         
-        return new Media(
+        Media tMedia = new Media(
                 tAction.getIdentifier(),
-                tAction.getLocation(),
-                tAction.getRevision()
+                tAction.getLocation()
         );
+        tMedia.setRevision(tAction.getRevision());        
+        return tMedia;
     }
 }
