@@ -37,11 +37,12 @@ public class RepositoryMonitor extends Service {
     //
 
     private String mSVNLocation;
-    private File mSVNCheckout;
+    private File mSVNCheckoutRoot;
     private SVNClient mSVNClient;
-    private long mSVNRevision;
     private Timer mSVNMonitor;
     private int mSVNMonitorInterval;
+    
+    private long mConfigurationRevision;
 
 
     //
@@ -52,16 +53,13 @@ public class RepositoryMonitor extends Service {
         @Override
         public void run() {
             try {
-                // Get the data
-                getLogger().debug("Checking the SVN repository for changes");
-                long tPreviousRevision = mSVNRevision;
-                getData();
-                
-                // Check for changes
-                if (mSVNRevision != tPreviousRevision)
-                {
-                    getLogger().debug("Repository has updated from revision " + tPreviousRevision + " to " + mSVNRevision + ", rereading the data");
-                    processData();
+                // Check configurations
+                getLogger().debug("Checking the configurations");
+                long tConfigurationsRevision = checkConfigurations();
+                if (mConfigurationRevision != tConfigurationsRevision) {
+                    getLogger().info("Configurations changed to revision " + tConfigurationsRevision);
+                    mConfigurationRevision = getConfigurations();
+                    processConfigurations();
                 }
             } catch (RepositoryException tException) {
                 Repository.getInstance().emitError("could not update repository", tException);
@@ -84,9 +82,9 @@ public class RepositoryMonitor extends Service {
     //
 
     public RepositoryMonitor() throws ServiceSetupException {
-        // Subversion checkout path
-        mSVNCheckout = new File(getConfiguration().getString("repository.checkout"));
-        if (!mSVNCheckout.exists() || !mSVNCheckout.canWrite())
+        // Subversion checkout root
+        mSVNCheckoutRoot = new File(getConfiguration().getString("repository.checkout"));
+        if (!mSVNCheckoutRoot.exists() || !mSVNCheckoutRoot.canWrite())
             throw new ServiceSetupException("checkout path does not exist or is not writable");
         
         // Subversion location
@@ -117,11 +115,9 @@ public class RepositoryMonitor extends Service {
     public final void run() throws ServiceRunException {
         // Do a checkout
         try {
-            getLogger().debug("Checking out the repository");
-            getData();
-            
-            getLogger().debug("Processing the data");
-            processData();
+            getLogger().debug("Checking out and processing the configurations");
+            mConfigurationRevision = getConfigurations();
+            processConfigurations();
         } catch (RepositoryException tException) {
             throw new ServiceRunException("Could not fetch initial data", tException);
         }
@@ -138,37 +134,50 @@ public class RepositoryMonitor extends Service {
     public final void stop() throws ServiceRunException {
     }
     
-    public final void getData() throws RepositoryException {
+    
+    //
+    // Configuration helpers
+    //
+    
+    public final long checkConfigurations() throws RepositoryException {
+        return getPathRevision("configurations");
+    }
+    
+    public final long getConfigurations() throws RepositoryException {
+        // Get a local checkout and location
+        final File tCheckout =  new File(mSVNCheckoutRoot, "configurations");
+        final String tLocation = mSVNLocation + "/configurations";
+        
         // Check if the repository exists and is valid
-        long tExistingRevision = -1;
+        Long tConfigurationRevision = null;
         try {
-            tExistingRevision = checkRepository(mSVNCheckout);
+            tConfigurationRevision = checkConfigurations();
         } catch (RepositoryException tException) {
             // Do nothing
         }
         
         // Checkout or update
         try {
-            if (tExistingRevision == -1) {
-                FileUtils.cleanDirectory(mSVNCheckout);
-                tExistingRevision = checkoutRepository(mSVNCheckout, mSVNLocation);            
+            if (tConfigurationRevision == null) {
+                FileUtils.cleanDirectory(tCheckout);
+                tConfigurationRevision = checkoutRepository(tCheckout, tLocation);            
             } else {
-                tExistingRevision = updateRepository(mSVNCheckout);              
+                tConfigurationRevision = updateRepository(tCheckout);              
             }
         } catch (RepositoryException tException) {
             throw new RepositoryException("could not download the repository", tException);
         } catch (IOException tException) {
             throw new RepositoryException("could not clean the existing (and seemingly invalid) copy of the repository", tException);
         }
-        mSVNRevision = tExistingRevision;
+        
+        return tConfigurationRevision;
     }
     
-    public final void processData() throws RepositoryException {
+    public final void processConfigurations() throws RepositoryException {
         // Read the configurations
-        // TODO: detect changes
         getLogger().debug("Reading configurations");
         List<Configuration> tConfigurations = new ArrayList<Configuration>();
-        File tConfigurationDirectory = new File(mSVNCheckout, "configurations");
+        File tConfigurationDirectory = new File(mSVNCheckoutRoot, "configurations");
         for (File tConfigurationFile: tConfigurationDirectory.listFiles(new ConfigurationFilter())) {
             // Generate an identifier
             String tName = tConfigurationFile.getName();
@@ -176,11 +185,14 @@ public class RepositoryMonitor extends Service {
             int tDotPosition = tName.lastIndexOf('.');
             String tNameSimple = tName.substring(0, tDotPosition);
             
+            // Get the local revision
+            final long tConfigurationRevision = getPathRevision("configurations/" + tConfigurationFile.getName());
+            
             // Process the contents
             ConfigurationReader tReader = new ConfigurationReader(tNameSimple, tConfigurationFile);
             tReader.process();
             if (tReader.getConfiguration() != null) {
-                tReader.getConfiguration().setRevision(mSVNRevision);
+                tReader.getConfiguration().setRevision(tConfigurationRevision);
                 tConfigurations.add(tReader.getConfiguration());
             } else {
                 throw new RepositoryException("found empty configuration file");
@@ -188,8 +200,7 @@ public class RepositoryMonitor extends Service {
         }        
             
         // Submit the configurations
-        // TODO: only submit changes
-        getLogger().debug("Submitting all configurations");
+        getLogger().debug("Submitting changed configurations");
         Repository tRepository = Repository.getInstance();
         for (Configuration tConfiguration : tConfigurations) {
             try {
@@ -199,13 +210,21 @@ public class RepositoryMonitor extends Service {
                     getLogger().debug("Processing kiosk configuration " + tKioskConfiguration.getId());
                     KioskConfiguration tOldKioskConfiguration = tRepository.getKioskConfiguration(tKioskConfiguration.getId());
                     if (tOldKioskConfiguration == null) {
-                        getLogger().debug("Configuration seems new, adding to repository");
+                        getLogger().debug("Configuration seems new (rev "
+                                + tKioskConfiguration.getRevision()
+                                + ", adding to repository");
                         tRepository.addKioskConfiguration(tKioskConfiguration);
                     } else if (tKioskConfiguration.getRevision() > tOldKioskConfiguration.getRevision()) {
-                        getLogger().debug("New configuration is a more recent version of an existing configuration, updating the repository");
+                        getLogger().debug("New configuration is a more recent version (rev "
+                                + tKioskConfiguration.getRevision()
+                                + ") of an existing configuration (rev "
+                                + tOldKioskConfiguration.getRevision() + 
+                                "), updating the repository");
                         tRepository.updateKioskConfiguration(tKioskConfiguration);
                     } else {
-                        getLogger().debug("Configuration hasn't been updated, ignoring");
+                        getLogger().debug("Configuration hasn't been updated (rev "
+                                + tKioskConfiguration.getRevision()
+                                + "), ignoring");
                     }
                 } else {
                     throw new RepositoryException("unknown configuration type");
@@ -214,12 +233,6 @@ public class RepositoryMonitor extends Service {
                 throw new RepositoryException("could not process configuration", tException);
             }
         }
-        
-        // Process the media
-        //getLogger().debug("Reading media");
-        // TODO: detect the changed media
-        //       this is only needed when we detect the changed configurations,
-        //       because now we reload each configuration anyhow
     }
 
 
@@ -227,18 +240,18 @@ public class RepositoryMonitor extends Service {
     // Auxiliary
     //
     
-    private long checkRepository(final File iCheckout) throws RepositoryException {
+    private long getPathRevision(final String iPath) throws RepositoryException {
         try
         {
             Info2[] tInfoList = mSVNClient.info2(
-                    iCheckout.getAbsolutePath(),
+                    mSVNLocation + "/" + iPath,
                     Revision.HEAD,
                     Revision.HEAD,
                     false);
             if (tInfoList.length != 1)
                 throw new RepositoryException("unexpected amount of info entries");
-            long tRevision = tInfoList[0].getRev();
-            getLogger().debug("Repository at '" + iCheckout + "' is at revision " + tRevision);
+            long tRevision = tInfoList[0].getLastChangedRev();
+            getLogger().trace("Repository entry '" + iPath + "' is at revision " + tRevision);
             return tRevision;
         } catch (ClientException tException) {
             throw new RepositoryException("could not check the repository", tException);
@@ -256,7 +269,7 @@ public class RepositoryMonitor extends Service {
                     Depth.infinity,
                     false,
                     false);
-            getLogger().debug("Checked revision " + tRevision + " from the repository at '" + iLocation + " out to '" + iCheckout);
+            getLogger().trace("Checked revision " + tRevision + " from the repository at '" + iLocation + " out to '" + iCheckout);
             
             return tRevision;
         } catch (ClientException tException) {
@@ -274,7 +287,7 @@ public class RepositoryMonitor extends Service {
                     true,
                     false,
                     false);
-            getLogger().debug("Updated the repository at '" + iCheckout + "' to revision " + tRevision);
+            getLogger().trace("Updated the repository at '" + iCheckout + "' to revision " + tRevision);
             return tRevision;
         } catch (ClientException tException) {
             throw new RepositoryException("could not update the repository", tException);
