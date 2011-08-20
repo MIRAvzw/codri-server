@@ -5,7 +5,7 @@
 package be.mira.adastra3.server.repository;
 
 import be.mira.adastra3.server.exceptions.RepositoryException;
-import be.mira.adastra3.server.repository.configurations.KioskConfiguration;
+import be.mira.adastra3.server.repository.configurations.Configuration;
 
 /**
  *
@@ -14,6 +14,6 @@ import be.mira.adastra3.server.repository.configurations.KioskConfiguration;
 public interface IRepositoryListener {
     void doRepositoryError(String iMessage, RepositoryException iException);
     void doRepositoryWarning(String iMessage);
-    void doKioskConfigurationAdded(KioskConfiguration iKioskConfiguration);
-    void doKioskConfigurationUpdated(KioskConfiguration iOldKioskConfiguration, KioskConfiguration iKioskConfiguration);
+    void doConfigurationAdded(Configuration iKioskConfiguration);
+    void doConfigurationUpdated(Configuration iOldKioskConfiguration, Configuration iKioskConfiguration);
 }

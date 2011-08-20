@@ -9,11 +9,11 @@ import be.mira.adastra3.server.exceptions.NetworkException;
 import be.mira.adastra3.server.network.controls.ApplicationControl;
 import be.mira.adastra3.server.network.controls.DeviceControl;
 import be.mira.adastra3.server.repository.Repository;
-import be.mira.adastra3.server.repository.configurations.ApplicationConfiguration;
 import be.mira.adastra3.server.repository.configurations.Configuration;
-import be.mira.adastra3.server.repository.configurations.DeviceConfiguration;
-import be.mira.adastra3.server.repository.configurations.KioskConfiguration;
-import be.mira.adastra3.server.repository.configurations.application.MediaConfiguration;
+import be.mira.adastra3.server.repository.configurations.Kiosk30Configuration;
+import be.mira.adastra3.server.repository.configurations.objects.ApplicationConfiguration;
+import be.mira.adastra3.server.repository.configurations.objects.DeviceConfiguration;
+import be.mira.adastra3.server.repository.configurations.objects.MediaConfiguration;
 import java.util.UUID;
 
 /**
@@ -48,31 +48,31 @@ public class Kiosk30 extends Device {
     @Override
     public final void setConfiguration(final Configuration iConfiguration) throws DeviceException {
         // Check the configuration type
-        if (!(iConfiguration instanceof KioskConfiguration)) {
+        if (!(iConfiguration instanceof Kiosk30Configuration)) {
             throw new DeviceException("device does not support non-kioskconfiguration propagation");
         }
-        KioskConfiguration tKioskConfiguration = (KioskConfiguration) iConfiguration;
+        Kiosk30Configuration tKioskConfiguration = (Kiosk30Configuration) iConfiguration;
         
         // Manage the device
-        DeviceConfiguration tDeviceConfiguration = tKioskConfiguration.getDeviceConfiguration();
+        DeviceConfiguration tDeviceConfiguration = tKioskConfiguration.getDevice();
         try {
-            getDeviceControl().setVolume(tDeviceConfiguration.getSoundConfiguration().getVolume());
+            getDeviceControl().setVolume(tDeviceConfiguration.getSound().getVolume());
         } catch (NetworkException tException) {
             throw new DeviceException("could not propagate device configuration", tException);
         }
         
         // Manage the application
-        ApplicationConfiguration tApplicationConfiguration = tKioskConfiguration.getApplicationConfiguration();
+        ApplicationConfiguration tApplicationConfiguration = tKioskConfiguration.getApplication();
         try {
             // TODO: check revision, e.d.
             Repository tRepository = Repository.getInstance();
             
-            MediaConfiguration tMediaConfiguration =  tApplicationConfiguration.getMediaConfiguration();
+            MediaConfiguration tMediaConfiguration =  tApplicationConfiguration.getMedia();
             if (tMediaConfiguration != null) {
                 String tMediaLocation = tRepository.getServer()
-                        + "/media/" + tMediaConfiguration.getId();
+                        + "/media/" + tMediaConfiguration.getIdentifier();
                 ApplicationControl.Media tMedia = new ApplicationControl.Media(
-                        tMediaConfiguration.getId(),
+                        tMediaConfiguration.getIdentifier(),
                         tMediaLocation,
                         ApplicationControl.Media.LATEST);
                 getApplicationControl().setMedia(tMedia);

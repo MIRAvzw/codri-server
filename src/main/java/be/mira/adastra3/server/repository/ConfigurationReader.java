@@ -5,12 +5,12 @@
 package be.mira.adastra3.server.repository;
 
 import be.mira.adastra3.server.exceptions.RepositoryException;
-import be.mira.adastra3.server.repository.configurations.ApplicationConfiguration;
 import be.mira.adastra3.server.repository.configurations.Configuration;
-import be.mira.adastra3.server.repository.configurations.DeviceConfiguration;
-import be.mira.adastra3.server.repository.configurations.KioskConfiguration;
-import be.mira.adastra3.server.repository.configurations.application.MediaConfiguration;
-import be.mira.adastra3.server.repository.configurations.device.SoundConfiguration;
+import be.mira.adastra3.server.repository.configurations.Kiosk30Configuration;
+import be.mira.adastra3.server.repository.configurations.objects.ApplicationConfiguration;
+import be.mira.adastra3.server.repository.configurations.objects.DeviceConfiguration;
+import be.mira.adastra3.server.repository.configurations.objects.MediaConfiguration;
+import be.mira.adastra3.server.repository.configurations.objects.SoundConfiguration;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -156,7 +156,7 @@ public class ConfigurationReader {
         return tText;
     }
     
-    private KioskConfiguration parseKioskConfiguration() throws RepositoryException, XmlPullParserException, IOException {        
+    private Kiosk30Configuration parseKioskConfiguration() throws RepositoryException, XmlPullParserException, IOException {        
         // Process the tags
         UUID tTarget = null;
         DeviceConfiguration tDeviceConfiguration = null;
@@ -182,10 +182,11 @@ public class ConfigurationReader {
         }
         
         // Create the object
-        KioskConfiguration tKioskConfiguration = new KioskConfiguration(mIdentifier);
-        tKioskConfiguration.setTarget(tTarget);
-        tKioskConfiguration.setApplicationConfiguration(tApplicationConfiguration);
-        tKioskConfiguration.setDeviceConfiguration(tDeviceConfiguration);
+        Kiosk30Configuration tKioskConfiguration = new Kiosk30Configuration(
+                mIdentifier,
+                tTarget,
+                tDeviceConfiguration,
+                tApplicationConfiguration);
         return tKioskConfiguration;
     }
         
@@ -210,8 +211,7 @@ public class ConfigurationReader {
         }
         
         // Create the object
-        DeviceConfiguration tDeviceConfiguration = new DeviceConfiguration();
-        tDeviceConfiguration.setSoundConfiguration(tSound);
+        DeviceConfiguration tDeviceConfiguration = new DeviceConfiguration(tSound);
         return tDeviceConfiguration;
     }
     
@@ -235,8 +235,7 @@ public class ConfigurationReader {
         }
         
         // Create the obhect
-        SoundConfiguration tSound = new SoundConfiguration();
-        tSound.setVolume(tVolume);
+        SoundConfiguration tSound = new SoundConfiguration(tVolume);
         return tSound;
     }
     
@@ -260,8 +259,7 @@ public class ConfigurationReader {
         }
         
         // Create the object
-        ApplicationConfiguration tApplicationConfiguration = new ApplicationConfiguration();
-        tApplicationConfiguration.setMediaConfiguration(tMediaConfiguration);
+        ApplicationConfiguration tApplicationConfiguration = new ApplicationConfiguration(tMediaConfiguration);
         return tApplicationConfiguration;
     }
     

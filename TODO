@@ -1,4 +1,4 @@
-VERSION 1.0
+VERSION 0.9
 -----------
 
 * General
@@ -16,26 +16,41 @@ VERSION 1.0
     device not reachable or smth)
 
 * Website subsystem
+
+* Network subsystem
+
+* Repository subsystem
+  - GetMediaRevision & GetConfigurationRevision, zo geen redundant loads @
+    checkout
+    + wie checkt? server? methodes zelfde signatuur geven
+
+* OS
+  - Deploy application on desktop
+  - Deploy repository on NAS
+
+VERSION 1.0
+-----------
+
+* Website subsystem
   - Display offline kiosks
 
 * Network subsystem
   - Preserve offline kiosks
 
 * Repository subsystem
-  - GetMediaRevision & GetConfigurationRevision, zo geen redundant loads @
-    checkout
-    + wie checkt? server? methodes zelfde signatuur geven
   - SVN locking
   - Integrated validation & parsing (plus no use of internal scheme stuff)
 
+* OS
+  - Deploy application on Efika MX
 
 VERSION 2.0
 -----------
 
-
-FUTURE
-------
-
 * Repository subsystem
   - Properly interpret changesets (it be concerning configurations or media)
+
+* OS
+  - Deploy application on NAS
+
 

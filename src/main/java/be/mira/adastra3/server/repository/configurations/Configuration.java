@@ -4,8 +4,7 @@
  */
 package be.mira.adastra3.server.repository.configurations;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.UUID;
 
 /**
  *
@@ -16,37 +15,35 @@ public abstract class Configuration {
     // Member data
     //
     
-    private Map<String, Object> mProperties;
-    private long mRevision;
+    private String mId;
+    private UUID mTarget;
+    private Long mRevision;
     
     
     //
     // Construction and destruction
     //
     
-    public Configuration() {
-        mProperties = new HashMap<String, Object>();
-        mRevision = 0;
+    public Configuration(final String iId, final UUID iTarget) {
+        mId = iId;
+        mTarget = iTarget;
     }
     
     
     //
     // Getters and setters
     //
-    
-    protected final Object getProperty(final String iName) {
-        if (mProperties.containsKey(iName)) {
-            return mProperties.get(iName);
-        } else {
-            return null;
-        }
+
+    public final String getId() {
+        return mId;
     }
-    
-    protected final void setProperty(final String iName, final Object iProperty) {
-        if (iProperty == null) {
-            return;
-        }
-        mProperties.put(iName, iProperty);
+
+    public final UUID getTarget() {
+        return mTarget;
+    }
+
+    public final void setTarget(final UUID iTarget) {
+        mTarget = iTarget;
     }
     
     public final long getRevision() {

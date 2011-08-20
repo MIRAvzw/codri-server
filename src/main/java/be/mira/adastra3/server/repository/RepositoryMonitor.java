@@ -10,12 +10,12 @@ import be.mira.adastra3.server.exceptions.RepositoryException;
 import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;
 import be.mira.adastra3.server.repository.configurations.Configuration;
-import be.mira.adastra3.server.repository.configurations.KioskConfiguration;
+import be.mira.adastra3.server.repository.configurations.Kiosk30Configuration;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Matcher;
@@ -176,7 +176,7 @@ public class RepositoryMonitor extends Service {
     public final void processConfigurations() throws RepositoryException {
         // Read the configurations
         getLogger().debug("Reading configurations");
-        List<Configuration> tConfigurations = new ArrayList<Configuration>();
+        Map<String, Configuration> tConfigurations = new HashMap<String, Configuration>();
         File tConfigurationDirectory = new File(mSVNCheckoutRoot, "configurations");
         for (File tConfigurationFile: tConfigurationDirectory.listFiles(new ConfigurationFilter())) {
             // Generate an identifier
@@ -193,7 +193,8 @@ public class RepositoryMonitor extends Service {
             tReader.process();
             if (tReader.getConfiguration() != null) {
                 tReader.getConfiguration().setRevision(tConfigurationRevision);
-                tConfigurations.add(tReader.getConfiguration());
+                Configuration tConfiguration = tReader.getConfiguration();
+                tConfigurations.put(tConfiguration.getId(), tReader.getConfiguration());
             } else {
                 throw new RepositoryException("found empty configuration file");
             }
@@ -202,25 +203,26 @@ public class RepositoryMonitor extends Service {
         // Submit the configurations
         getLogger().debug("Submitting changed configurations");
         Repository tRepository = Repository.getInstance();
-        for (Configuration tConfiguration : tConfigurations) {
+        for (Configuration tConfiguration : tConfigurations.values()) {
             try {
                 // KioskConfiguration processing
-                if (tConfiguration instanceof KioskConfiguration) {
-                    KioskConfiguration tKioskConfiguration = (KioskConfiguration) tConfiguration;
+                if (tConfiguration instanceof Kiosk30Configuration) {
+                    // TODO: verify these casts?
+                    Kiosk30Configuration tKioskConfiguration = (Kiosk30Configuration) tConfiguration;
                     getLogger().debug("Processing kiosk configuration " + tKioskConfiguration.getId());
-                    KioskConfiguration tOldKioskConfiguration = tRepository.getKioskConfiguration(tKioskConfiguration.getId());
+                    Kiosk30Configuration tOldKioskConfiguration = (Kiosk30Configuration) tRepository.getConfiguration(tKioskConfiguration.getId());
                     if (tOldKioskConfiguration == null) {
                         getLogger().debug("Configuration seems new (rev "
                                 + tKioskConfiguration.getRevision()
                                 + ", adding to repository");
-                        tRepository.addKioskConfiguration(tKioskConfiguration);
+                        tRepository.addConfiguration(tKioskConfiguration);
                     } else if (tKioskConfiguration.getRevision() > tOldKioskConfiguration.getRevision()) {
                         getLogger().debug("New configuration is a more recent version (rev "
                                 + tKioskConfiguration.getRevision()
                                 + ") of an existing configuration (rev "
                                 + tOldKioskConfiguration.getRevision() + 
                                 "), updating the repository");
-                        tRepository.updateKioskConfiguration(tKioskConfiguration);
+                        tRepository.updateConfiguration(tKioskConfiguration);
                     } else {
                         getLogger().debug("Configuration hasn't been updated (rev "
                                 + tKioskConfiguration.getRevision()
