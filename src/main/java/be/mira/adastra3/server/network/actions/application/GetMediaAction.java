@@ -8,6 +8,8 @@ import be.mira.adastra3.server.exceptions.NetworkException;
 import org.teleal.cling.model.action.ActionArgumentValue;
 import org.teleal.cling.model.action.ActionInvocation;
 import org.teleal.cling.model.meta.Service;
+import org.teleal.cling.model.types.Datatype;
+import org.teleal.cling.model.types.UnsignedIntegerFourBytes;
 
 /**
  *
@@ -32,5 +34,15 @@ public class GetMediaAction extends ActionInvocation {
             throw new NetworkException("state variable not accessible");
         }
         return ((String) tMediaIdentifier.getValue());
+    }
+    
+    public final long getRevision() throws NetworkException {    
+        ActionArgumentValue tMediaRevision = getOutput("oMediaRevisionValue");
+        if (tMediaRevision == null) {
+            throw new NetworkException("state variable not accessible");
+        } else if (tMediaRevision.getDatatype().getBuiltin() != Datatype.Builtin.UI4) {
+            throw new NetworkException("invalid return type by Media.GetMediaRevision (not an UI4)");
+        }
+        return (long) ((UnsignedIntegerFourBytes) tMediaRevision.getValue()).getValue();
     }
 }

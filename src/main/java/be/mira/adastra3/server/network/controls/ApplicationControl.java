@@ -8,8 +8,7 @@ import be.mira.adastra3.server.exceptions.NetworkException;
 import be.mira.adastra3.server.network.Network;
 import be.mira.adastra3.server.network.actions.application.GetConfigurationRevisionAction;
 import be.mira.adastra3.server.network.actions.application.GetMediaAction;
-import be.mira.adastra3.server.network.actions.application.GetMediaRevisionAction;
-import be.mira.adastra3.server.network.actions.application.LoadMediaAction;
+import be.mira.adastra3.server.network.actions.application.SetMediaAction;
 import be.mira.adastra3.server.network.actions.application.SetConfigurationRevisionAction;
 import org.teleal.cling.controlpoint.ActionCallback;
 import org.teleal.cling.model.meta.RemoteService;
@@ -47,11 +46,16 @@ public class ApplicationControl extends Control {
         // Data members
         private String mIdentifier;
         private String mLocation;
+        private long mRevision;
+        
+        // Static members
+        public final static long LATEST = -1;   // TODO: actually use this
         
         // Construction
-        public Media(final String iIdentifier, final String iLocation) {
+        public Media(final String iIdentifier, final String iLocation, final long iRevision) {
             mIdentifier = iIdentifier;
             mLocation = iLocation;
+            mRevision = iRevision;
         }
         
         // Getters and setters
@@ -60,6 +64,9 @@ public class ApplicationControl extends Control {
         }
         public final String getLocation() {
             return mLocation;
+        }
+        public final long getRevision() {
+            return mRevision;
         }
     }
     
@@ -88,19 +95,10 @@ public class ApplicationControl extends Control {
         ).run();
     }
     
-    public final long getMediaRevision() throws NetworkException {
-        GetMediaRevisionAction tAction = new GetMediaRevisionAction(getService());
+    public final void setMedia(final Media iMedia) throws NetworkException {
+        SetMediaAction tAction = new SetMediaAction(getService(), iMedia.getIdentifier(), iMedia.getLocation());
         
-        new ActionCallback.Default(
-                tAction,
-                Network.getControlPoint()
-        ).run();
-        
-        return tAction.getMediaRevision();
-    }
-    
-    public final void loadMedia(final Media iMedia) throws NetworkException {
-        LoadMediaAction tAction = new LoadMediaAction(getService(), iMedia.getIdentifier(), iMedia.getLocation());
+        // TODO: use iMedia.Revision
         
         new ActionCallback.Default(
                 tAction,
@@ -118,7 +116,8 @@ public class ApplicationControl extends Control {
         
         return new Media(
                 tAction.getIdentifier(),
-                tAction.getLocation()
+                tAction.getLocation(),
+                tAction.getRevision()
         );
     }
 }
