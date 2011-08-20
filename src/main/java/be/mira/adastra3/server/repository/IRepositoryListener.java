@@ -16,4 +16,5 @@ public interface IRepositoryListener {
     void doRepositoryWarning(String iMessage);
     void doConfigurationAdded(Configuration iKioskConfiguration);
     void doConfigurationUpdated(Configuration iOldKioskConfiguration, Configuration iKioskConfiguration);
+    void doConfigurationRemoved(Configuration iKioskConfiguration);
 }

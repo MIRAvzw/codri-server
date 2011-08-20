@@ -105,6 +105,13 @@ public class Controller extends Service implements INetworkListener, IRepository
         }
     }
     
+    @Override
+    public final void doConfigurationRemoved(final Configuration iConfiguration) {
+        getLogger().info("Configuration removed: " + iConfiguration.getId());
+        
+        // TODO: Erase the configuration on the device
+    }
+    
     
     //
     // Network listener interface

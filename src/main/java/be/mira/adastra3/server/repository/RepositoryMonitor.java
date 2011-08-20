@@ -203,33 +203,36 @@ public class RepositoryMonitor extends Service {
         // Submit the configurations
         getLogger().debug("Submitting changed configurations");
         Repository tRepository = Repository.getInstance();
+        for (Configuration tOldConfiguration: tRepository.getConfigurations()) {
+            if (! tConfigurations.containsKey(tOldConfiguration.getId())) {
+                getLogger().debug("Configuration "
+                        + tOldConfiguration.getId()
+                        + "seems to have been deleted (last known rev "
+                        + tOldConfiguration.getRevision()
+                        + ", removing from repository");
+                tRepository.removeConfiguration(tOldConfiguration);
+                
+            }
+        }
         for (Configuration tConfiguration : tConfigurations.values()) {
             try {
-                // KioskConfiguration processing
-                if (tConfiguration instanceof Kiosk30Configuration) {
-                    // TODO: verify these casts?
-                    Kiosk30Configuration tKioskConfiguration = (Kiosk30Configuration) tConfiguration;
-                    getLogger().debug("Processing kiosk configuration " + tKioskConfiguration.getId());
-                    Kiosk30Configuration tOldKioskConfiguration = (Kiosk30Configuration) tRepository.getConfiguration(tKioskConfiguration.getId());
-                    if (tOldKioskConfiguration == null) {
-                        getLogger().debug("Configuration seems new (rev "
-                                + tKioskConfiguration.getRevision()
-                                + ", adding to repository");
-                        tRepository.addConfiguration(tKioskConfiguration);
-                    } else if (tKioskConfiguration.getRevision() > tOldKioskConfiguration.getRevision()) {
-                        getLogger().debug("New configuration is a more recent version (rev "
-                                + tKioskConfiguration.getRevision()
-                                + ") of an existing configuration (rev "
-                                + tOldKioskConfiguration.getRevision() + 
-                                "), updating the repository");
-                        tRepository.updateConfiguration(tKioskConfiguration);
-                    } else {
-                        getLogger().debug("Configuration hasn't been updated (rev "
-                                + tKioskConfiguration.getRevision()
-                                + "), ignoring");
-                    }
-                } else {
-                    throw new RepositoryException("unknown configuration type");
+                Configuration tOldConfiguration = tRepository.getConfiguration(tConfiguration.getId());
+                if (tOldConfiguration == null) {
+                    getLogger().debug("Configuration "
+                            + tConfiguration.getId()
+                            + "seems new (rev "
+                            + tConfiguration.getRevision()
+                            + ", adding to repository");
+                    tRepository.addConfiguration(tConfiguration);
+                } else if (tConfiguration.getRevision() > tOldConfiguration.getRevision()) {
+                    getLogger().debug("Configuration "
+                            + tConfiguration.getId()
+                            + " is a more recent version (rev "
+                            + tConfiguration.getRevision()
+                            + ") of an existing configuration (rev "
+                            + tOldConfiguration.getRevision() + 
+                            "), updating the repository");
+                    tRepository.updateConfiguration(tConfiguration);
                 }
             } catch (RepositoryException tException) {
                 throw new RepositoryException("could not process configuration", tException);

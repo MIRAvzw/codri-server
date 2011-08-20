@@ -75,6 +75,10 @@ public final class Repository {
         return mConfigurations.values();
     }
 
+    public Configuration getConfiguration(final String iName) {
+        return mConfigurations.get(iName);
+    }
+
     public void addConfiguration(final Configuration iConfiguration) throws RepositoryException {
         if (mConfigurations.containsKey(iConfiguration.getId())) {
             throw new RepositoryException("configuration " + iConfiguration.getId() + " already present in repository");
@@ -91,8 +95,12 @@ public final class Repository {
         emitConfigurationUpdated(tOldConfiguration, iConfiguration);
     }
 
-    public Configuration getConfiguration(final String iName) {
-        return mConfigurations.get(iName);
+    public void removeConfiguration(final Configuration iConfiguration) throws RepositoryException {
+        if (! mConfigurations.containsKey(iConfiguration.getId())) {
+            throw new RepositoryException("configuration " + iConfiguration.getId() + " not present in repository");
+        }
+        mConfigurations.remove(iConfiguration.getId());
+        emitConfigurationRemoved(iConfiguration);
     }
     
     
@@ -110,7 +118,7 @@ public final class Repository {
         for (IRepositoryListener tListener : mListeners) {
             tListener.doRepositoryWarning(iMessage);
         }
-    }  
+    }
     
     private void emitConfigurationAdded(final Configuration iConfiguration) {
         for (IRepositoryListener tListener : mListeners) {
@@ -121,6 +129,12 @@ public final class Repository {
     private void emitConfigurationUpdated(final Configuration iOldConfiguration, final Configuration iConfiguration) {
         for (IRepositoryListener tListener : mListeners) {
             tListener.doConfigurationUpdated(iOldConfiguration, iConfiguration);
+        }
+    }
+    
+    private void emitConfigurationRemoved(final Configuration iConfiguration) {
+        for (IRepositoryListener tListener : mListeners) {
+            tListener.doConfigurationRemoved(iConfiguration);
         }
     }
 }
