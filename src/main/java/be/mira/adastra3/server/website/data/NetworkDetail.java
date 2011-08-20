@@ -4,11 +4,11 @@
  */
 package be.mira.adastra3.server.website.data;
 
-import be.mira.adastra3.server.network.devices.Device;
-import be.mira.adastra3.server.network.devices.Kiosk30;
+import be.mira.adastra3.server.network.entities.Entity;
+import be.mira.adastra3.server.network.entities.Kiosk;
 import be.mira.adastra3.server.website.auxiliary.Signal1Bubbler;
 import be.mira.adastra3.server.website.auxiliary.Signal2Bubbler;
-import be.mira.adastra3.server.website.data.details.Kiosk30Detail;
+import be.mira.adastra3.server.website.data.details.KioskDetail;
 import eu.webtoolkit.jwt.Signal1;
 import eu.webtoolkit.jwt.Signal2;
 import eu.webtoolkit.jwt.WContainerWidget;
@@ -26,7 +26,7 @@ public class NetworkDetail extends WStackedWidget {
     
     // Widgets
     private WContainerWidget mDetailDummy;
-    private Kiosk30Detail mDetailKiosk30;
+    private KioskDetail mDetailKiosk;
     
     // Events
     private Signal2<String, Exception> mEventError;
@@ -59,12 +59,12 @@ public class NetworkDetail extends WStackedWidget {
         addWidget(mDetailDummy); // Redundant?
         
         // Kiosk30 detail
-        mDetailKiosk30 = new Kiosk30Detail(this);
-        mDetailKiosk30.error().addListener(this, new Signal2Bubbler<String, Exception>(mEventError));
-        mDetailKiosk30.warning().addListener(this, new Signal1Bubbler<String>(mEventWarning));
-        mDetailKiosk30.info().addListener(this, new Signal1Bubbler<String>(mEventInfo));
-        mDetailKiosk30.debug().addListener(this, new Signal1Bubbler<String>(mEventDebug));
-        addWidget(mDetailKiosk30); // Redundant?
+        mDetailKiosk = new KioskDetail(this);
+        mDetailKiosk.error().addListener(this, new Signal2Bubbler<String, Exception>(mEventError));
+        mDetailKiosk.warning().addListener(this, new Signal1Bubbler<String>(mEventWarning));
+        mDetailKiosk.info().addListener(this, new Signal1Bubbler<String>(mEventInfo));
+        mDetailKiosk.debug().addListener(this, new Signal1Bubbler<String>(mEventDebug));
+        addWidget(mDetailKiosk); // Redundant?
         
         showDetail(null);        
     }
@@ -110,11 +110,11 @@ public class NetworkDetail extends WStackedWidget {
             return;
         }
         
-        Device tDevice = iNetworkItem.getDevice();
-        if (tDevice instanceof Kiosk30) {
-            Kiosk30 tKiosk = (Kiosk30) tDevice;
-            mDetailKiosk30.loadDevice(tKiosk);
-            setCurrentWidget(mDetailKiosk30);
+        Entity tDevice = iNetworkItem.getDevice();
+        if (tDevice instanceof Kiosk) {
+            Kiosk tKiosk = (Kiosk) tDevice;
+            mDetailKiosk.loadKiosk(tKiosk);
+            setCurrentWidget(mDetailKiosk);
         } else {
             setCurrentWidget(mDetailDummy);
         }

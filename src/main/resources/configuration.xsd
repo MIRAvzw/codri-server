@@ -7,21 +7,34 @@
       The root element bundles all possible entry elements for the XML files.
       -->
     
-    <xsd:element name="kiosk" type="kioskType" />
+    <xsd:element name="configuration" type="configurationType" />
+    
+    <!--
+      The configuration object is the root of the file, and contains all possible
+      child objects. Depending on the "type" attribute, differend configuration
+      objects are created.
+      -->
+    
+    <xsd:complexType name="configurationType">
+        <xsd:sequence>
+            <xsd:element name="device" type="deviceType" minOccurs="0" />
+            <xsd:element name="media" type="mediaType" minOccurs="0" />
+        </xsd:sequence>
+        <xsd:attribute name="type" type="xsd:string" use="required" />
+    </xsd:complexType>
     
     
     <!--
-      A kiosk represents an integral piece of hard- and software within the 
+      A device represents an integral piece of hard- and software within the 
       network. It is mapped 1 on 1 with a UPnP device, and as such has a 
       unique identifier used to distinguish it within the network.
       -->
     
-    <xsd:complexType name="kioskType">
+    <xsd:complexType name="deviceType">
         <xsd:sequence>
-            <xsd:element name="target" type="UuidType" />
-            <xsd:element name="device" type="deviceType" minOccurs="0" />
-            <xsd:element name="application" type="applicationType" minOccurs="0" />
+            <xsd:element name="sound" type="soundType" minOccurs="0" />     
         </xsd:sequence>
+        <xsd:attribute name="id" type="UuidType" use="required" />
     </xsd:complexType>
     
     <xsd:simpleType name="UuidType">
@@ -29,18 +42,6 @@
             <xsd:pattern value="[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}" />
         </xsd:restriction>
     </xsd:simpleType>
-    
-    
-    <!--
-      The device element represents the hardware portion of a kiosk. It is the
-      configuration counterpart of the DeviceService UPnP service.
-      -->
-    
-    <xsd:complexType name="deviceType">
-        <xsd:sequence>
-            <xsd:element name="sound" type="soundType" minOccurs="0" />            
-        </xsd:sequence>
-    </xsd:complexType>
 
     <xsd:complexType name="soundType">
         <xsd:sequence>
@@ -56,15 +57,9 @@
     
     
     <!--
-      The application element represents the application on a kiosk. It is the
-      configuration counterpart of the ApplicationService UPnP service.
+      The media element represents the media on a kiosk. It is the
+      configuration counterpart of the MediaService UPnP service.
       -->
-    
-    <xsd:complexType name="applicationType">
-        <xsd:sequence>
-            <xsd:element name="media" type="mediaType" minOccurs="0" />
-        </xsd:sequence>
-    </xsd:complexType>
 
     <xsd:complexType name="mediaType">
         <xsd:sequence>

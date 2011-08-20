@@ -4,7 +4,7 @@
  */
 package be.mira.adastra3.server.website.data;
 
-import be.mira.adastra3.server.network.devices.Device;
+import be.mira.adastra3.server.network.entities.Entity;
 
 /**
  *
@@ -15,14 +15,14 @@ public class NetworkItem extends TreeItem {
     // Data members
     //
     
-    private Device mDevice;
+    private Entity mDevice;
     
     
     //
     // Construction and destruction
     //
 
-    public NetworkItem(final Device iDevice, final TreeItem iParent) {
+    public NetworkItem(final Entity iDevice, final TreeItem iParent) {
         super(iParent);
         mDevice = iDevice;
     }
@@ -54,7 +54,7 @@ public class NetworkItem extends TreeItem {
     // Basic I/O
     //
     
-    public final Device getDevice() {
+    public final Entity getDevice() {
         return mDevice;
     }
 }

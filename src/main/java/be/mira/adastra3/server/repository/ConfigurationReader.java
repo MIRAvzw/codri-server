@@ -6,8 +6,7 @@ package be.mira.adastra3.server.repository;
 
 import be.mira.adastra3.server.exceptions.RepositoryException;
 import be.mira.adastra3.server.repository.configurations.Configuration;
-import be.mira.adastra3.server.repository.configurations.Kiosk30Configuration;
-import be.mira.adastra3.server.repository.configurations.objects.ApplicationConfiguration;
+import be.mira.adastra3.server.repository.configurations.KioskConfiguration;
 import be.mira.adastra3.server.repository.configurations.objects.DeviceConfiguration;
 import be.mira.adastra3.server.repository.configurations.objects.MediaConfiguration;
 import be.mira.adastra3.server.repository.configurations.objects.SoundConfiguration;
@@ -112,11 +111,11 @@ public class ConfigurationReader {
                         mParser.next();
                         break loop;
                     case (XmlPullParser.START_TAG):
-                        if (mParser.getName().equals("kiosk")) {
+                        if (mParser.getName().equals("configuration")) {
                             if (mConfiguration != null) {
                                 throw new RepositoryException("configuration file contains multiple configurations");
                             }
-                            mConfiguration = parseKioskConfiguration();
+                            mConfiguration = parseConfiguration();
                         }
                         break;
                     default:                        
@@ -156,11 +155,32 @@ public class ConfigurationReader {
         return tText;
     }
     
-    private Kiosk30Configuration parseKioskConfiguration() throws RepositoryException, XmlPullParserException, IOException {        
+    private Configuration parseConfiguration() throws RepositoryException, XmlPullParserException, IOException {
+        // Process the attributes
+        String tType = null;
+        for (int tAttributeIndex = 0; tAttributeIndex < mParser.getAttributeCount(); tAttributeIndex++) {
+            String tAttributeName = mParser.getAttributeName(tAttributeIndex);
+            String tAttributeValue = mParser.getAttributeValue(tAttributeIndex);
+            
+            if (tAttributeName.equals("type")) {
+                tType = tAttributeValue;
+            }
+        }
+        if (tType == null)
+            throw new RepositoryException("could not find configuration type");
+        
+        // Handle the configuration type
+        if (tType.equals("kiosk")) {
+            return parseKioskConfiguration();
+        } else {
+            throw new RepositoryException("unknown configuration type");
+        }
+    }
+    
+    private Configuration parseKioskConfiguration() throws RepositoryException, XmlPullParserException, IOException {        
         // Process the tags
-        UUID tTarget = null;
         DeviceConfiguration tDeviceConfiguration = null;
-        ApplicationConfiguration tApplicationConfiguration = null;
+        MediaConfiguration tMediaConfiguration = null;
         mParser.next();
         loop: while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
             switch (mParser.getEventType()) {
@@ -168,10 +188,8 @@ public class ConfigurationReader {
                     mParser.next();
                     break loop;
                 case (XmlPullParser.START_TAG):
-                    if (mParser.getName().equals("target")) {
-                        tTarget = UUID.fromString(parseTextElement());
-                    } else if (mParser.getName().equals("application")) {
-                        tApplicationConfiguration = parseApplicationConfiguration();
+                    if (mParser.getName().equals("media")) {
+                        tMediaConfiguration = parseMediaConfiguration();
                     } else if (mParser.getName().equals("device")) {
                         tDeviceConfiguration = parseDeviceConfiguration();
                     }
@@ -182,18 +200,34 @@ public class ConfigurationReader {
         }
         
         // Create the object
-        Kiosk30Configuration tKioskConfiguration = new Kiosk30Configuration(
+        KioskConfiguration tKioskConfiguration = new KioskConfiguration(
                 mIdentifier,
-                tTarget,
                 tDeviceConfiguration,
-                tApplicationConfiguration);
+                tMediaConfiguration);
         return tKioskConfiguration;
     }
         
     
     private DeviceConfiguration parseDeviceConfiguration() throws RepositoryException, XmlPullParserException, IOException {
+        // Process the attributes
+        UUID tIdentifier = null;
+        for (int tAttributeIndex = 0; tAttributeIndex < mParser.getAttributeCount(); tAttributeIndex++) {
+            String tAttributeName = mParser.getAttributeName(tAttributeIndex);
+            String tAttributeValue = mParser.getAttributeValue(tAttributeIndex);
+            
+            if (tAttributeName.equals("id")) {
+                try {
+                    tIdentifier = UUID.fromString(tAttributeValue);
+                } catch (IllegalArgumentException tException) {
+                    throw new RepositoryException("invalid device identifier", tException);
+                }
+            }
+        }
+        if (tIdentifier == null)
+            throw new RepositoryException("no device identifier found");
+        
         // Process the tags
-        SoundConfiguration tSound = null;
+        SoundConfiguration tSoundConfiguration = null;
         mParser.next();
         loop: while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
             switch (mParser.getEventType()) {
@@ -202,7 +236,7 @@ public class ConfigurationReader {
                     break loop;
                 case (XmlPullParser.START_TAG):
                     if (mParser.getName().equals("sound")) {
-                        tSound = parseDeviceSound();
+                        tSoundConfiguration = parseDeviceSound();
                     }
                     break;
                 default:
@@ -211,7 +245,7 @@ public class ConfigurationReader {
         }
         
         // Create the object
-        DeviceConfiguration tDeviceConfiguration = new DeviceConfiguration(tSound);
+        DeviceConfiguration tDeviceConfiguration = new DeviceConfiguration(tIdentifier, tSoundConfiguration);
         return tDeviceConfiguration;
     }
     
@@ -239,58 +273,22 @@ public class ConfigurationReader {
         return tSound;
     }
     
-    private ApplicationConfiguration parseApplicationConfiguration() throws RepositoryException, XmlPullParserException, IOException {
-        // Process the tags
-        MediaConfiguration tMediaConfiguration = null;
-        mParser.next();
-        loop: while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
-            switch (mParser.getEventType()) {
-                case (XmlPullParser.END_TAG):
-                    mParser.next();
-                    break loop;
-                case (XmlPullParser.START_TAG):
-                    if (mParser.getName().equals("media")) {
-                        tMediaConfiguration = parseApplicationMedia();
-                    }
-                    break;
-                default:
-                    mParser.next();
-            }
-        }
-        
-        // Create the object
-        ApplicationConfiguration tApplicationConfiguration = new ApplicationConfiguration(tMediaConfiguration);
-        return tApplicationConfiguration;
-    }
-    
-    private MediaConfiguration parseApplicationMedia() throws RepositoryException, XmlPullParserException, IOException {
+    private MediaConfiguration parseMediaConfiguration() throws RepositoryException, XmlPullParserException, IOException {
         // Process the attributes
-        String tId = null;
+        String tIdentifier = null;
         for (int tAttributeIndex = 0; tAttributeIndex < mParser.getAttributeCount(); tAttributeIndex++) {
             String tAttributeName = mParser.getAttributeName(tAttributeIndex);
             String tAttributeValue = mParser.getAttributeValue(tAttributeIndex);
             
             if (tAttributeName.equals("id")) {
-                tId = tAttributeValue;
+                tIdentifier = tAttributeValue;
             }
         }
-        
-        // Process the tags
-        mParser.next();
-        loop: while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
-            switch (mParser.getEventType()) {
-                case (XmlPullParser.END_TAG):
-                    mParser.next();
-                    break loop;
-                case (XmlPullParser.START_TAG):
-                    break;
-                default:
-                    mParser.next();
-            }
-        }
+        if (tIdentifier == null)
+            throw new RepositoryException("no device identifier found");
         
         // Create the object
-        MediaConfiguration tApplicationMedia = new MediaConfiguration(tId);
-        return tApplicationMedia;
+        MediaConfiguration tMediaConfiguration = new MediaConfiguration(tIdentifier);
+        return tMediaConfiguration;
     }
 }

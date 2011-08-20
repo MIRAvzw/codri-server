@@ -16,7 +16,6 @@ public abstract class Configuration {
     //
     
     private String mId;
-    private UUID mTarget;
     private Long mRevision;
     
     
@@ -24,9 +23,8 @@ public abstract class Configuration {
     // Construction and destruction
     //
     
-    public Configuration(final String iId, final UUID iTarget) {
+    public Configuration(final String iId) {
         mId = iId;
-        mTarget = iTarget;
     }
     
     
@@ -36,14 +34,6 @@ public abstract class Configuration {
 
     public final String getId() {
         return mId;
-    }
-
-    public final UUID getTarget() {
-        return mTarget;
-    }
-
-    public final void setTarget(final UUID iTarget) {
-        mTarget = iTarget;
     }
     
     public final long getRevision() {

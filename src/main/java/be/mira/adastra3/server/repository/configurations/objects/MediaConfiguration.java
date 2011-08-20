@@ -8,7 +8,7 @@ package be.mira.adastra3.server.repository.configurations.objects;
  *
  * @author tim
  */
-public final class MediaConfiguration {
+public class MediaConfiguration {
     //
     // Data members
     //
@@ -31,5 +31,5 @@ public final class MediaConfiguration {
     
     public String getIdentifier() {
         return mIdentifier;
-    }
+    }    
 }

@@ -4,24 +4,28 @@
  */
 package be.mira.adastra3.server.repository.configurations.objects;
 
+import java.util.UUID;
+
 /**
  *
  * @author tim
  */
-public final class DeviceConfiguration {
+public class DeviceConfiguration {
     //
     // Data members
     //
     
-    private SoundConfiguration mSound;
+    private UUID mIdentifier;
+    private SoundConfiguration mSoundConfiguration;
     
     
     //
     // Constructors
     //
     
-    public DeviceConfiguration(final SoundConfiguration iSound) {
-        mSound = iSound;
+    public DeviceConfiguration(final UUID iIdentifier, SoundConfiguration iSoundConfiguration) {
+        mIdentifier = iIdentifier;
+        mSoundConfiguration = iSoundConfiguration;
     }
     
     
@@ -29,7 +33,11 @@ public final class DeviceConfiguration {
     // Getters
     //
     
-    public SoundConfiguration getSound() {
-        return mSound;
+    public UUID getIdentifier() {
+        return mIdentifier;
+    }
+    
+    public SoundConfiguration getSoundConfiguration() {
+        return mSoundConfiguration;
     }
 }

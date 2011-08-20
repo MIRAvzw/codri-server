@@ -8,7 +8,9 @@ import be.mira.adastra3.server.exceptions.NetworkException;
 import be.mira.adastra3.server.network.Network;
 import be.mira.adastra3.server.network.actions.device.GetVolumeAction;
 import be.mira.adastra3.server.network.actions.device.EchoAction;
+import be.mira.adastra3.server.network.actions.device.GetRevisionAction;
 import be.mira.adastra3.server.network.actions.device.RebootAction;
+import be.mira.adastra3.server.network.actions.device.SetRevisionAction;
 import be.mira.adastra3.server.network.actions.device.SetVolumeAction;
 import be.mira.adastra3.server.network.actions.device.ShutdownAction;
 import org.teleal.cling.controlpoint.ActionCallback;
@@ -34,7 +36,7 @@ public class DeviceControl extends Control {
     public DeviceControl(final RemoteService iService) throws NetworkException {
         super(iService);
         if (! iService.getServiceId().equals(cIdentifier)) {
-            throw new NetworkException("KioskControl instantiated for a non-KioskService");
+            throw new NetworkException("DeviceControl instantiated for a non-DeviceControl");
         }
     }
     
@@ -42,6 +44,26 @@ public class DeviceControl extends Control {
     //
     // Service actions
     //
+    
+    public final long getRevision() throws NetworkException {
+        GetRevisionAction tAction = new GetRevisionAction(getService());
+        
+        new ActionCallback.Default(
+                tAction,
+                Network.getControlPoint()
+        ).run();
+        
+        return tAction.getConfigurationRevision();
+    }
+    
+    public final void setRevision(long iConfigurationRevision) throws NetworkException {
+        SetRevisionAction tAction = new SetRevisionAction(getService(), iConfigurationRevision);
+        
+        new ActionCallback.Default(
+                tAction,
+                Network.getControlPoint()
+        ).run();
+    }
     
     public final void shutdown() throws NetworkException {
         ShutdownAction tAction = new ShutdownAction(getService());

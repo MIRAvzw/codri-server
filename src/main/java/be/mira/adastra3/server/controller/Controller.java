@@ -12,11 +12,11 @@ import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;
 import be.mira.adastra3.server.network.INetworkListener;
 import be.mira.adastra3.server.network.Network;
-import be.mira.adastra3.server.network.devices.Device;
+import be.mira.adastra3.server.network.entities.Entity;
 import be.mira.adastra3.server.repository.IRepositoryListener;
 import be.mira.adastra3.server.repository.Repository;
 import be.mira.adastra3.server.repository.configurations.Configuration;
-import be.mira.adastra3.server.repository.configurations.Kiosk30Configuration;
+import be.mira.adastra3.server.repository.configurations.KioskConfiguration;
 import be.mira.adastra3.server.repository.media.Media;
 
 /**
@@ -79,7 +79,7 @@ public class Controller extends Service implements INetworkListener, IRepository
         getLogger().info("Configuration added: " + iConfiguration.getId());
         
         // Check if there is a valid target device, and if so push the configuration
-        Device tDevice = null;
+        Entity tDevice = null;
         try {
             tDevice = Network.getInstance().getDevice(iConfiguration.getTarget());
             tDevice.setConfiguration(iConfiguration);
@@ -95,7 +95,7 @@ public class Controller extends Service implements INetworkListener, IRepository
         getLogger().info("Configuration updated: " + iConfiguration.getId());
         
         // Check if there is a valid target device, and if so update the configuration
-        Device tDevice = null;
+        Entity tDevice = null;
         try {
             tDevice = Network.getInstance().getDevice(iConfiguration.getTarget());
             tDevice.setConfiguration(iConfiguration);
@@ -150,7 +150,7 @@ public class Controller extends Service implements INetworkListener, IRepository
     }
 
     @Override
-    public final void doDeviceAdded(final Device iDevice) {
+    public final void doDeviceAdded(final Entity iDevice) {
         getLogger().info("MIRA device added to network: " + iDevice.getUuid());
         Repository tRepository = Repository.getInstance();
             
@@ -175,7 +175,7 @@ public class Controller extends Service implements INetworkListener, IRepository
     }
 
     @Override
-    public final void doDeviceRemoved(final Device iDevice) {
+    public final void doDeviceRemoved(final Entity iDevice) {
         getLogger().info("MIRA device removed from network: " + iDevice.getUuid());
     }
 }

@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package be.mira.adastra3.server.network.devices;
+package be.mira.adastra3.server.network.entities;
 
 import be.mira.adastra3.server.exceptions.DeviceException;
 import be.mira.adastra3.server.repository.configurations.Configuration;
@@ -13,7 +13,7 @@ import java.util.UUID;
  *
  * @author tim
  */
-abstract public class Device {
+abstract public class Entity {
     //
     // Member data
     //
@@ -27,17 +27,10 @@ abstract public class Device {
     // Construction and destruction
     //
     
-    public Device(final UUID iUuid) {
+    public Entity(final UUID iUuid) {
         mUuid = iUuid;
         setMark();
     }
-    
-    
-    //
-    // Configuration handling
-    //
-    
-    abstract public void setConfiguration(Configuration iConfiguration) throws DeviceException;
     
     
     //

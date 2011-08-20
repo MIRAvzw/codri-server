@@ -10,9 +10,9 @@ import be.mira.adastra3.server.exceptions.NetworkException;
 import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;
 import be.mira.adastra3.server.network.controls.DeviceControl;
-import be.mira.adastra3.server.network.controls.ApplicationControl;
-import be.mira.adastra3.server.network.devices.Device;
-import be.mira.adastra3.server.network.devices.Kiosk30;
+import be.mira.adastra3.server.network.controls.MediaControl;
+import be.mira.adastra3.server.network.entities.Entity;
+import be.mira.adastra3.server.network.entities.Kiosk;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -101,13 +101,13 @@ public class NetworkMonitor extends Service {
                         try {                        
                             // Extract services
                             RemoteService tServiceDevice = iDevice.findService(DeviceControl.cIdentifier);
-                            RemoteService tServiceApplication = iDevice.findService(ApplicationControl.cIdentifier);
+                            RemoteService tServiceApplication = iDevice.findService(MediaControl.cIdentifier);
                             if (tServiceDevice == null || tServiceApplication == null) {
                                 throw new NetworkException("an essential network service has not been found");
                             }
                             
                             // Create device
-                            Kiosk30 tDevice = new Kiosk30(tUuid, new DeviceControl(tServiceDevice), new ApplicationControl(tServiceApplication));
+                            Kiosk tDevice = new Kiosk(tUuid, new DeviceControl(tServiceDevice), new MediaControl(tServiceApplication));
                             tDevice.setName(iDevice.getDetails().getFriendlyName());
                             tNetwork.addDevice(tDevice);
                         } catch (NetworkException tException) {
@@ -138,7 +138,7 @@ public class NetworkMonitor extends Service {
                     
                     // Remove the device
                     try {
-                        Device tDevice = tNetwork.getDevice(tUuid); 
+                        Entity tDevice = tNetwork.getDevice(tUuid); 
                         tNetwork.removeDevice(tDevice);
                     } catch (NetworkException tException) {
                         tNetwork.emitError("could not remove a MIRA device", tException);
@@ -164,7 +164,7 @@ public class NetworkMonitor extends Service {
                     
                     // Update the device
                     try {
-                        Device tDevice = tNetwork.getDevice(tUuid);
+                        Entity tDevice = tNetwork.getDevice(tUuid);
                         tDevice.setMark();
                     } catch (NetworkException tException) {
                         tNetwork.emitError("could not update a MIRA device", tException);
