@@ -17,6 +17,7 @@ import be.mira.adastra3.server.repository.IRepositoryListener;
 import be.mira.adastra3.server.repository.Repository;
 import be.mira.adastra3.server.repository.configurations.Configuration;
 import be.mira.adastra3.server.repository.configurations.Kiosk30Configuration;
+import be.mira.adastra3.server.repository.media.Media;
 
 /**
  *
@@ -110,6 +111,27 @@ public class Controller extends Service implements INetworkListener, IRepository
         getLogger().info("Configuration removed: " + iConfiguration.getId());
         
         // TODO: Erase the configuration on the device
+    }
+    
+    @Override
+    public final void doMediaAdded(final Media iMedia) {
+        getLogger().info("Media added: " + iMedia.getId());
+        
+        // TODO
+    }
+
+    @Override
+    public final void doMediaUpdated(final Media iOldMedia, final Media iMedia) {
+        getLogger().info("Media updated: " + iMedia.getId());
+        
+        // TODO
+    }
+    
+    @Override
+    public final void doMediaRemoved(final Media iMedia) {
+        getLogger().info("Media removed: " + iMedia.getId());
+        
+        // TODO
     }
     
     

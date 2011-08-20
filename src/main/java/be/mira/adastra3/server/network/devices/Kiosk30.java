@@ -53,12 +53,22 @@ public class Kiosk30 extends Device {
         }
         Kiosk30Configuration tKioskConfiguration = (Kiosk30Configuration) iConfiguration;
         
+        // Check if the configuration isn't loaded yet
+        // TODO: this doesn't belong in the ApplicationControl
+        try {
+            if (iConfiguration.getRevision() == getApplicationControl().getConfigurationRevision()) {
+                return;
+            }
+        } catch (NetworkException tException) {
+            throw new DeviceException("could not check existing configuration revision");
+        }
+        
         // Manage the device
         DeviceConfiguration tDeviceConfiguration = tKioskConfiguration.getDevice();
         try {
             getDeviceControl().setVolume(tDeviceConfiguration.getSound().getVolume());
         } catch (NetworkException tException) {
-            throw new DeviceException("could not propagate device configuration", tException);
+            throw new DeviceException("could not push the device settings", tException);
         }
         
         // Manage the application
@@ -78,7 +88,15 @@ public class Kiosk30 extends Device {
                 getApplicationControl().setMedia(tMedia);
             }
         } catch (NetworkException tException) {
-            throw new DeviceException("could not propagate device configuration", tException);
+            throw new DeviceException("could not push the device settings", tException);
+        }
+        
+        // Save the configuration revision
+        // TODO: this doesn't belong in the ApplicationControl
+        try {
+            getApplicationControl().setConfigurationRevision(iConfiguration.getRevision());
+        } catch (NetworkException tException) {
+            throw new DeviceException("could not push the configuration revision");
         }
     }
     

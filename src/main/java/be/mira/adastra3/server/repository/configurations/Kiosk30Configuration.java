@@ -36,11 +36,11 @@ public final class Kiosk30Configuration extends Configuration {
     // Getters
     //
     
-    public DeviceConfiguration getDevice() {
+    public final DeviceConfiguration getDevice() {
         return mDevice;
     }
     
-    public ApplicationConfiguration getApplication() {
+    public final ApplicationConfiguration getApplication() {
         return mApplication;
     }
 }

@@ -10,11 +10,12 @@ import be.mira.adastra3.server.exceptions.RepositoryException;
 import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;
 import be.mira.adastra3.server.repository.configurations.Configuration;
-import be.mira.adastra3.server.repository.configurations.Kiosk30Configuration;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -24,6 +25,7 @@ import org.apache.commons.io.FileUtils;
 import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.Depth;
 import org.tigris.subversion.javahl.Info2;
+import org.tigris.subversion.javahl.InfoCallback;
 import org.tigris.subversion.javahl.Revision;
 import org.tigris.subversion.javahl.SVNClient;
 
@@ -43,6 +45,8 @@ public class RepositoryMonitor extends Service {
     private int mSVNMonitorInterval;
     
     private long mConfigurationRevision;
+    private long mMediaRevision;
+    private Map<String, Long> mMediaRevisions;
 
 
     //
@@ -52,19 +56,34 @@ public class RepositoryMonitor extends Service {
     private class Monitor extends TimerTask {
         @Override
         public void run() {
+            // Check the configurations
             try {
-                // Check configurations
                 getLogger().debug("Checking the configurations");
                 long tConfigurationsRevision = checkConfigurations();
                 if (mConfigurationRevision != tConfigurationsRevision) {
                     getLogger().info("Configurations changed to revision " + tConfigurationsRevision);
-                    mConfigurationRevision = getConfigurations();
+                    mConfigurationRevision = tConfigurationsRevision;
+                    getConfigurations();
                     processConfigurations();
                 }
             } catch (RepositoryException tException) {
-                Repository.getInstance().emitError("could not update repository", tException);
+                Repository.getInstance().emitError("could not update the configurations", tException);
+            }
+            
+            // Check the media
+            try {
+                getLogger().debug("Checking the media");
+                long tMediaRevision = checkMedia();
+                if (mMediaRevision != tMediaRevision) {
+                    getLogger().info("Media changed to revision " + tMediaRevision);
+                    mMediaRevision = tMediaRevision;
+                    processMedia();
+                }
+            } catch (RepositoryException tException) {
+                Repository.getInstance().emitError("could not update the media", tException);
             }
         }
+        
     }
     
     public class ConfigurationFilter implements FilenameFilter {
@@ -104,6 +123,9 @@ public class RepositoryMonitor extends Service {
         mSVNMonitorInterval = tInterval;
         getLogger().debug("Scheduling SVN monitor with interval of " + tInterval + " seconds");
         mSVNMonitor = new Timer();
+        
+        // Media revisions
+        mMediaRevisions = new HashMap<String, Long>();
     }
 
 
@@ -113,13 +135,22 @@ public class RepositoryMonitor extends Service {
 
     @Override
     public final void run() throws ServiceRunException {
-        // Do a checkout
+        // Get the configurations
         try {
             getLogger().debug("Checking out and processing the configurations");
             mConfigurationRevision = getConfigurations();
             processConfigurations();
         } catch (RepositoryException tException) {
-            throw new ServiceRunException("Could not fetch initial data", tException);
+            throw new ServiceRunException("could not fetch the configurations", tException);
+        }
+        
+        // Get the media
+        try {
+            getLogger().debug("Processing the media");
+            mConfigurationRevision = checkMedia();
+            processMedia();
+        } catch (RepositoryException tException) {
+            throw new ServiceRunException("could not fetch the media", tException);
         }
 
         // Schedule the monitor
@@ -239,6 +270,46 @@ public class RepositoryMonitor extends Service {
             }
         }
     }
+    
+    
+    //
+    // Media helpers
+    //
+    
+    public final long checkMedia() throws RepositoryException {
+        return getPathRevision("media");
+    }
+    
+    public final void processMedia() throws RepositoryException {
+        // TODO: maybe but in Repository as well?
+        
+        // Get the media names
+        getLogger().debug("Listing media");
+        Map<String, Long> tMedia = getChildrenRevisions("media");
+        for (String tMediaIdentifier: tMedia.keySet()) {
+            Long tMediaRevision = tMedia.get(tMediaIdentifier);
+            Long tOldMediaRevision = mMediaRevisions.get(tMediaIdentifier);
+            if (tOldMediaRevision == null) {
+                getLogger().debug("Media "
+                        + tMediaIdentifier
+                        + "seems new (rev "
+                        + tMediaRevision
+                        + "), trying to update");
+                // TODO
+                //tRepository.addConfiguration(tConfiguration);
+            } else if (tMediaRevision > tOldMediaRevision) {
+                getLogger().debug("Media "
+                        + tMediaIdentifier
+                        + " is a more recent version (rev "
+                        + tMediaRevision
+                        + ") of an existing configuration (rev "
+                        + tOldMediaRevision
+                        + "), updating the repository");
+                // TODO
+                //tRepository.updateConfiguration(tConfiguration);
+            }   
+        }
+    }
 
 
     //
@@ -246,26 +317,53 @@ public class RepositoryMonitor extends Service {
     //
     
     private long getPathRevision(final String iPath) throws RepositoryException {
-        try
-        {
-            Info2[] tInfoList = mSVNClient.info2(
+        try {
+            final List<Long> tRevisions = new ArrayList<Long>();
+            mSVNClient.info2(
                     mSVNLocation + "/" + iPath,
                     Revision.HEAD,
                     Revision.HEAD,
-                    false);
-            if (tInfoList.length != 1)
+                    1,
+                    null,
+                    new InfoCallback() {
+                        @Override
+                        public void singleInfo(Info2 iInfo) {
+                            tRevisions.add(iInfo.getLastChangedRev());
+                        }
+                    });
+            if (tRevisions.size() != 1)
                 throw new RepositoryException("unexpected amount of info entries");
-            long tRevision = tInfoList[0].getLastChangedRev();
-            getLogger().trace("Repository entry '" + iPath + "' is at revision " + tRevision);
-            return tRevision;
+            return tRevisions.get(0);
+        } catch (ClientException tException) {
+            throw new RepositoryException("could not check the repository", tException);
+        }
+    }
+    
+    private Map<String, Long> getChildrenRevisions(final String iPath) throws RepositoryException {
+        try {
+            final Map<String, Long> tChildren = new HashMap<String, Long>();
+            mSVNClient.info2(
+                    mSVNLocation + "/" + iPath,
+                    Revision.HEAD,
+                    Revision.HEAD,
+                    2,
+                    null,
+                    new InfoCallback() {
+                        @Override
+                        public void singleInfo(Info2 iInfo) {
+                            if (iInfo.getPath().equals(iPath))
+                                return;
+                            tChildren.put(iInfo.getPath(), iInfo.getLastChangedRev());
+                        }
+                    });
+            return tChildren;
         } catch (ClientException tException) {
             throw new RepositoryException("could not check the repository", tException);
         }
     }
 
-    private long checkoutRepository(final File iCheckout, final String iLocation) throws RepositoryException  {
-        try
-        {
+    private long checkoutRepository(final File iCheckout, final String iLocation) throws RepositoryException {
+        try {
             long tRevision = mSVNClient.checkout(
                     iLocation,
                     iCheckout.getAbsolutePath(),
@@ -273,9 +371,7 @@ public class RepositoryMonitor extends Service {
                     Revision.HEAD,
                     Depth.infinity,
                     false,
-                    false);
-            getLogger().trace("Checked revision " + tRevision + " from the repository at '" + iLocation + " out to '" + iCheckout);
-            
+                    false);            
             return tRevision;
         } catch (ClientException tException) {
             throw new RepositoryException("could not checkout the repository", tException);
@@ -283,8 +379,7 @@ public class RepositoryMonitor extends Service {
     }
     
     private long updateRepository(final File iCheckout) throws RepositoryException {
-        try
-        {
+        try {
             long tRevision = mSVNClient.update(
                     iCheckout.getAbsolutePath(),
                     Revision.HEAD,
@@ -292,7 +387,6 @@ public class RepositoryMonitor extends Service {
                     true,
                     false,
                     false);
-            getLogger().trace("Updated the repository at '" + iCheckout + "' to revision " + tRevision);
             return tRevision;
         } catch (ClientException tException) {
             throw new RepositoryException("could not update the repository", tException);
