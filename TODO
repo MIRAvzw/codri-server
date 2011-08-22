@@ -20,9 +20,6 @@ VERSION 0.9
 * Network subsystem
 
 * Repository subsystem
-  - GetMediaRevision & GetConfigurationRevision, zo geen redundant loads @
-    checkout
-    + wie checkt? server? methodes zelfde signatuur geven
 
 * OS
   - Deploy application on desktop
