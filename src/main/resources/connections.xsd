@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://www.mira.be"
+            xmlns="http://www.mira.be"
+            elementFormDefault="qualified">
+    <!--
+      The root element enumerates all connections.
+      -->
+    
+    <xsd:element name="connections" type="connectionsType" />
+    
+    <xsd:complexType name="connectionsType">
+        <xsd:sequence>
+            <xsd:element name="kioskconnection" type="kioskconnectionType" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+    
+    
+    <!--
+      A kiosk connection links together a single physical kiosk in the network,
+      a configuration preset, as well as the presentation it should display.
+      -->
+    
+    <xsd:complexType name="kioskconnectionType">
+        <xsd:sequence>
+            <xsd:element name="kiosk" type="UuidType" />
+            <xsd:element name="configuration" type="xsd:string" />
+            <xsd:element name="presentation" type="xsd:string" />
+        </xsd:sequence>
+    </xsd:complexType>
+    
+    <xsd:simpleType name="UuidType">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}" />
+        </xsd:restriction>
+    </xsd:simpleType>
+</xsd:schema>

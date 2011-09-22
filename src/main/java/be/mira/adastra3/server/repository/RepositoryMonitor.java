@@ -5,12 +5,13 @@
 
 package be.mira.adastra3.server.repository;
 
+import be.mira.adastra3.server.repository.processors.ConfigurationProcessor;
 import be.mira.adastra3.server.Service;
 import be.mira.adastra3.server.exceptions.RepositoryException;
 import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;
-import be.mira.adastra3.server.repository.configurations.Configuration;
-import be.mira.adastra3.server.repository.media.Media;
+import be.mira.adastra3.server.repository.configuration.Configuration;
+import be.mira.adastra3.server.repository.presentation.Presentation;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -223,7 +224,7 @@ public class RepositoryMonitor extends Service {
             final long tConfigurationRevision = getPathRevision("configurations/" + tConfigurationFile.getName());
             
             // Process the contents
-            ConfigurationReader tReader = new ConfigurationReader(tNameSimple, tConfigurationFile);
+            ConfigurationProcessor tReader = new ConfigurationProcessor(tNameSimple, tConfigurationFile);
             tReader.process();
             if (tReader.getConfiguration() != null) {
                 Configuration tConfiguration = tReader.getConfiguration();
@@ -286,13 +287,13 @@ public class RepositoryMonitor extends Service {
     public final void processMedia() throws RepositoryException {        
         // List the media
         getLogger().debug("Listing media");
-        Map<String, Media> tAllMedia = new HashMap<String, Media>();
+        Map<String, Presentation> tAllMedia = new HashMap<String, Presentation>();
         Map<String, Long> tPathEntries = getChildrenRevisions("media");
         for (String tName: tPathEntries.keySet()) {
             long tRevision = tPathEntries.get(tName);
             String tLocation = Repository.getInstance().getServer() + "/media/" + tName;
             
-            Media tMedia = new Media(tName, tLocation);
+            Presentation tMedia = new Presentation(tName, tLocation);
             tMedia.setRevision(tRevision);
             tAllMedia.put(tName, tMedia);
         }
@@ -300,7 +301,7 @@ public class RepositoryMonitor extends Service {
         // Submit the media        
         getLogger().debug("Submitting media");
         Repository tRepository = Repository.getInstance();
-        for (Media tOldMedia: tRepository.getAllMedia()) {
+        for (Presentation tOldMedia: tRepository.getAllMedia()) {
             if (! tAllMedia.containsKey(tOldMedia.getId())) {
                 getLogger().debug("Media "
                         + tOldMedia.getId()
@@ -310,9 +311,9 @@ public class RepositoryMonitor extends Service {
                 tRepository.removeMedia(tOldMedia);
             }
         }
-        for (Media tMedia : tAllMedia.values()) {
+        for (Presentation tMedia : tAllMedia.values()) {
             try {
-                Media tOldMedia = tRepository.getMedia(tMedia.getId());
+                Presentation tOldMedia = tRepository.getMedia(tMedia.getId());
                 if (tOldMedia == null) {
                     getLogger().debug("Media "
                             + tMedia.getId()

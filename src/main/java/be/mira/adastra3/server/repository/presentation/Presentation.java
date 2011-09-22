@@ -2,29 +2,30 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package be.mira.adastra3.server.repository.media;
+package be.mira.adastra3.server.repository.presentation;
+
+import be.mira.adastra3.server.repository.Repository;
+import be.mira.adastra3.server.repository.RepositoryEntity;
 
 /**
  *
  * @author tim
  */
-public class Media {
+public class Presentation extends RepositoryEntity {
     //
     // Member data
     //
     
     private String mId;
-    private String mLocation;
-    private Long mRevision;
     
     
     //
     // Construction and destruction
     //
     
-    public Media(final String iId, final String iLocation) {
+    public Presentation(final long iRevision, final String iPath, final String iId) {
+        super(iRevision, iPath);
         mId = iId;
-        mLocation = iLocation;
     }
     
     
@@ -37,14 +38,6 @@ public class Media {
     }
     
     public final String getLocation() {
-        return mLocation;
-    }
-    
-    public final long getRevision() {
-        return mRevision;
-    }
-    
-    public final void setRevision(final long iRevision) {
-        mRevision = iRevision;
+        return Repository.getInstance().getServer() + getPath();
     }
 }

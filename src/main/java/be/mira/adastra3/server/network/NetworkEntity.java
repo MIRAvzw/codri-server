@@ -2,10 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package be.mira.adastra3.server.network.entities;
+package be.mira.adastra3.server.network;
 
 import be.mira.adastra3.server.exceptions.DeviceException;
-import be.mira.adastra3.server.repository.configurations.Configuration;
+import be.mira.adastra3.server.repository.configuration.Configuration;
 import java.util.Date;
 import java.util.UUID;
 
@@ -13,7 +13,7 @@ import java.util.UUID;
  *
  * @author tim
  */
-abstract public class Entity {
+abstract public class NetworkEntity {
     //
     // Member data
     //
@@ -27,7 +27,7 @@ abstract public class Entity {
     // Construction and destruction
     //
     
-    public Entity(final UUID iUuid) {
+    public NetworkEntity(final UUID iUuid) {
         mUuid = iUuid;
         setMark();
     }

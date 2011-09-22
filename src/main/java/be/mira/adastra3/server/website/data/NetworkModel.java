@@ -7,7 +7,7 @@ package be.mira.adastra3.server.website.data;
 import be.mira.adastra3.server.exceptions.NetworkException;
 import be.mira.adastra3.server.network.INetworkListener;
 import be.mira.adastra3.server.network.Network;
-import be.mira.adastra3.server.network.entities.Entity;
+import be.mira.adastra3.server.network.NetworkEntity;
 import eu.webtoolkit.jwt.ItemFlag;
 import eu.webtoolkit.jwt.WModelIndex;
 import java.util.Arrays;
@@ -26,7 +26,7 @@ public class NetworkModel extends TreeModel<NetworkItem> implements INetworkList
     
     private Network mNetwork = Network.getInstance();
     private SectionItem mSectionServers, mSectionKiosks;
-    private Map<Entity, NetworkItem> mDevices;
+    private Map<NetworkEntity, NetworkItem> mDevices;
     
     
     //
@@ -40,11 +40,11 @@ public class NetworkModel extends TreeModel<NetworkItem> implements INetworkList
         mSectionServers = getRoot().addSection("Servers");
         mSectionKiosks = getRoot().addSection("Kiosks");
         
-        mDevices = new HashMap<Entity, NetworkItem>();
+        mDevices = new HashMap<NetworkEntity, NetworkItem>();
     }
     
     public final void attach() {
-        for (Entity tDevice : mNetwork.getDevices()) {
+        for (NetworkEntity tDevice : mNetwork.getDevices()) {
             WModelIndex tIndex = getIndex(mSectionKiosks.getRow(), 0);
             NetworkItem tNetworkItem = new NetworkItem(tDevice, mSectionKiosks);                
             mDevices.put(tDevice, tNetworkItem);
@@ -63,11 +63,11 @@ public class NetworkModel extends TreeModel<NetworkItem> implements INetworkList
     //
 
     @Override
-    public final void doEntityAdded(final Entity iDevice) {        
+    public final void doEntityAdded(final NetworkEntity iDevice) {        
         DeferredExecution.cDeferrees.add(new DeferredExecution() {
-            private Entity mDevice;
+            private NetworkEntity mDevice;
             
-            public DeferredExecution construct(final Entity iDevice) {
+            public DeferredExecution construct(final NetworkEntity iDevice) {
                 mDevice = iDevice;
                 return this;
             }
@@ -83,11 +83,11 @@ public class NetworkModel extends TreeModel<NetworkItem> implements INetworkList
     }
 
     @Override
-    public final void doEntityRemoved(final Entity iDevice) {        
+    public final void doEntityRemoved(final NetworkEntity iDevice) {        
         DeferredExecution.cDeferrees.add(new DeferredExecution() {
-            private Entity mDevice;
+            private NetworkEntity mDevice;
             
-            public DeferredExecution construct(final Entity iDevice) {
+            public DeferredExecution construct(final NetworkEntity iDevice) {
                 mDevice = iDevice;
                 return this;
             }

@@ -5,7 +5,6 @@
 package be.mira.adastra3.server.network;
 
 import be.mira.adastra3.server.exceptions.NetworkException;
-import be.mira.adastra3.server.network.entities.Entity;
 
 /**
  *
@@ -14,6 +13,6 @@ import be.mira.adastra3.server.network.entities.Entity;
 public interface INetworkListener {
     void doNetworkError(String iMessage, NetworkException iException);
     void doNetworkWarning(String iMessage);
-    void doEntityAdded(Entity iDevice);
-    void doEntityRemoved(Entity iDevice);
+    void doEntityAdded(NetworkEntity iDevice);
+    void doEntityRemoved(NetworkEntity iDevice);
 }

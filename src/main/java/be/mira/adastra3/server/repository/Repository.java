@@ -6,8 +6,8 @@
 package be.mira.adastra3.server.repository;
 
 import be.mira.adastra3.server.exceptions.RepositoryException;
-import be.mira.adastra3.server.repository.configurations.Configuration;
-import be.mira.adastra3.server.repository.media.Media;
+import be.mira.adastra3.server.repository.configuration.Configuration;
+import be.mira.adastra3.server.repository.presentation.Presentation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -24,7 +24,7 @@ public final class Repository {
     //
     
     private Map<String, Configuration> mConfigurations;
-    private Map<String, Media> mMedia;
+    private Map<String, Presentation> mMedia;
     private List<IRepositoryListener> mListeners;
     private String mServer;
 
@@ -49,7 +49,7 @@ public final class Repository {
 
     private Repository() {
         mConfigurations = new HashMap<String, Configuration>();
-        mMedia = new HashMap<String, Media>();
+        mMedia = new HashMap<String, Presentation>();
         mListeners = new ArrayList<IRepositoryListener>();
     }
 
@@ -107,15 +107,15 @@ public final class Repository {
         emitConfigurationRemoved(iConfiguration);
     }
     
-    public Collection<Media> getAllMedia() {
+    public Collection<Presentation> getAllMedia() {
         return mMedia.values();
     }
 
-    public Media getMedia(final String iName) {
+    public Presentation getMedia(final String iName) {
         return mMedia.get(iName);
     }
 
-    public void addMedia(final Media iMedia) throws RepositoryException {
+    public void addMedia(final Presentation iMedia) throws RepositoryException {
         if (mMedia.containsKey(iMedia.getId())) {
             throw new RepositoryException("configuration " + iMedia.getId() + " already present in repository");
         }
@@ -123,15 +123,15 @@ public final class Repository {
         emitMediaAdded(iMedia);
     }
     
-    public void updateMedia(final Media iMedia) throws RepositoryException {
+    public void updateMedia(final Presentation iMedia) throws RepositoryException {
         if (! mMedia.containsKey(iMedia.getId())) {
             throw new RepositoryException("configuration " + iMedia.getId() + " not present in repository");
         }
-        Media tOldMedia = mMedia.put(iMedia.getId(), iMedia);
+        Presentation tOldMedia = mMedia.put(iMedia.getId(), iMedia);
         emitMediaUpdated(tOldMedia, iMedia);
     }
 
-    public void removeMedia(final Media iMedia) throws RepositoryException {
+    public void removeMedia(final Presentation iMedia) throws RepositoryException {
         if (! mMedia.containsKey(iMedia.getId())) {
             throw new RepositoryException("configuration " + iMedia.getId() + " not present in repository");
         }
@@ -174,21 +174,21 @@ public final class Repository {
         }
     }
     
-    private void emitMediaAdded(final Media iMedia) {
+    private void emitMediaAdded(final Presentation iMedia) {
         for (IRepositoryListener tListener : mListeners) {
-            tListener.doMediaAdded(iMedia);
+            tListener.doPresentationAdded(iMedia);
         }
     }
     
-    private void emitMediaUpdated(final Media iOldMedia, final Media iMedia) {
+    private void emitMediaUpdated(final Presentation iOldMedia, final Presentation iMedia) {
         for (IRepositoryListener tListener : mListeners) {
-            tListener.doMediaUpdated(iOldMedia, iMedia);
+            tListener.doPresentationUpdated(iOldMedia, iMedia);
         }
     }
     
-    private void emitMediaRemoved(final Media iMedia) {
+    private void emitMediaRemoved(final Presentation iMedia) {
         for (IRepositoryListener tListener : mListeners) {
-            tListener.doMediaRemoved(iMedia);
+            tListener.doPresentationRemoved(iMedia);
         }
     }
 }

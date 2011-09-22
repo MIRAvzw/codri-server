@@ -4,50 +4,22 @@
             xmlns="http://www.mira.be"
             elementFormDefault="qualified">
     <!--
-      The root element bundles all possible entry elements for the XML files.
+      The configuration object contains all configurable paramters.
       -->
     
     <xsd:element name="configuration" type="configurationType" />
     
-    <!--
-      The configuration object is the root of the file, and contains all possible
-      child objects. Depending on the "type" attribute, differend configuration
-      objects are created.
-      -->
-    
     <xsd:complexType name="configurationType">
         <xsd:sequence>
-            <xsd:element name="target" type="UuidType" minOccurs="0" />
-            <xsd:element name="device" type="deviceType" minOccurs="0" />
-            <xsd:element name="media" type="mediaType" minOccurs="0" />
+            <xsd:element name="sound" type="soundType" minOccurs="0" />  
         </xsd:sequence>
-        <xsd:attribute name="type" type="typeType" use="required" />
     </xsd:complexType>
-    
-    <xsd:simpleType name="UuidType">
-        <xsd:restriction base="xsd:string">
-            <xsd:pattern value="[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}" />
-        </xsd:restriction>
-    </xsd:simpleType>
-    
-    <xsd:simpleType name="typeType">
-        <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="kiosk"/>
-        </xsd:restriction>
-    </xsd:simpleType>
     
     
     <!--
-      A device represents an integral piece of hard- and software within the 
-      network. It is mapped 1 on 1 with a UPnP device, and as such has a 
-      unique identifier used to distinguish it within the network.
+      The sound elements configures all aspects of the device its sound playback
+      capabilities.
       -->
-    
-    <xsd:complexType name="deviceType">
-        <xsd:sequence>
-            <xsd:element name="sound" type="soundType" minOccurs="0" />     
-        </xsd:sequence>
-    </xsd:complexType>
 
     <xsd:complexType name="soundType">
         <xsd:sequence>
@@ -60,16 +32,4 @@
             <xsd:maxInclusive value="255"/>
         </xsd:restriction>
     </xsd:simpleType>
-    
-    
-    <!--
-      The media element represents the media on a kiosk. It is the
-      configuration counterpart of the MediaService UPnP service.
-      -->
-
-    <xsd:complexType name="mediaType">
-        <xsd:sequence>
-            <xsd:element name="name" type="xsd:string" />    
-        </xsd:sequence>
-    </xsd:complexType>
 </xsd:schema>

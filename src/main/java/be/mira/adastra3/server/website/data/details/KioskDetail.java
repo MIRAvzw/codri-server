@@ -5,9 +5,9 @@
 package be.mira.adastra3.server.website.data.details;
 
 import be.mira.adastra3.server.exceptions.NetworkException;
-import be.mira.adastra3.server.network.controls.MediaControl;
-import be.mira.adastra3.server.network.entities.Kiosk;
-import be.mira.adastra3.server.repository.media.Media;
+import be.mira.adastra3.server.network.controls.PresentationControl;
+import be.mira.adastra3.server.network.Kiosk;
+import be.mira.adastra3.server.repository.presentation.Presentation;
 import eu.webtoolkit.jwt.Signal;
 import eu.webtoolkit.jwt.Signal1;
 import eu.webtoolkit.jwt.Signal2;
@@ -162,7 +162,7 @@ public class KioskDetail extends WContainerWidget {
         public void trigger() {
             try {
                 debug().trigger("getting device revision");
-                mDeviceRevision.setText(String.valueOf(mKiosk.getDeviceControl().getRevision()));
+                mDeviceRevision.setText(String.valueOf(mKiosk.getConfigurationControl().getRevision()));
             } catch (NetworkException tException) {
                 mEventError.trigger("coult not get device revision", tException);
             }
@@ -175,7 +175,7 @@ public class KioskDetail extends WContainerWidget {
             try {
                 debug().trigger("setting device volume to " + mDeviceVolume.getText());
                 Integer tVolume = Integer.parseInt(mDeviceVolume.getText());
-                mKiosk.getDeviceControl().setVolume(tVolume);
+                mKiosk.getConfigurationControl().setVolume(tVolume);
             } catch (NumberFormatException tException) {
                 mEventError.trigger("invalid volume specified", tException);
             } catch (NetworkException tException) {
@@ -189,7 +189,7 @@ public class KioskDetail extends WContainerWidget {
         public void trigger() {
             try {
                 debug().trigger("requesting device volume");
-                mDeviceVolume.setText(mKiosk.getDeviceControl().getVolume().toString());
+                mDeviceVolume.setText(mKiosk.getConfigurationControl().getVolume().toString());
             } catch (NetworkException tException) {
                 mEventError.trigger("coult not get device volume", tException);
             }
@@ -201,7 +201,7 @@ public class KioskDetail extends WContainerWidget {
         public void trigger() {
             try {
                 debug().trigger("measuring device latency");
-                mDeviceLatency.setText(String.valueOf(mKiosk.getDeviceControl().ping()) + " ms");
+                mDeviceLatency.setText(String.valueOf(mKiosk.getConfigurationControl().ping()) + " ms");
             } catch (NetworkException tException) {
                 mEventError.trigger("coult not measure device latency", tException);
             }
@@ -221,7 +221,7 @@ public class KioskDetail extends WContainerWidget {
         public void trigger() {
             try {
                 debug().trigger("rebooting device");
-                mKiosk.getDeviceControl().reboot();
+                mKiosk.getConfigurationControl().reboot();
             } catch (NetworkException tException) {
                 mEventError.trigger("coult not reboot device", tException);
             }
@@ -233,7 +233,7 @@ public class KioskDetail extends WContainerWidget {
         public void trigger() {
             try {
                 debug().trigger("shutting device down");
-                mKiosk.getDeviceControl().shutdown();
+                mKiosk.getConfigurationControl().shutdown();
             } catch (NetworkException tException) {
                 mEventError.trigger("coult not shutdown device", tException);
             }
@@ -245,7 +245,7 @@ public class KioskDetail extends WContainerWidget {
         public void trigger() {
             try {
                 debug().trigger("getting media revision");
-                mMediaRevision.setText(String.valueOf(mKiosk.getMediaControl().getRevision()));
+                mMediaRevision.setText(String.valueOf(mKiosk.getPresentationControl().getRevision()));
             } catch (NetworkException tException) {
                 mEventError.trigger("coult not get media revision", tException);
             }
@@ -257,7 +257,7 @@ public class KioskDetail extends WContainerWidget {
         public void trigger() {
             try {
                 debug().trigger("getting media location");
-                mMediaLocation.setText(mKiosk.getMediaControl().getLocation());
+                mMediaLocation.setText(mKiosk.getPresentationControl().getLocation());
             } catch (NetworkException tException) {
                 mEventError.trigger("coult not get media location", tException);
             }
@@ -269,7 +269,7 @@ public class KioskDetail extends WContainerWidget {
         public void trigger() {
             try {
                 debug().trigger("setting media location to " + mMediaLocation.getText());
-                mKiosk.getMediaControl().setLocation(mMediaLocation.getText());
+                mKiosk.getPresentationControl().setLocation(mMediaLocation.getText());
             } catch (NetworkException tException) {
                 mEventError.trigger("coult not set media location", tException);
             }

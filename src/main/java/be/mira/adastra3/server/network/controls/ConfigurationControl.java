@@ -21,7 +21,7 @@ import org.teleal.cling.model.types.ServiceId;
  *
  * @author tim
  */
-public class DeviceControl extends Control {
+public class ConfigurationControl extends Control {
     //
     // Data members
     //
@@ -33,7 +33,7 @@ public class DeviceControl extends Control {
     // Construction and destruction
     //
 
-    public DeviceControl(final RemoteService iService) throws NetworkException {
+    public ConfigurationControl(final RemoteService iService) throws NetworkException {
         super(iService);
         if (! iService.getServiceId().equals(cIdentifier)) {
             throw new NetworkException("DeviceControl instantiated for a non-DeviceControl");

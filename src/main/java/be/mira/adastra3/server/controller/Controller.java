@@ -12,13 +12,12 @@ import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;
 import be.mira.adastra3.server.network.INetworkListener;
 import be.mira.adastra3.server.network.Network;
-import be.mira.adastra3.server.network.entities.Entity;
-import be.mira.adastra3.server.network.entities.Kiosk;
+import be.mira.adastra3.server.network.NetworkEntity;
+import be.mira.adastra3.server.network.Kiosk;
 import be.mira.adastra3.server.repository.IRepositoryListener;
 import be.mira.adastra3.server.repository.Repository;
-import be.mira.adastra3.server.repository.configurations.Configuration;
-import be.mira.adastra3.server.repository.configurations.KioskConfiguration;
-import be.mira.adastra3.server.repository.media.Media;
+import be.mira.adastra3.server.repository.configuration.Configuration;
+import be.mira.adastra3.server.repository.presentation.Presentation;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,7 +66,7 @@ public class Controller extends Service implements INetworkListener, IRepository
     // Repository listener interface
     //
     
-    // TODO: the doRepository as well as doMedia(Update|Added) functions are
+    // TODO: the doRepository as well as doPresentation(Update|Added) functions are
     //       quite similar, it would be nice to deduplicate this code&
 
     @Override
@@ -85,7 +84,7 @@ public class Controller extends Service implements INetworkListener, IRepository
         getLogger().info("Configuration added: " + iConfiguration.getId());
         
         // Check if there is a valid target device, and if so push the configuration
-        Entity tDevice = null;
+        NetworkEntity tDevice = null;
         try {
             tDevice = Network.getInstance().getDevice(iConfiguration.getTarget());
             if (tDevice != null) {
@@ -103,7 +102,7 @@ public class Controller extends Service implements INetworkListener, IRepository
         getLogger().info("Configuration updated: " + iConfiguration.getId());
         
         // Check if there is a valid target device, and if so update the configuration
-        Entity tDevice = null;
+        NetworkEntity tDevice = null;
         try {
             tDevice = Network.getInstance().getDevice(iConfiguration.getTarget());
             if (tDevice != null) {
@@ -124,30 +123,30 @@ public class Controller extends Service implements INetworkListener, IRepository
     }
     
     @Override
-    public final void doMediaAdded(final Media iMedia) {
-        getLogger().info("Media added: " + iMedia.getId());
+    public final void doPresentationAdded(final Presentation iPresentation) {
+        getLogger().info("Presentation added: " + iPresentation.getId());
         
-        List<KioskConfiguration> tKioskConfigurations = findKioskConfigurationsByMedia(iMedia);
+        List<KioskConfiguration> tKioskConfigurations = findKioskConfigurationsByPresentation(iPresentation);
         if (tKioskConfigurations.size() == 0) {
-            getLogger().warn("Media " + iMedia.getId() + " is not referred to by any configuration");
+            getLogger().warn("Presentation " + iPresentation.getId() + " is not referred to by any configuration");
         }
         for (KioskConfiguration tKioskConfiguration: tKioskConfigurations) {
-            Entity tEntity = Network.getInstance().getDevice(tKioskConfiguration.getTarget());
+            NetworkEntity tEntity = Network.getInstance().getDevice(tKioskConfiguration.getTarget());
             if (tEntity != null) {
                 try {
-                    getLogger().debug("Media "
-                            + iMedia.getId()
+                    getLogger().debug("Presentation "
+                            + iPresentation.getId()
                             + " is in use by network entity "
                             + tEntity.getName() +
                             ", resubmitting");
                     if (tEntity instanceof Kiosk) {
-                        ((Kiosk)tEntity).setMedia(iMedia);
+                        ((Kiosk)tEntity).setPresentation(iPresentation);
                     } else {
                         getLogger().error("Cannot update media, unknown network entity");
                     }
                 } catch (DeviceException tException) {
                     getLogger().error("Could not set media "
-                            + iMedia.getId()
+                            + iPresentation.getId()
                             + " on device "
                             + tEntity.getName());
                 }
@@ -156,30 +155,30 @@ public class Controller extends Service implements INetworkListener, IRepository
     }
 
     @Override
-    public final void doMediaUpdated(final Media iOldMedia, final Media iMedia) {
-        getLogger().info("Media updated: " + iMedia.getId());
+    public final void doPresentationUpdated(final Presentation iOldPresentation, final Presentation iPresentation) {
+        getLogger().info("Presentation updated: " + iPresentation.getId());
         
-        List<KioskConfiguration> tKioskConfigurations = findKioskConfigurationsByMedia(iMedia);
+        List<KioskConfiguration> tKioskConfigurations = findKioskConfigurationsByPresentation(iPresentation);
         if (tKioskConfigurations.size() == 0) {
-            getLogger().warn("Media " + iMedia.getId() + " is not referred to by any configuration");
+            getLogger().warn("Presentation " + iPresentation.getId() + " is not referred to by any configuration");
         }
         for (KioskConfiguration tKioskConfiguration: tKioskConfigurations) {
-            Entity tEntity = Network.getInstance().getDevice(tKioskConfiguration.getTarget());
+            NetworkEntity tEntity = Network.getInstance().getDevice(tKioskConfiguration.getTarget());
             if (tEntity != null) {
                 try {
-                    getLogger().debug("Media "
-                            + iMedia.getId()
+                    getLogger().debug("Presentation "
+                            + iPresentation.getId()
                             + " is in use by network entity "
                             + tEntity.getName() +
                             ", resubmitting");
                     if (tEntity instanceof Kiosk) {
-                        ((Kiosk)tEntity).setMedia(iMedia);
+                        ((Kiosk)tEntity).setPresentation(iPresentation);
                     } else {
                         getLogger().error("Cannot update media, unknown network entity");
                     }
                 } catch (DeviceException tException) {
                     getLogger().error("Could not set media "
-                            + iMedia.getId()
+                            + iPresentation.getId()
                             + " on device "
                             + tEntity.getName());
                 }
@@ -188,19 +187,19 @@ public class Controller extends Service implements INetworkListener, IRepository
     }
     
     @Override
-    public final void doMediaRemoved(final Media iMedia) {
-        getLogger().info("Media removed: " + iMedia.getId());
+    public final void doPresentationRemoved(final Presentation iPresentation) {
+        getLogger().info("Presentation removed: " + iPresentation.getId());
         
         // TODO
     }
     
-    private List<KioskConfiguration> findKioskConfigurationsByMedia(final Media iMedia) {
+    private List<KioskConfiguration> findKioskConfigurationsByPresentation(final Presentation iPresentation) {
         List<KioskConfiguration> tKioskConfigurations = new ArrayList<KioskConfiguration>();
         
         for (Configuration tConfiguration: Repository.getInstance().getAllConfigurations()) {
             if (tConfiguration instanceof KioskConfiguration) {
                 KioskConfiguration tKioskConfiguration = (KioskConfiguration) tConfiguration;
-                if (tKioskConfiguration.getMediaConfiguration().getName().equals(iMedia.getId())) {
+                if (tKioskConfiguration.getPresentationConfiguration().getName().equals(iPresentation.getId())) {
                     tKioskConfigurations.add(tKioskConfiguration);
                 }
             }
@@ -225,7 +224,7 @@ public class Controller extends Service implements INetworkListener, IRepository
     }
 
     @Override
-    public final void doEntityAdded(final Entity iEntity) {
+    public final void doEntityAdded(final NetworkEntity iEntity) {
         getLogger().info("MIRA network entity added: " + iEntity.getUuid());
         Repository tRepository = Repository.getInstance();
             
@@ -250,7 +249,7 @@ public class Controller extends Service implements INetworkListener, IRepository
     }
 
     @Override
-    public final void doEntityRemoved(final Entity iEntity) {
+    public final void doEntityRemoved(final NetworkEntity iEntity) {
         getLogger().info("MIRA network entity removed: " + iEntity.getUuid());
     }
 }

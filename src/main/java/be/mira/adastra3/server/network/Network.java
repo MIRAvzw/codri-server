@@ -6,7 +6,6 @@ package be.mira.adastra3.server.network;
 
 import be.mira.adastra3.server.network.cling.CompatUpnpServiceConfiguration;
 import be.mira.adastra3.server.exceptions.NetworkException;
-import be.mira.adastra3.server.network.entities.Entity;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -26,7 +25,7 @@ public final class Network {
     // Member data
     //
     
-    private Map<UUID, Entity> mDevices;
+    private Map<UUID, NetworkEntity> mDevices;
     private UpnpService mUpnpService;
     private List<INetworkListener> mListeners;
 
@@ -52,11 +51,11 @@ public final class Network {
     private Network() {
         // HACK
         if (System.getProperty("java.vendor").equals("Oracle Corporation")) {
-            mDevices = new HashMap<UUID, Entity>();
+            mDevices = new HashMap<UUID, NetworkEntity>();
             mUpnpService = new UpnpServiceImpl();
             mListeners = new ArrayList<INetworkListener>();            
         } else if (System.getProperty("java.vendor").equals("GNU Classpath")) {
-            mDevices = new HashMap<UUID, Entity>();
+            mDevices = new HashMap<UUID, NetworkEntity>();
             mUpnpService = new UpnpServiceImpl(new CompatUpnpServiceConfiguration());
             mListeners = new ArrayList<INetworkListener>();           
         } else {
@@ -85,15 +84,15 @@ public final class Network {
         return mUpnpService;
     }
     
-    public Collection<Entity> getDevices() {
+    public Collection<NetworkEntity> getDevices() {
         return mDevices.values();
     }
     
-    public Entity getDevice(final UUID iUuid) {
+    public NetworkEntity getDevice(final UUID iUuid) {
         return mDevices.get(iUuid);
     }
     
-    public void addDevice(final Entity iDevice) throws NetworkException{
+    public void addDevice(final NetworkEntity iDevice) throws NetworkException{
         if (mDevices.containsKey(iDevice.getUuid())) {
             throw new NetworkException("device " + iDevice.getUuid() + " already present in network");
         }
@@ -101,7 +100,7 @@ public final class Network {
         emitDeviceAdded(iDevice);
     }
     
-    public void removeDevice(final Entity iDevice) throws NetworkException {
+    public void removeDevice(final NetworkEntity iDevice) throws NetworkException {
         if (!mDevices.containsKey(iDevice.getUuid())) {
             throw new NetworkException("device " + iDevice.getUuid() + " not present in network");
         }
@@ -126,13 +125,13 @@ public final class Network {
         }
     }
     
-    private void emitDeviceAdded(final Entity iDevice) {
+    private void emitDeviceAdded(final NetworkEntity iDevice) {
         for (INetworkListener tListener : mListeners) {
             tListener.doEntityAdded(iDevice);
         }
     }
     
-    private void emitDeviceRemoved(final Entity iDevice) {
+    private void emitDeviceRemoved(final NetworkEntity iDevice) {
         for (INetworkListener tListener : mListeners) {
             tListener.doEntityRemoved(iDevice);
         }        

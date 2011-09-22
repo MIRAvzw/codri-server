@@ -75,4 +75,8 @@ public abstract class Service {
     final protected Logger getLogger() {
         return mLogger;
     }
+    
+    final public static Logger getLogger(Object iObject) {
+        return Logger.getLogger(iObject.getClass());
+    }
 }

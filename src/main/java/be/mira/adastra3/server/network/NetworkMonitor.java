@@ -9,10 +9,8 @@ import be.mira.adastra3.server.Service;
 import be.mira.adastra3.server.exceptions.NetworkException;
 import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;
-import be.mira.adastra3.server.network.controls.DeviceControl;
-import be.mira.adastra3.server.network.controls.MediaControl;
-import be.mira.adastra3.server.network.entities.Entity;
-import be.mira.adastra3.server.network.entities.Kiosk;
+import be.mira.adastra3.server.network.controls.ConfigurationControl;
+import be.mira.adastra3.server.network.controls.PresentationControl;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -100,14 +98,14 @@ public class NetworkMonitor extends Service {
                         
                         try {                        
                             // Extract services
-                            RemoteService tServiceDevice = iDevice.findService(DeviceControl.cIdentifier);
-                            RemoteService tServiceApplication = iDevice.findService(MediaControl.cIdentifier);
+                            RemoteService tServiceDevice = iDevice.findService(ConfigurationControl.cIdentifier);
+                            RemoteService tServiceApplication = iDevice.findService(PresentationControl.cIdentifier);
                             if (tServiceDevice == null || tServiceApplication == null) {
                                 throw new NetworkException("an essential network service has not been found");
                             }
                             
                             // Create device
-                            Kiosk tDevice = new Kiosk(tUuid, new DeviceControl(tServiceDevice), new MediaControl(tServiceApplication));
+                            Kiosk tDevice = new Kiosk(tUuid, new ConfigurationControl(tServiceDevice), new PresentationControl(tServiceApplication));
                             tDevice.setName(iDevice.getDetails().getFriendlyName());
                             tNetwork.addDevice(tDevice);
                         } catch (NetworkException tException) {
@@ -138,7 +136,7 @@ public class NetworkMonitor extends Service {
                     
                     // Remove the device
                     try {
-                        Entity tDevice = tNetwork.getDevice(tUuid); 
+                        NetworkEntity tDevice = tNetwork.getDevice(tUuid); 
                         if (tDevice != null) {
                             tNetwork.removeDevice(tDevice);
                         }
@@ -165,7 +163,7 @@ public class NetworkMonitor extends Service {
                     }
                     
                     // Update the device
-                    Entity tDevice = tNetwork.getDevice(tUuid);
+                    NetworkEntity tDevice = tNetwork.getDevice(tUuid);
                     if (tDevice != null) {
                         tDevice.setMark();
                     }

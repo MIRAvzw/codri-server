@@ -4,8 +4,8 @@
  */
 package be.mira.adastra3.server.website.data;
 
-import be.mira.adastra3.server.network.entities.Entity;
-import be.mira.adastra3.server.network.entities.Kiosk;
+import be.mira.adastra3.server.network.NetworkEntity;
+import be.mira.adastra3.server.network.Kiosk;
 import be.mira.adastra3.server.website.auxiliary.Signal1Bubbler;
 import be.mira.adastra3.server.website.auxiliary.Signal2Bubbler;
 import be.mira.adastra3.server.website.data.details.KioskDetail;
@@ -110,7 +110,7 @@ public class NetworkDetail extends WStackedWidget {
             return;
         }
         
-        Entity tDevice = iNetworkItem.getDevice();
+        NetworkEntity tDevice = iNetworkItem.getDevice();
         if (tDevice instanceof Kiosk) {
             Kiosk tKiosk = (Kiosk) tDevice;
             mDetailKiosk.loadKiosk(tKiosk);

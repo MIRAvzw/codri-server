@@ -17,7 +17,7 @@ import org.teleal.cling.model.types.ServiceId;
  *
  * @author tim
  */
-public class MediaControl extends Control {
+public class PresentationControl extends Control {
     //
     // Data members
     //
@@ -29,7 +29,7 @@ public class MediaControl extends Control {
     // Construction and destruction
     //
 
-    public MediaControl(final RemoteService iService) throws NetworkException {
+    public PresentationControl(final RemoteService iService) throws NetworkException {
         super(iService);
         if (! iService.getServiceId().equals(cIdentifier)) {
             throw new NetworkException("MediaControl instantiated for a non-MediaService");
