@@ -61,7 +61,7 @@ public class Kiosk extends NetworkEntity {
         }
     }
     
-    public final void setMedia(final Presentation iPresentation) throws DeviceException {
+    public final void setPresentation(final Presentation iPresentation) throws DeviceException {
         // Fetch the current revision
         long tCurrentRevision;
         try {

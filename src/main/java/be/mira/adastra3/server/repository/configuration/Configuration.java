@@ -15,16 +15,14 @@ public class Configuration extends RepositoryEntity {
     // Member data
     //
     
-    private String mId;
     private SoundConfiguration mSoundConfiguration;
     
     //
     // Construction and destruction
     //
     
-    public Configuration(final long iRevision, final String iPath, final String iId, final SoundConfiguration iSoundConfiguration) {
-        super(iRevision, iPath);
-        mId = iId;
+    public Configuration(final String iId, final long iRevision, final String iPath, final SoundConfiguration iSoundConfiguration) {
+        super(iId, iRevision, iPath);
         mSoundConfiguration = iSoundConfiguration;
     }
     
@@ -32,10 +30,6 @@ public class Configuration extends RepositoryEntity {
     //
     // Getters and setters
     //
-
-    public final String getId() {
-        return mId;
-    }
     
     public final SoundConfiguration getSoundConfiguration() {
         return mSoundConfiguration;

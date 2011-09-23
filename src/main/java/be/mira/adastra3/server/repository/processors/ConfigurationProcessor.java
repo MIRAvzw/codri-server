@@ -31,8 +31,8 @@ public class ConfigurationProcessor extends Processor {
     // Construction and destruction
     //
     
-    public ConfigurationProcessor(final long iRevision, final String iPath, final String iId, final File iConfigurationFile) throws RepositoryException {
-        super(iConfigurationFile, "configuration.xsd");
+    public ConfigurationProcessor(final long iRevision, final String iPath, final String iId, final File iFile) throws RepositoryException {
+        super(iFile, "configuration.xsd");
         mRevision = iRevision;
         mPath = iPath;
         mId = iId;
@@ -104,9 +104,9 @@ public class ConfigurationProcessor extends Processor {
         // Create the object
         // TODO: null check of soundconfiguration? can it be missing?
         Configuration tConfiguration = new Configuration(
+                mId,
                 mRevision,
                 mPath,
-                mId,
                 tSoundConfiguration);
         return tConfiguration;
     }

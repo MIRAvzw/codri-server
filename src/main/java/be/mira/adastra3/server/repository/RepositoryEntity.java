@@ -13,15 +13,17 @@ public abstract class RepositoryEntity {
     // Member data
     //
     
-    private long mRevision;
-    private String mPath;
+    private final String mId;
+    private final long mRevision;
+    private final String mPath;
     
     
     //
     // Construction and destruction
     //
     
-    public RepositoryEntity(final long iRevision, final String iPath) {
+    public RepositoryEntity(final String iId, final long iRevision, final String iPath) {
+        mId = iId;
         mRevision = iRevision;
         mPath = iPath;
     }
@@ -30,6 +32,10 @@ public abstract class RepositoryEntity {
     //
     // Getters & setters
     //
+
+    public final String getId() {
+        return mId;
+    }
     
     public final long getRevision() {
         return mRevision;

@@ -4,8 +4,6 @@
  */
 package be.mira.adastra3.server.network;
 
-import be.mira.adastra3.server.exceptions.DeviceException;
-import be.mira.adastra3.server.repository.configuration.Configuration;
 import java.util.Date;
 import java.util.UUID;
 
@@ -34,13 +32,6 @@ abstract public class NetworkEntity {
     
     
     //
-    // Configuration handling
-    //
-    
-    public abstract void setConfiguration(Configuration iConfiguration) throws DeviceException;
-    
-    
-    //
     // Getters and setters
     //
     
@@ -66,5 +57,9 @@ abstract public class NetworkEntity {
     
     public final long getMarkDelta() {
         return (new Date().getTime()) - mMark.getTime();
+    }
+    
+    public final String getType() {
+        return getClass().getSimpleName();
     }
 }

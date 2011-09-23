@@ -4,22 +4,11 @@
             xmlns="http://www.mira.be"
             elementFormDefault="qualified">
     <!--
-      The root element enumerates all connections.
-      -->
-    
-    <xsd:element name="connections" type="connectionsType" />
-    
-    <xsd:complexType name="connectionsType">
-        <xsd:sequence>
-            <xsd:element name="kioskconnection" type="kioskconnectionType" minOccurs="0" maxOccurs="unbounded" />
-        </xsd:sequence>
-    </xsd:complexType>
-    
-    
-    <!--
-      A kiosk connection links together a single physical kiosk in the network,
+      The connection links together a single physical kiosk in the network,
       a configuration preset, as well as the presentation it should display.
       -->
+    
+    <xsd:element name="connection" type="connectionType" />
     
     <xsd:complexType name="kioskconnectionType">
         <xsd:sequence>

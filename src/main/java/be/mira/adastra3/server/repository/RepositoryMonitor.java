@@ -11,7 +11,9 @@ import be.mira.adastra3.server.exceptions.RepositoryException;
 import be.mira.adastra3.server.exceptions.ServiceRunException;
 import be.mira.adastra3.server.exceptions.ServiceSetupException;
 import be.mira.adastra3.server.repository.configuration.Configuration;
+import be.mira.adastra3.server.repository.connection.Connection;
 import be.mira.adastra3.server.repository.presentation.Presentation;
+import be.mira.adastra3.server.repository.processors.ConnectionProcessor;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -46,8 +48,9 @@ public class RepositoryMonitor extends Service {
     private Timer mSVNMonitor;
     private int mSVNMonitorInterval;
     
-    private long mConfigurationRevision;
-    private long mMediaRevision;
+    private long mConnectionsRevision;
+    private long mConfigurationsRevision;
+    private long mPresentationsRevision;
 
 
     //
@@ -57,13 +60,29 @@ public class RepositoryMonitor extends Service {
     private class Monitor extends TimerTask {
         @Override
         public void run() {
+            // TODO: squash these three cases in something using the 
+            //       RepositoryEntity interface
+            // Check the connections
+            try {
+                getLogger().debug("Checking the configurations");
+                long tConnectionsRevision = checkConnections();
+                if (mConnectionsRevision != tConnectionsRevision) {
+                    getLogger().info("Connections changed to revision " + tConnectionsRevision);
+                    mConnectionsRevision = tConnectionsRevision;
+                    getConnections();
+                    processConnections();
+                }
+            } catch (RepositoryException tException) {
+                Repository.getInstance().emitError("could not update the connections", tException);
+            }
+            
             // Check the configurations
             try {
                 getLogger().debug("Checking the configurations");
                 long tConfigurationsRevision = checkConfigurations();
-                if (mConfigurationRevision != tConfigurationsRevision) {
+                if (mConfigurationsRevision != tConfigurationsRevision) {
                     getLogger().info("Configurations changed to revision " + tConfigurationsRevision);
-                    mConfigurationRevision = tConfigurationsRevision;
+                    mConfigurationsRevision = tConfigurationsRevision;
                     getConfigurations();
                     processConfigurations();
                 }
@@ -71,23 +90,23 @@ public class RepositoryMonitor extends Service {
                 Repository.getInstance().emitError("could not update the configurations", tException);
             }
             
-            // Check the media
+            // Check the presentations
             try {
-                getLogger().debug("Checking the media");
-                long tMediaRevision = checkMedia();
-                if (mMediaRevision != tMediaRevision) {
-                    getLogger().info("Media changed to revision " + tMediaRevision);
-                    mMediaRevision = tMediaRevision;
-                    processMedia();
+                getLogger().debug("Checking the presentations");
+                long tPresentationRevision = checkPresentations();
+                if (mPresentationsRevision != tPresentationRevision) {
+                    getLogger().info("Presentations changed to revision " + tPresentationRevision);
+                    mPresentationsRevision = tPresentationRevision;
+                    processPresentations();
                 }
             } catch (RepositoryException tException) {
-                Repository.getInstance().emitError("could not update the media", tException);
+                Repository.getInstance().emitError("could not update the presentations", tException);
             }
         }
         
     }
     
-    public class ConfigurationFilter implements FilenameFilter {
+    public class XMLFilter implements FilenameFilter {
       protected Pattern mPattern = Pattern.compile("\\.xml$", Pattern.CASE_INSENSITIVE);
 
       @Override
@@ -137,7 +156,7 @@ public class RepositoryMonitor extends Service {
         // Get the configurations
         try {
             getLogger().debug("Checking out and processing the configurations");
-            mConfigurationRevision = getConfigurations();
+            mConfigurationsRevision = getConfigurations();
             processConfigurations();
         } catch (RepositoryException tException) {
             throw new ServiceRunException("could not fetch the configurations", tException);
@@ -146,8 +165,8 @@ public class RepositoryMonitor extends Service {
         // Get the media
         try {
             getLogger().debug("Processing the media");
-            mConfigurationRevision = checkMedia();
-            processMedia();
+            mConfigurationsRevision = checkPresentations();
+            processPresentations();
         } catch (RepositoryException tException) {
             throw new ServiceRunException("could not fetch the media", tException);
         }
@@ -166,14 +185,97 @@ public class RepositoryMonitor extends Service {
     
     
     //
+    // Connection helpers
+    //
+    
+    // TODO: Remove the quite identical Connection/Configuration/Presentation setters
+    //       somehow make it using the RepositoryEntity interface
+    
+    private long checkConnections() throws RepositoryException {
+        return getPathRevision("connections");
+    }
+    
+    private long getConnections() throws RepositoryException {
+        // Get a local checkout and location
+        final File tCheckout =  new File(mSVNCheckoutRoot, "connections");
+        final String tLocation = mSVNLocation + "/connections";
+        
+        // Check if the repository exists and is valid
+        Long tConnectionRevision = null;
+        try {
+            tConnectionRevision = checkConnections();
+        } catch (RepositoryException tException) {
+            // Do nothing
+        }
+        
+        // Checkout or update
+        try {
+            if (tConnectionRevision == null) {
+                FileUtils.cleanDirectory(tCheckout);
+                tConnectionRevision = checkoutRepository(tCheckout, tLocation);            
+            } else {
+                tConnectionRevision = updateRepository(tCheckout);              
+            }
+        } catch (RepositoryException tException) {
+            throw new RepositoryException("could not download the repository", tException);
+        } catch (IOException tException) {
+            throw new RepositoryException("could not clean the existing (and seemingly invalid) copy of the repository", tException);
+        }
+        
+        return tConnectionRevision;
+    }
+    
+    private void processConnections() throws RepositoryException {        
+        // Read
+        getLogger().debug("Reading connections");
+        Map<String, Connection> tNewConnections = new HashMap<String, Connection>();
+        File tDirectory = new File(mSVNCheckoutRoot, "connections");
+        for (File tFile: tDirectory.listFiles(new XMLFilter())) {
+            // Generate an identifier
+            String tFilename = tFile.getName();
+            getLogger().trace("Processing '" + tFilename + "'");
+            int tDotPosition = tFilename.lastIndexOf('.');
+            String tId = tFilename.substring(0, tDotPosition);
+            
+            // Get the local revision
+            String tPath = "/connections/" + tFilename;
+            final long tRevision = getPathRevision(tPath);
+            
+            // Process the contents
+            ConnectionProcessor tReader = new ConnectionProcessor(tRevision, tPath, tId, tFile);
+            tReader.process();
+            Connection tConnection = tReader.getConnection();
+            if (tConnection == null) {
+                throw new RepositoryException("found empty connection file");
+            }
+            tNewConnections.put(tConnection.getId(), tConnection);
+        }
+        
+        // Update
+        getLogger().debug("Updating connections");
+        Repository tRepository = Repository.getInstance();
+        RepositoryChangeset<Connection> tChangeset = new RepositoryChangeset<Connection>(tRepository.getConnections(), tNewConnections);
+        for (Connection tRemoval: tChangeset.getRemovals().values()) {
+            tRepository.removeConnection(tRemoval);
+        }
+        for (Connection tAddition: tChangeset.getAdditions().values()) {
+            tRepository.addConnection(tAddition);
+        }
+        for (Connection tRemoval: tChangeset.getUpdates().values()) {
+            tRepository.addConnection(tRemoval);
+        }
+    }
+    
+    
+    //
     // Configuration helpers
     //
     
-    public final long checkConfigurations() throws RepositoryException {
+    private long checkConfigurations() throws RepositoryException {
         return getPathRevision("configurations");
     }
     
-    public final long getConfigurations() throws RepositoryException {
+    private long getConfigurations() throws RepositoryException {
         // Get a local checkout and location
         final File tCheckout =  new File(mSVNCheckoutRoot, "configurations");
         final String tLocation = mSVNLocation + "/configurations";
@@ -203,137 +305,80 @@ public class RepositoryMonitor extends Service {
         return tConfigurationRevision;
     }
     
-    public final void processConfigurations() throws RepositoryException {
-        // TODO: the actual diff code in processConfigurations and processMedia
-        //       is more or less the same, maybe move the getRevision interface
-        //       from Media & Configuration to RepositoryEntry, and deduplicate
-        //       the diff code?
-        
-        // Read the configurations
+    private void processConfigurations() throws RepositoryException {        
+        // Read
         getLogger().debug("Reading configurations");
-        Map<String, Configuration> tConfigurations = new HashMap<String, Configuration>();
-        File tConfigurationDirectory = new File(mSVNCheckoutRoot, "configurations");
-        for (File tConfigurationFile: tConfigurationDirectory.listFiles(new ConfigurationFilter())) {
+        Map<String, Configuration> tNewConfigurations = new HashMap<String, Configuration>();
+        File tDirectory = new File(mSVNCheckoutRoot, "configurations");
+        for (File tFile: tDirectory.listFiles(new XMLFilter())) {
             // Generate an identifier
-            String tName = tConfigurationFile.getName();
-            getLogger().trace("Processing '" + tName + "'");
-            int tDotPosition = tName.lastIndexOf('.');
-            String tNameSimple = tName.substring(0, tDotPosition);
+            String tFilename = tFile.getName();
+            getLogger().trace("Processing '" + tFilename + "'");
+            int tDotPosition = tFilename.lastIndexOf('.');
+            String tId = tFilename.substring(0, tDotPosition);
             
             // Get the local revision
-            final long tConfigurationRevision = getPathRevision("configurations/" + tConfigurationFile.getName());
+            String tPath = "/configurations/" + tFilename;
+            final long tRevision = getPathRevision(tPath);
             
             // Process the contents
-            ConfigurationProcessor tReader = new ConfigurationProcessor(tNameSimple, tConfigurationFile);
+            ConfigurationProcessor tReader = new ConfigurationProcessor(tRevision, tPath, tId, tFile);
             tReader.process();
-            if (tReader.getConfiguration() != null) {
-                Configuration tConfiguration = tReader.getConfiguration();
-                tConfiguration.setRevision(tConfigurationRevision);
-                tConfigurations.put(tConfiguration.getId(), tConfiguration);
-            } else {
+            Configuration tConfiguration = tReader.getConfiguration();
+            if (tConfiguration == null) {
                 throw new RepositoryException("found empty configuration file");
             }
-        }        
-            
-        // Submit the configurations
-        getLogger().debug("Submitting changed configurations");
-        Repository tRepository = Repository.getInstance();
-        for (Configuration tOldConfiguration: tRepository.getAllConfigurations()) {
-            if (! tConfigurations.containsKey(tOldConfiguration.getId())) {
-                getLogger().debug("Configuration "
-                        + tOldConfiguration.getId()
-                        + " seems to have been deleted (last known rev "
-                        + tOldConfiguration.getRevision()
-                        + "), removing from repository");
-                tRepository.removeConfiguration(tOldConfiguration);
-                
-            }
-        }
-        for (Configuration tConfiguration : tConfigurations.values()) {
-            try {
-                Configuration tOldConfiguration = tRepository.getConfiguration(tConfiguration.getId());
-                if (tOldConfiguration == null) {
-                    getLogger().debug("Configuration "
-                            + tConfiguration.getId()
-                            + " seems new (rev "
-                            + tConfiguration.getRevision()
-                            + "), adding to repository");
-                    tRepository.addConfiguration(tConfiguration);
-                } else if (tConfiguration.getRevision() > tOldConfiguration.getRevision()) {
-                    getLogger().debug("Configuration "
-                            + tConfiguration.getId()
-                            + " is a more recent version (rev "
-                            + tConfiguration.getRevision()
-                            + ") of an existing configuration (rev "
-                            + tOldConfiguration.getRevision()
-                            + "), updating the repository");
-                    tRepository.updateConfiguration(tConfiguration);
-                }
-            } catch (RepositoryException tException) {
-                throw new RepositoryException("could not process configuration", tException);
-            }
-        }
-    }
-    
-    
-    //
-    // Media helpers
-    //
-    
-    public final long checkMedia() throws RepositoryException {
-        return getPathRevision("media");
-    }
-    
-    public final void processMedia() throws RepositoryException {        
-        // List the media
-        getLogger().debug("Listing media");
-        Map<String, Presentation> tAllMedia = new HashMap<String, Presentation>();
-        Map<String, Long> tPathEntries = getChildrenRevisions("media");
-        for (String tName: tPathEntries.keySet()) {
-            long tRevision = tPathEntries.get(tName);
-            String tLocation = Repository.getInstance().getServer() + "/media/" + tName;
-            
-            Presentation tMedia = new Presentation(tName, tLocation);
-            tMedia.setRevision(tRevision);
-            tAllMedia.put(tName, tMedia);
+            tNewConfigurations.put(tConfiguration.getId(), tConfiguration);
         }
         
-        // Submit the media        
-        getLogger().debug("Submitting media");
+        // Update
+        getLogger().debug("Updating configurations");
         Repository tRepository = Repository.getInstance();
-        for (Presentation tOldMedia: tRepository.getAllMedia()) {
-            if (! tAllMedia.containsKey(tOldMedia.getId())) {
-                getLogger().debug("Media "
-                        + tOldMedia.getId()
-                        + " seems to have been deleted (last known rev "
-                        + tOldMedia.getRevision()
-                        + "), removing from repository");
-                tRepository.removeMedia(tOldMedia);
-            }
+        RepositoryChangeset<Configuration> tChangeset = new RepositoryChangeset<Configuration>(tRepository.getConfigurations(), tNewConfigurations);
+        for (Configuration tRemoval: tChangeset.getRemovals().values()) {
+            tRepository.removeConfiguration(tRemoval);
         }
-        for (Presentation tMedia : tAllMedia.values()) {
-            try {
-                Presentation tOldMedia = tRepository.getMedia(tMedia.getId());
-                if (tOldMedia == null) {
-                    getLogger().debug("Media "
-                            + tMedia.getId()
-                            + " seems new (rev "
-                            + tMedia.getRevision()
-                            + "), adding to repository");
-                    tRepository.addMedia(tMedia);
-                } else if (tMedia.getRevision() > tOldMedia.getRevision()) {
-                    getLogger().debug("Configuration "
-                            + tMedia.getId()
-                            + " is a more recent version (rev "
-                            + tMedia.getRevision()
-                            + ") of an existing media (rev "
-                            + tOldMedia.getRevision()
-                            + "), updating the repository");
-                    tRepository.updateMedia(tMedia);
-                }
-            } catch (RepositoryException tException) {
-                throw new RepositoryException("could not process media", tException);
-            }
+        for (Configuration tAddition: tChangeset.getAdditions().values()) {
+            tRepository.addConfiguration(tAddition);
+        }
+        for (Configuration tRemoval: tChangeset.getUpdates().values()) {
+            tRepository.addConfiguration(tRemoval);
+        }
+    }
+    
+    
+    //
+    // Presentation helpers
+    //
+    
+    private long checkPresentations() throws RepositoryException {
+        return getPathRevision("presentations");
+    }
+    
+    private void processPresentations() throws RepositoryException {        
+        // List
+        getLogger().debug("Listing presentations");
+        Map<String, Presentation> tNewPresentations = new HashMap<String, Presentation>();
+        Map<String, Long> tPathEntries = getChildrenRevisions("presentations");
+        for (String tId: tPathEntries.keySet()) {
+            long tRevision = tPathEntries.get(tId);
+            String tPath = "/presentations/" + tId;            
+            Presentation tMedia = new Presentation(tId, tRevision, tPath);
+            tNewPresentations.put(tId, tMedia);
+        }
+        
+        // Update
+        getLogger().debug("Updating presentations");
+        Repository tRepository = Repository.getInstance();
+        RepositoryChangeset<Presentation> tChangeset = new RepositoryChangeset<Presentation>(tRepository.getPresentations(), tNewPresentations);
+        for (Presentation tRemoval: tChangeset.getRemovals().values()) {
+            tRepository.removePresentation(tRemoval);
+        }
+        for (Presentation tAddition: tChangeset.getAdditions().values()) {
+            tRepository.addPresentation(tAddition);
+        }
+        for (Presentation tRemoval: tChangeset.getUpdates().values()) {
+            tRepository.updatePresentation(tRemoval);
         }
     }
 
@@ -416,6 +461,77 @@ public class RepositoryMonitor extends Service {
             return tRevision;
         } catch (ClientException tException) {
             throw new RepositoryException("could not update the repository", tException);
+        }
+    }
+    
+    private class RepositoryChangeset<T extends RepositoryEntity> {
+        //
+        // Member data
+        //
+        
+        private final Map<String, T> mAdditions;
+        private final Map<String, T> mRemovals;
+        private final Map<String, T> mUpdates;
+        
+        
+        //
+        // Construction and destruction
+        //
+        
+        public RepositoryChangeset(Map<String, T> iOldEntities, Map<String, T> iCurrentEntities) {
+            // Check for removed entities
+            mRemovals = new HashMap<String, T>();
+            for (T tOldEntity: iOldEntities.values()) {
+                if (! iCurrentEntities.containsKey(tOldEntity.getId())) {
+                    getLogger().debug("Entity "
+                            + tOldEntity.getId()
+                            + " seems to have been deleted (last known rev "
+                            + tOldEntity.getRevision()
+                            + "), removing from repository");
+                    mRemovals.put(tOldEntity.getId(), tOldEntity);
+                }
+            }
+
+            // Check for new and updated entities      
+            mAdditions = new HashMap<String, T>();
+            mUpdates = new HashMap<String, T>();
+            for (T tCurrentEntity : iCurrentEntities.values()) {
+                T tOldEntity = iOldEntities.get(tCurrentEntity.getId());
+                if (tOldEntity == null) {
+                    getLogger().debug("Entity "
+                            + tCurrentEntity.getId()
+                            + " seems new (rev "
+                            + tCurrentEntity.getRevision()
+                            + "), adding to repository");
+                    mAdditions.put(tCurrentEntity.getId(), tCurrentEntity);
+                } else if (tCurrentEntity.getRevision() > tOldEntity.getRevision()) {
+                    getLogger().debug("Entity "
+                            + tCurrentEntity.getId()
+                            + " is a more recent version (rev "
+                            + tCurrentEntity.getRevision()
+                            + ") of an existing media (rev "
+                            + tOldEntity.getRevision()
+                            + "), updating the repository");
+                    mUpdates.put(tCurrentEntity.getId(), tCurrentEntity);
+                }
+            }
+        }
+        
+        
+        //
+        // Getters and setters
+        //
+        
+        public final Map<String, T> getAdditions() {
+            return mAdditions;
+        }
+        
+        public final Map<String, T> getRemovals() {
+            return mRemovals;
+        }
+        
+        public final Map<String, T> getUpdates() {
+            return mUpdates;
         }
     }
 }

@@ -11,31 +11,20 @@ import be.mira.adastra3.server.repository.RepositoryEntity;
  *
  * @author tim
  */
-public class Presentation extends RepositoryEntity {
-    //
-    // Member data
-    //
-    
-    private String mId;
-    
+public class Presentation extends RepositoryEntity {   
     
     //
     // Construction and destruction
     //
     
-    public Presentation(final long iRevision, final String iPath, final String iId) {
-        super(iRevision, iPath);
-        mId = iId;
+    public Presentation(final String iId, final long iRevision, final String iPath) {
+        super(iId, iRevision, iPath);
     }
     
     
     //
     // Getters and setters
     //
-
-    public final String getId() {
-        return mId;
-    }
     
     public final String getLocation() {
         return Repository.getInstance().getServer() + getPath();

@@ -4,10 +4,49 @@
  */
 package be.mira.adastra3.server.repository.connection;
 
+import be.mira.adastra3.server.repository.RepositoryEntity;
+import java.util.UUID;
+
 /**
  *
  * @author tim
  */
-public class Connection {
+public class Connection extends RepositoryEntity {
+    //
+    // Member data
+    //
+    
+    private UUID mKiosk;
+    private String mConfiguration;
+    private String mPresentation;
+    
+    
+    //
+    // Construction and destruction
+    //
+    
+    public Connection(final String iId, final long iRevision, final String iPath, final UUID iKiosk, final String iConfiguration, final String iPresentation) {
+        super(iId, iRevision, iPath);
+        mKiosk = iKiosk;
+        mConfiguration = iConfiguration;
+        mPresentation = iPresentation;
+    }
+    
+    
+    //
+    // Getters & setters
+    //
+    
+    public final UUID getKiosk() {
+        return mKiosk;
+    }
+    
+    public final String getConfiguration() {
+        return mConfiguration;
+    }
+    
+    public final String getPresentation() {
+        return mPresentation;
+    }
     
 }

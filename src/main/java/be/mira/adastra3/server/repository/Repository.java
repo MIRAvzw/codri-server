@@ -7,9 +7,9 @@ package be.mira.adastra3.server.repository;
 
 import be.mira.adastra3.server.exceptions.RepositoryException;
 import be.mira.adastra3.server.repository.configuration.Configuration;
+import be.mira.adastra3.server.repository.connection.Connection;
 import be.mira.adastra3.server.repository.presentation.Presentation;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,8 +23,9 @@ public final class Repository {
     // Member data
     //
     
-    private Map<String, Configuration> mConfigurations;
-    private Map<String, Presentation> mMedia;
+    private final Map<String, Connection> mConnections;
+    private final Map<String, Configuration> mConfigurations;
+    private final Map<String, Presentation> mMedia;
     private List<IRepositoryListener> mListeners;
     private String mServer;
 
@@ -48,6 +49,7 @@ public final class Repository {
     //
 
     private Repository() {
+        mConnections = new HashMap<String, Connection>();
         mConfigurations = new HashMap<String, Configuration>();
         mMedia = new HashMap<String, Presentation>();
         mListeners = new ArrayList<IRepositoryListener>();
@@ -58,11 +60,13 @@ public final class Repository {
     // Getters and setters
     //
     
+    // TODO: Remove the quite identical Connection/Configuration/Presentation setters
+    //       somehow make it using the RepositoryEntity interface
+    
     public String getServer() {
         return mServer;
     }
     
-    // TODO: this isn't used? wat?
     public void setServer(final String iServer) {
         mServer = iServer;
     }
@@ -75,8 +79,40 @@ public final class Repository {
         mListeners.remove(iListener);
     }
     
-    public Collection<Configuration> getAllConfigurations() {
-        return mConfigurations.values();
+    public Map<String, Connection> getConnections() {
+        return mConnections;
+    }
+
+    public Connection getConnection(final String iName) {
+        return mConnections.get(iName);
+    }
+
+    public void addConnection(final Connection iConnection) throws RepositoryException {
+        if (mConnections.containsKey(iConnection.getId())) {
+            throw new RepositoryException("connection " + iConnection.getId() + " already present in repository");
+        }
+        mConnections.put(iConnection.getId(), iConnection);
+        emitConnectionAdded(iConnection);
+    }
+    
+    public void updateConnection(final Connection iConnection) throws RepositoryException {
+        if (! mConnections.containsKey(iConnection.getId())) {
+            throw new RepositoryException("connection " + iConnection.getId() + " not present in repository");
+        }
+        Connection tOldConnection = mConnections.put(iConnection.getId(), iConnection);
+        emitConnectionUpdated(tOldConnection, iConnection);
+    }
+
+    public void removeConnection(final Connection iConnection) throws RepositoryException {
+        if (! mConnections.containsKey(iConnection.getId())) {
+            throw new RepositoryException("connection " + iConnection.getId() + " not present in repository");
+        }
+        mConnections.remove(iConnection.getId());
+        emitConnectionRemoved(iConnection);
+    }
+    
+    public Map<String, Configuration> getConfigurations() {
+        return mConfigurations;
     }
 
     public Configuration getConfiguration(final String iName) {
@@ -107,36 +143,36 @@ public final class Repository {
         emitConfigurationRemoved(iConfiguration);
     }
     
-    public Collection<Presentation> getAllMedia() {
-        return mMedia.values();
+    public Map<String, Presentation> getPresentations() {
+        return mMedia;
     }
 
-    public Presentation getMedia(final String iName) {
-        return mMedia.get(iName);
+    public Presentation getPresentation(final String iId) {
+        return mMedia.get(iId);
     }
 
-    public void addMedia(final Presentation iMedia) throws RepositoryException {
-        if (mMedia.containsKey(iMedia.getId())) {
-            throw new RepositoryException("configuration " + iMedia.getId() + " already present in repository");
+    public void addPresentation(final Presentation iPresentation) throws RepositoryException {
+        if (mMedia.containsKey(iPresentation.getId())) {
+            throw new RepositoryException("presentation " + iPresentation.getId() + " already present in repository");
         }
-        mMedia.put(iMedia.getId(), iMedia);
-        emitMediaAdded(iMedia);
+        mMedia.put(iPresentation.getId(), iPresentation);
+        emitPresentationAdded(iPresentation);
     }
     
-    public void updateMedia(final Presentation iMedia) throws RepositoryException {
-        if (! mMedia.containsKey(iMedia.getId())) {
-            throw new RepositoryException("configuration " + iMedia.getId() + " not present in repository");
+    public void updatePresentation(final Presentation iPresentation) throws RepositoryException {
+        if (! mMedia.containsKey(iPresentation.getId())) {
+            throw new RepositoryException("presentation " + iPresentation.getId() + " not present in repository");
         }
-        Presentation tOldMedia = mMedia.put(iMedia.getId(), iMedia);
-        emitMediaUpdated(tOldMedia, iMedia);
+        Presentation tOldMedia = mMedia.put(iPresentation.getId(), iPresentation);
+        emitPresentationUpdated(tOldMedia, iPresentation);
     }
 
-    public void removeMedia(final Presentation iMedia) throws RepositoryException {
-        if (! mMedia.containsKey(iMedia.getId())) {
-            throw new RepositoryException("configuration " + iMedia.getId() + " not present in repository");
+    public void removePresentation(final Presentation iPresentation) throws RepositoryException {
+        if (! mMedia.containsKey(iPresentation.getId())) {
+            throw new RepositoryException("presentation " + iPresentation.getId() + " not present in repository");
         }
-        mMedia.remove(iMedia.getId());
-        emitMediaRemoved(iMedia);
+        mMedia.remove(iPresentation.getId());
+        emitPresentationRemoved(iPresentation);
     }
     
     
@@ -153,6 +189,24 @@ public final class Repository {
     public void emitWarning(final String iMessage) {
         for (IRepositoryListener tListener : mListeners) {
             tListener.doRepositoryWarning(iMessage);
+        }
+    }
+    
+    private void emitConnectionAdded(final Connection iConnection) {
+        for (IRepositoryListener tListener : mListeners) {
+            tListener.doConnectionAdded(iConnection);
+        }
+    }
+    
+    private void emitConnectionUpdated(final Connection iOldConnection, final Connection iConnection) {
+        for (IRepositoryListener tListener : mListeners) {
+            tListener.doConnectionUpdated(iOldConnection, iConnection);
+        }
+    }
+    
+    private void emitConnectionRemoved(final Connection iConnection) {
+        for (IRepositoryListener tListener : mListeners) {
+            tListener.doConnectionRemoved(iConnection);
         }
     }
     
@@ -174,19 +228,19 @@ public final class Repository {
         }
     }
     
-    private void emitMediaAdded(final Presentation iMedia) {
+    private void emitPresentationAdded(final Presentation iMedia) {
         for (IRepositoryListener tListener : mListeners) {
             tListener.doPresentationAdded(iMedia);
         }
     }
     
-    private void emitMediaUpdated(final Presentation iOldMedia, final Presentation iMedia) {
+    private void emitPresentationUpdated(final Presentation iOldMedia, final Presentation iMedia) {
         for (IRepositoryListener tListener : mListeners) {
             tListener.doPresentationUpdated(iOldMedia, iMedia);
         }
     }
     
-    private void emitMediaRemoved(final Presentation iMedia) {
+    private void emitPresentationRemoved(final Presentation iMedia) {
         for (IRepositoryListener tListener : mListeners) {
             tListener.doPresentationRemoved(iMedia);
         }

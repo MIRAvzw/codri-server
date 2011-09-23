@@ -7,11 +7,8 @@ package be.mira.adastra3.server.repository.processors;
 import be.mira.adastra3.server.exceptions.RepositoryException;
 import be.mira.adastra3.server.repository.configuration.SoundConfiguration;
 import be.mira.adastra3.server.repository.connection.Connection;
-import be.mira.adastra3.server.repository.connection.KioskConnection;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -20,12 +17,15 @@ import org.xmlpull.v1.XmlPullParserException;
  *
  * @author tim
  */
-public class ConnectionsProcessor extends Processor {
+public class ConnectionProcessor extends Processor {
     //
     // Member data
     //
     
-    private List<Connection> mConnections;
+    private Connection mConnection;
+    private long mRevision;
+    private String mPath;
+    private String mId;
     
     
     
@@ -34,8 +34,11 @@ public class ConnectionsProcessor extends Processor {
     // Construction and destruction
     //
     
-    public ConnectionsProcessor(final File iConfigurationFile) throws RepositoryException {
-        super(iConfigurationFile, "connections.xsd");
+    public ConnectionProcessor(final long iRevision, final String iPath, final String iId, final File iFile) throws RepositoryException {
+        super(iFile, "connection.xsd");
+        mRevision = iRevision;
+        mPath = iPath;
+        mId = iId;
     }
     
     
@@ -59,7 +62,7 @@ public class ConnectionsProcessor extends Processor {
                         break loop;
                     case (XmlPullParser.START_TAG):
                         if (mParser.getName().equals("connections")) {
-                            mConnections = parseConnections();
+                            mConnection = parseConnection();
                         }
                         break;
                     default:                        
@@ -73,8 +76,8 @@ public class ConnectionsProcessor extends Processor {
         }
     }
     
-    public final List<Connection> getConnections() {
-        return mConnections;
+    public final Connection getConnection() {
+        return mConnection;
     }
     
     
@@ -82,29 +85,7 @@ public class ConnectionsProcessor extends Processor {
     // Parsing helpers
     //
     
-    private List<Connection> parseConnections() throws RepositoryException, XmlPullParserException, IOException {
-        // Process the tags
-        List<Connection> tConnections = new ArrayList<Connection>();
-        mParser.next();
-        loop: while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
-            switch (mParser.getEventType()) {
-                case (XmlPullParser.END_TAG):
-                    mParser.next();
-                    break loop;
-                case (XmlPullParser.START_TAG):
-                    if (mParser.getName().equals("kioskconnection")) {
-                        tConnections.add(parseKioskConnection());
-                    }
-                    break;
-                default:
-                    mParser.next();
-            }
-        }
-        
-        return tConnections;        
-    }
-    
-    private KioskConnection parseKioskConnection() throws RepositoryException, XmlPullParserException, IOException {       
+    private Connection parseConnection() throws RepositoryException, XmlPullParserException, IOException {       
         // Process the tags
         UUID tKiosk = null;
         String tConfiguration = null;
@@ -130,11 +111,14 @@ public class ConnectionsProcessor extends Processor {
         }
         
         // Create the object
-        KioskConnection tKioskConnection = new KioskConnection(
+        Connection tConnection = new Connection(
+                mId,
+                mRevision,
+                mPath,
                 tKiosk,
                 tConfiguration,
                 tPresentation);
-        return tKioskConnection;
+        return tConnection;
     }
     
     private SoundConfiguration parseSoundConfiguration() throws RepositoryException, XmlPullParserException, IOException {

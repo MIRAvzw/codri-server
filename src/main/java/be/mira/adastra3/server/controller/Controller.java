@@ -17,6 +17,7 @@ import be.mira.adastra3.server.network.Kiosk;
 import be.mira.adastra3.server.repository.IRepositoryListener;
 import be.mira.adastra3.server.repository.Repository;
 import be.mira.adastra3.server.repository.configuration.Configuration;
+import be.mira.adastra3.server.repository.connection.Connection;
 import be.mira.adastra3.server.repository.presentation.Presentation;
 import java.util.ArrayList;
 import java.util.List;
@@ -79,40 +80,103 @@ public class Controller extends Service implements INetworkListener, IRepository
         getLogger().error("Repository error: " + iMessage, iException);
     }
     
+    
+    private void pushConnection(final Connection iConnection) {
+        // Check if there is a valid target device
+        NetworkEntity tDevice = Network.getInstance().getDevice(iConnection.getKiosk());
+        if (tDevice == null) {
+            getLogger().warn("Connection " + iConnection.getId() + " does not point to a valid device");
+            return;
+        }
+        
+        // Process all types of devices
+        if (tDevice instanceof Kiosk) {
+            Kiosk tKiosk = (Kiosk) tDevice;
+            
+            // Push the configuration
+            Configuration tConfiguration = Repository.getInstance().getConfiguration(iConnection.getConfiguration());
+            if (tConfiguration != null) {
+                try {
+                    tKiosk.setConfiguration(tConfiguration);
+                } catch (DeviceException tException) {
+                    getLogger().error("Could not upload configuration " + tConfiguration.getId(), tException);
+                }
+            } else {
+                getLogger().warn("Connection " + iConnection.getId() + " does not point to a valid configuration");
+            }
+            
+            // Push the presentation
+            Presentation tPresentation = Repository.getInstance().getPresentation(iConnection.getPresentation());
+            if (tPresentation != null) {
+                try {
+                    tKiosk.setPresentation(tPresentation);
+                } catch (DeviceException tException) {
+                    getLogger().error("Could not upload presentation " + tConfiguration.getId(), tException);
+                }
+            } else {
+                getLogger().warn("Connection " + iConnection.getId() + " does not point to a valid presentation");
+            }
+        } else {
+            getLogger().error("Cannot handle a device of type " + tDevice.getType());
+        }        
+    }
+    @Override
+    public final void doConnectionAdded(final Connection iConnection) {
+        getLogger().info("Connection added: " + iConnection.getId());
+        pushConnection(iConnection);
+    }
+
+    @Override
+    public final void doConnectionUpdated(final Connection iOldConnection, final Connection iConnection) {
+        getLogger().info("Connection updated: " + iConnection.getId());
+        pushConnection(iConnection);
+    }
+    
+    @Override
+    public final void doConnectionRemoved(final Connection iConnection) {
+        getLogger().info("Connection removed: " + iConnection.getId());
+        
+        // TODO: Erase the connection on the device
+    }
+    
+    private void pushConfiguration(final Configuration iConfiguration) {
+        // Find the connections this configuration is a part of
+        List<Connection> tRelevantConnections = new ArrayList<Connection>();
+        for (Connection tConnection: Repository.getInstance().getConnections().values()) {
+            if (tConnection.getConfiguration().equals(iConfiguration.getId())) {
+                tRelevantConnections.add(tConnection);
+            }
+        }
+        
+        // Push to the devices
+        for (Connection tConnection: tRelevantConnections) {
+            NetworkEntity tDevice = Network.getInstance().getDevice(tConnection.getKiosk());
+            // No need to display too many errors here, this should already have
+            // have happened when the connection was initially added to the
+            // repository
+            if (tDevice != null) {
+                if (tDevice instanceof Kiosk) {
+                    Kiosk tKiosk = (Kiosk) tDevice;
+                    try {
+                        tKiosk.setConfiguration(iConfiguration);
+                    } catch (DeviceException tException) {
+                        getLogger().error("Could not push configuration " + iConfiguration.getId() + " to target device '" + tDevice.getUuid() + "'", tException);
+                    }
+                }
+            }
+        }        
+    }
+    
     @Override
     public final void doConfigurationAdded(final Configuration iConfiguration) {
         getLogger().info("Configuration added: " + iConfiguration.getId());
-        
-        // Check if there is a valid target device, and if so push the configuration
-        NetworkEntity tDevice = null;
-        try {
-            tDevice = Network.getInstance().getDevice(iConfiguration.getTarget());
-            if (tDevice != null) {
-                tDevice.setConfiguration(iConfiguration);
-            } else {
-                getLogger().warn("Configuration " + iConfiguration.getId() + " does not target a valid device");
-            }
-        } catch (DeviceException tException) {
-            getLogger().error("Could not push configuration " + iConfiguration.getId() + " to target device '" + tDevice.getUuid() + "'", tException);
-        }
+        pushConfiguration(iConfiguration);
     }
 
     @Override
     public final void doConfigurationUpdated(final Configuration iOldConfiguration, final Configuration iConfiguration) {
         getLogger().info("Configuration updated: " + iConfiguration.getId());
-        
-        // Check if there is a valid target device, and if so update the configuration
-        NetworkEntity tDevice = null;
-        try {
-            tDevice = Network.getInstance().getDevice(iConfiguration.getTarget());
-            if (tDevice != null) {
-                tDevice.setConfiguration(iConfiguration);
-            } else {
-                getLogger().warn("Configuration " + iConfiguration.getId() + " does not target a valid device");
-            }
-        } catch (DeviceException tException) {
-            getLogger().error("Could not update configuration " + iConfiguration.getId() + " on target device '" + tDevice.getUuid() + "'", tException);
-        }
+        pushConfiguration(iConfiguration);
     }
     
     @Override
@@ -122,68 +186,45 @@ public class Controller extends Service implements INetworkListener, IRepository
         // TODO: Erase the configuration on the device
     }
     
+    
+    private void pushPresentation(final Presentation iPresentation) {
+        // Find the connections this presentation is a part of
+        List<Connection> tRelevantConnections = new ArrayList<Connection>();
+        for (Connection tConnection: Repository.getInstance().getConnections().values()) {
+            if (tConnection.getPresentation().equals(iPresentation.getId())) {
+                tRelevantConnections.add(tConnection);
+            }
+        }
+        
+        // Push to the devices
+        for (Connection tConnection: tRelevantConnections) {
+            NetworkEntity tDevice = Network.getInstance().getDevice(tConnection.getKiosk());
+            // No need to display too many errors here, this should already have
+            // have happened when the connection was initially added to the
+            // repository
+            if (tDevice != null) {
+                if (tDevice instanceof Kiosk) {
+                    Kiosk tKiosk = (Kiosk) tDevice;
+                    try {
+                        tKiosk.setPresentation(iPresentation);
+                    } catch (DeviceException tException) {
+                        getLogger().error("Could not push presentation " + iPresentation.getId() + " to target device '" + tDevice.getUuid() + "'", tException);
+                    }
+                }
+            }
+        }        
+    }
+    
     @Override
     public final void doPresentationAdded(final Presentation iPresentation) {
         getLogger().info("Presentation added: " + iPresentation.getId());
-        
-        List<KioskConfiguration> tKioskConfigurations = findKioskConfigurationsByPresentation(iPresentation);
-        if (tKioskConfigurations.size() == 0) {
-            getLogger().warn("Presentation " + iPresentation.getId() + " is not referred to by any configuration");
-        }
-        for (KioskConfiguration tKioskConfiguration: tKioskConfigurations) {
-            NetworkEntity tEntity = Network.getInstance().getDevice(tKioskConfiguration.getTarget());
-            if (tEntity != null) {
-                try {
-                    getLogger().debug("Presentation "
-                            + iPresentation.getId()
-                            + " is in use by network entity "
-                            + tEntity.getName() +
-                            ", resubmitting");
-                    if (tEntity instanceof Kiosk) {
-                        ((Kiosk)tEntity).setPresentation(iPresentation);
-                    } else {
-                        getLogger().error("Cannot update media, unknown network entity");
-                    }
-                } catch (DeviceException tException) {
-                    getLogger().error("Could not set media "
-                            + iPresentation.getId()
-                            + " on device "
-                            + tEntity.getName());
-                }
-            }
-        }
+        pushPresentation(iPresentation);
     }
 
     @Override
     public final void doPresentationUpdated(final Presentation iOldPresentation, final Presentation iPresentation) {
         getLogger().info("Presentation updated: " + iPresentation.getId());
-        
-        List<KioskConfiguration> tKioskConfigurations = findKioskConfigurationsByPresentation(iPresentation);
-        if (tKioskConfigurations.size() == 0) {
-            getLogger().warn("Presentation " + iPresentation.getId() + " is not referred to by any configuration");
-        }
-        for (KioskConfiguration tKioskConfiguration: tKioskConfigurations) {
-            NetworkEntity tEntity = Network.getInstance().getDevice(tKioskConfiguration.getTarget());
-            if (tEntity != null) {
-                try {
-                    getLogger().debug("Presentation "
-                            + iPresentation.getId()
-                            + " is in use by network entity "
-                            + tEntity.getName() +
-                            ", resubmitting");
-                    if (tEntity instanceof Kiosk) {
-                        ((Kiosk)tEntity).setPresentation(iPresentation);
-                    } else {
-                        getLogger().error("Cannot update media, unknown network entity");
-                    }
-                } catch (DeviceException tException) {
-                    getLogger().error("Could not set media "
-                            + iPresentation.getId()
-                            + " on device "
-                            + tEntity.getName());
-                }
-            }
-        }
+        pushPresentation(iPresentation);
     }
     
     @Override
@@ -191,21 +232,6 @@ public class Controller extends Service implements INetworkListener, IRepository
         getLogger().info("Presentation removed: " + iPresentation.getId());
         
         // TODO
-    }
-    
-    private List<KioskConfiguration> findKioskConfigurationsByPresentation(final Presentation iPresentation) {
-        List<KioskConfiguration> tKioskConfigurations = new ArrayList<KioskConfiguration>();
-        
-        for (Configuration tConfiguration: Repository.getInstance().getAllConfigurations()) {
-            if (tConfiguration instanceof KioskConfiguration) {
-                KioskConfiguration tKioskConfiguration = (KioskConfiguration) tConfiguration;
-                if (tKioskConfiguration.getPresentationConfiguration().getName().equals(iPresentation.getId())) {
-                    tKioskConfigurations.add(tKioskConfiguration);
-                }
-            }
-        }
-        
-        return tKioskConfigurations;
     }
     
     
@@ -226,25 +252,23 @@ public class Controller extends Service implements INetworkListener, IRepository
     @Override
     public final void doEntityAdded(final NetworkEntity iEntity) {
         getLogger().info("MIRA network entity added: " + iEntity.getUuid());
-        Repository tRepository = Repository.getInstance();
-            
-        // Check if there is a configuration for this entity
-        try {
-            Configuration tConfiguration = null;
-            for (Configuration tAvailableConfiguration: tRepository.getAllConfigurations()) {
-                if (tAvailableConfiguration.getTarget() == iEntity.getUuid()) {
-                    tConfiguration = tAvailableConfiguration;
-                    break;
-                }
+        
+        // Find the connections this device is a part of
+        List<Connection> tRelevantConnections = new ArrayList<Connection>();
+        for (Connection tConnection: Repository.getInstance().getConnections().values()) {
+            if (tConnection.getKiosk().equals(iEntity.getUuid())) {
+                tRelevantConnections.add(tConnection);
             }
-            if (tConfiguration == null) {
-                getLogger().warn("Couldn't find any configuration for device " + iEntity.getUuid() + ", it'll remain unconfigured");
-            } else {
-                getLogger().debug("Loading configuration " + tConfiguration.getId() + " onto device " + iEntity.getUuid());
-                iEntity.setConfiguration(tConfiguration);
-            }
-        } catch (DeviceException tException) {
-            getLogger().error("could not configure device", tException);
+        }
+        
+        // Check the connections
+        if (tRelevantConnections.isEmpty()) {
+            getLogger().warn("Couldn't find any configuration for device " + iEntity.getUuid() + ", it'll remain unconfigured");
+        } else if (tRelevantConnections.size() > 1) {
+            getLogger().warn("Ambiguous connections found for device " + iEntity.getUuid() + ", it'll remain unconfigured");
+        } else {
+            Connection tConnection = tRelevantConnections.get(0);
+            pushConnection(tConnection);
         }
     }
 
