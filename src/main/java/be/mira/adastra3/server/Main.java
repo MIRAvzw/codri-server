@@ -68,7 +68,7 @@ public class Main {
 
         // Logging
         BasicConfigurator.configure();
-        LOGGER = Logger.getLogger(Main.class);
+        LOGGER = Service.getLogger(Main.class);
         LOGGER.info("Initializing logging");
         try {
             Iterator tKeyIterator = Service.getConfiguration().getKeys("log4j");

@@ -1,5 +1,6 @@
 package be.mira.adastra3.server.website.status;
 
+import be.mira.adastra3.server.Service;
 import be.mira.adastra3.server.website.data.DeferredExecution;
 import be.mira.adastra3.server.website.data.NetworkDetail;
 import be.mira.adastra3.server.website.data.NetworkItem;
@@ -62,7 +63,7 @@ public class StatusApplication extends WApplication {
     
     public StatusApplication(final WEnvironment iEnvironment) {
         super(iEnvironment);
-        mLogger = Logger.getLogger(this.getClass());
+        mLogger = Service.getLogger(this);
         
         setCssTheme("polished");        
         setTitle("Status page");        
