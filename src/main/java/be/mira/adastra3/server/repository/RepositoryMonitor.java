@@ -192,7 +192,7 @@ public class RepositoryMonitor extends Service {
     //       somehow make it using the RepositoryEntity interface
     
     private long checkConnections() throws RepositoryException {
-        return getPathRevision("connections");
+        return getRevision(mSVNLocation + "/connections");
     }
     
     private long getConnections() throws RepositoryException {
@@ -203,7 +203,7 @@ public class RepositoryMonitor extends Service {
         // Check if the repository exists and is valid
         Long tConnectionRevision = null;
         try {
-            tConnectionRevision = checkConnections();
+            tConnectionRevision = getRevision(tCheckout);
         } catch (RepositoryException tException) {
             // Do nothing
         }
@@ -211,9 +211,13 @@ public class RepositoryMonitor extends Service {
         // Checkout or update
         try {
             if (tConnectionRevision == null) {
-                FileUtils.cleanDirectory(tCheckout);
+                getLogger().trace("Fetching connections");
+                if (tCheckout.exists()) {
+                    FileUtils.cleanDirectory(tCheckout);
+                }
                 tConnectionRevision = checkoutRepository(tCheckout, tLocation);            
             } else {
+                getLogger().trace("Updating connections");
                 tConnectionRevision = updateRepository(tCheckout);              
             }
         } catch (RepositoryException tException) {
@@ -236,13 +240,11 @@ public class RepositoryMonitor extends Service {
             getLogger().trace("Processing '" + tFilename + "'");
             int tDotPosition = tFilename.lastIndexOf('.');
             String tId = tFilename.substring(0, tDotPosition);
-            
-            // Get the local revision
-            String tPath = "/connections/" + tFilename;
-            final long tRevision = getPathRevision(tPath);
+            final long tRevision = getRevision(tFile);
             
             // Process the contents
-            ConnectionProcessor tReader = new ConnectionProcessor(tRevision, tPath, tId, tFile);
+            String tRepositoryPath = "/connections/" + tFilename;
+            ConnectionProcessor tReader = new ConnectionProcessor(tRevision, tRepositoryPath, tId, tFile);
             tReader.process();
             Connection tConnection = tReader.getConnection();
             if (tConnection == null) {
@@ -251,8 +253,8 @@ public class RepositoryMonitor extends Service {
             tNewConnections.put(tConnection.getId(), tConnection);
         }
         
-        // Update
-        getLogger().debug("Updating connections");
+        // Save
+        getLogger().debug("Saving connections");
         Repository tRepository = Repository.getInstance();
         RepositoryChangeset<Connection> tChangeset = new RepositoryChangeset<Connection>(tRepository.getConnections(), tNewConnections);
         for (Connection tRemoval: tChangeset.getRemovals().values()) {
@@ -272,7 +274,7 @@ public class RepositoryMonitor extends Service {
     //
     
     private long checkConfigurations() throws RepositoryException {
-        return getPathRevision("configurations");
+        return getRevision(mSVNLocation + "/configurations");
     }
     
     private long getConfigurations() throws RepositoryException {
@@ -283,7 +285,7 @@ public class RepositoryMonitor extends Service {
         // Check if the repository exists and is valid
         Long tConfigurationRevision = null;
         try {
-            tConfigurationRevision = checkConfigurations();
+            tConfigurationRevision = getRevision(tCheckout);
         } catch (RepositoryException tException) {
             // Do nothing
         }
@@ -291,9 +293,13 @@ public class RepositoryMonitor extends Service {
         // Checkout or update
         try {
             if (tConfigurationRevision == null) {
-                FileUtils.cleanDirectory(tCheckout);
+                getLogger().trace("Fetching configurations");
+                if (tCheckout.exists()) {
+                    FileUtils.cleanDirectory(tCheckout);
+                }
                 tConfigurationRevision = checkoutRepository(tCheckout, tLocation);            
             } else {
+                getLogger().trace("Updating configurations");
                 tConfigurationRevision = updateRepository(tCheckout);              
             }
         } catch (RepositoryException tException) {
@@ -316,13 +322,11 @@ public class RepositoryMonitor extends Service {
             getLogger().trace("Processing '" + tFilename + "'");
             int tDotPosition = tFilename.lastIndexOf('.');
             String tId = tFilename.substring(0, tDotPosition);
-            
-            // Get the local revision
-            String tPath = "/configurations/" + tFilename;
-            final long tRevision = getPathRevision(tPath);
+            final long tRevision = getRevision(tFile);
             
             // Process the contents
-            ConfigurationProcessor tReader = new ConfigurationProcessor(tRevision, tPath, tId, tFile);
+            String tRepositoryPath = "/configurations/" + tFilename;
+            ConfigurationProcessor tReader = new ConfigurationProcessor(tRevision, tRepositoryPath, tId, tFile);
             tReader.process();
             Configuration tConfiguration = tReader.getConfiguration();
             if (tConfiguration == null) {
@@ -331,8 +335,8 @@ public class RepositoryMonitor extends Service {
             tNewConfigurations.put(tConfiguration.getId(), tConfiguration);
         }
         
-        // Update
-        getLogger().debug("Updating configurations");
+        // Save
+        getLogger().debug("Saving configurations");
         Repository tRepository = Repository.getInstance();
         RepositoryChangeset<Configuration> tChangeset = new RepositoryChangeset<Configuration>(tRepository.getConfigurations(), tNewConfigurations);
         for (Configuration tRemoval: tChangeset.getRemovals().values()) {
@@ -352,14 +356,14 @@ public class RepositoryMonitor extends Service {
     //
     
     private long checkPresentations() throws RepositoryException {
-        return getPathRevision("presentations");
+        return getRevision(mSVNLocation + "/presentations");
     }
     
     private void processPresentations() throws RepositoryException {        
         // List
         getLogger().debug("Listing presentations");
         Map<String, Presentation> tNewPresentations = new HashMap<String, Presentation>();
-        Map<String, Long> tPathEntries = getChildrenRevisions("presentations");
+        Map<String, Long> tPathEntries = getChildrenRevisions(mSVNLocation + "/presentations");
         for (String tId: tPathEntries.keySet()) {
             long tRevision = tPathEntries.get(tId);
             String tPath = "/presentations/" + tId;            
@@ -387,11 +391,20 @@ public class RepositoryMonitor extends Service {
     // Auxiliary
     //
     
-    private long getPathRevision(final String iPath) throws RepositoryException {
+    private Long getRevision(final File iFile) throws RepositoryException {
+        if (! iFile.exists()) {
+            return null;
+        }
+        return getRevision(iFile.getAbsolutePath());
+    }
+    
+    // TODO: case for an URL
+    
+    private Long getRevision(final String iPath) throws RepositoryException {
         try {
             final List<Long> tRevisions = new ArrayList<Long>();
             mSVNClient.info2(
-                    mSVNLocation + "/" + iPath,
+                    iPath,
                     Revision.HEAD,
                     Revision.HEAD,
                     Depth.empty,
@@ -410,11 +423,20 @@ public class RepositoryMonitor extends Service {
         }
     }
     
+    private Map<String, Long> getChildrenRevisions(final File iFile) throws RepositoryException {
+        if (! iFile.exists()) {
+            return null;
+        }
+        return getChildrenRevisions(iFile.getAbsoluteFile());
+    }
+    
+    // TODO: case for an URL
+    
     private Map<String, Long> getChildrenRevisions(final String iPath) throws RepositoryException {
         try {
             final Map<String, Long> tChildren = new HashMap<String, Long>();
             mSVNClient.info2(
-                    mSVNLocation + "/" + iPath,
+                    iPath,
                     Revision.HEAD,
                     Revision.HEAD,
                     Depth.immediates,
