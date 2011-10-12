@@ -10,7 +10,7 @@
     
     <xsd:element name="connection" type="connectionType" />
     
-    <xsd:complexType name="kioskconnectionType">
+    <xsd:complexType name="connectionType">
         <xsd:sequence>
             <xsd:element name="kiosk" type="UuidType" />
             <xsd:element name="configuration" type="xsd:string" />

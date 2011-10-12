@@ -123,6 +123,8 @@ public class RepositoryMonitor extends Service {
     public RepositoryMonitor() throws ServiceSetupException {
         // Subversion checkout root
         mSVNCheckoutRoot = new File(getConfiguration().getString("repository.checkout"));
+        if (!mSVNCheckoutRoot.exists())
+            mSVNCheckoutRoot.mkdirs();
         if (!mSVNCheckoutRoot.exists() || !mSVNCheckoutRoot.canWrite())
             throw new ServiceSetupException("checkout path does not exist or is not writable");
         
@@ -153,6 +155,15 @@ public class RepositoryMonitor extends Service {
 
     @Override
     public final void run() throws ServiceRunException {
+        // Get the connections
+        try {
+            getLogger().debug("Checking out and processing the connections");
+            mConnectionsRevision = getConnections();
+            processConnections();
+        } catch (RepositoryException tException) {
+            throw new ServiceRunException("could not fetch the connections", tException);
+        }
+        
         // Get the configurations
         try {
             getLogger().debug("Checking out and processing the configurations");

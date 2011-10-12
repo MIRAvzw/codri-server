@@ -45,20 +45,16 @@ public class Processor {
         // Validate the file
         // TODO: do this within the pull parser
         if (iValidationFilename != null) {
-            if (System.getProperty("java.vendor").equals("GNU Classpath")) {
-                mLogger.warn("Cannot validate the configuration file due to a buggy Java");
-            } else {
-                try {
-                    String tSchemaLanguage = "http://www.w3.org/2001/XMLSchema";
-                    SchemaFactory tSchemaFactory = SchemaFactory.newInstance(tSchemaLanguage);
-                    Schema tSchema = tSchemaFactory.newSchema(this.getClass().getClassLoader().getResource("configuration.xsd"));
-                    Validator tValidator = tSchema.newValidator();
-                    tValidator.validate(new StreamSource(iValidationFilename));
-                } catch (SAXException tException) {
-                    throw new RepositoryException("could not validate file", tException);
-                } catch (IOException tException) {
-                    throw new RepositoryException("could not open schema", tException);
-                }
+            try {
+                String tSchemaLanguage = "http://www.w3.org/2001/XMLSchema";
+                SchemaFactory tSchemaFactory = SchemaFactory.newInstance(tSchemaLanguage);
+                Schema tSchema = tSchemaFactory.newSchema(this.getClass().getClassLoader().getResource(iValidationFilename));
+                Validator tValidator = tSchema.newValidator();
+                tValidator.validate(new StreamSource(iFile));
+            } catch (SAXException tException) {
+                throw new RepositoryException("could not validate file", tException);
+            } catch (IOException tException) {
+                throw new RepositoryException("could not open schema", tException);
             }
         }
         
