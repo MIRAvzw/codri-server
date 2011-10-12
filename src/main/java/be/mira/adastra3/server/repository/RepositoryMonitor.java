@@ -64,7 +64,7 @@ public class RepositoryMonitor extends Service {
             //       RepositoryEntity interface
             // Check the connections
             try {
-                getLogger().debug("Checking the configurations");
+                getLogger().debug("Checking the connections");
                 long tConnectionsRevision = checkConnections();
                 if (mConnectionsRevision != tConnectionsRevision) {
                     getLogger().info("Connections changed to revision " + tConnectionsRevision);

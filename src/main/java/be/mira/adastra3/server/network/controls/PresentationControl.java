@@ -22,7 +22,7 @@ public class PresentationControl extends Control {
     // Data members
     //
     
-    public final static ServiceId cIdentifier = new ServiceId("mira-be", "Media:1");
+    public final static ServiceId cIdentifier = new ServiceId("mira-be", "Presentation:1");
     
     
     //
@@ -32,7 +32,7 @@ public class PresentationControl extends Control {
     public PresentationControl(final RemoteService iService) throws NetworkException {
         super(iService);
         if (! iService.getServiceId().equals(cIdentifier)) {
-            throw new NetworkException("MediaControl instantiated for a non-MediaService");
+            throw new NetworkException("PresentationControl instantiated for a non-Presentation service");
         }
     }
     

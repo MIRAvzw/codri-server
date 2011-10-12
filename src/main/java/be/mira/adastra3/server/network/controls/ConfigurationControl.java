@@ -26,7 +26,7 @@ public class ConfigurationControl extends Control {
     // Data members
     //
     
-    public final static ServiceId cIdentifier = new ServiceId("mira-be", "Device:1");
+    public final static ServiceId cIdentifier = new ServiceId("mira-be", "Configuration:1");
     
     
     //
@@ -36,7 +36,7 @@ public class ConfigurationControl extends Control {
     public ConfigurationControl(final RemoteService iService) throws NetworkException {
         super(iService);
         if (! iService.getServiceId().equals(cIdentifier)) {
-            throw new NetworkException("DeviceControl instantiated for a non-DeviceControl");
+            throw new NetworkException("ConfigurationControl instantiated for a non-Device service");
         }
     }
     

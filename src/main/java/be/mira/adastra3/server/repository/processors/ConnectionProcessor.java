@@ -4,8 +4,8 @@
  */
 package be.mira.adastra3.server.repository.processors;
 
+import be.mira.adastra3.server.exceptions.InvalidStateException;
 import be.mira.adastra3.server.exceptions.RepositoryException;
-import be.mira.adastra3.server.repository.configuration.SoundConfiguration;
 import be.mira.adastra3.server.repository.connection.Connection;
 import java.io.File;
 import java.io.IOException;
@@ -61,8 +61,10 @@ public class ConnectionProcessor extends Processor {
                         mParser.next();
                         break loop;
                     case (XmlPullParser.START_TAG):
-                        if (mParser.getName().equals("connections")) {
+                        if (mParser.getName().equals("connection")) {
                             mConnection = parseConnection();
+                        } else {
+                            throw new InvalidStateException("inconsistency detected between validator and processor (unknown tag)");
                         }
                         break;
                     default:                        
@@ -103,6 +105,8 @@ public class ConnectionProcessor extends Processor {
                         tConfiguration = parseTextElement();
                     } else if (mParser.getName().equals("presentation")) {
                         tPresentation = parseTextElement();
+                    } else {
+                        throw new InvalidStateException("inconsistency detected between validator and processor (unknown tag)");
                     }
                     break;
                 default:
@@ -119,29 +123,5 @@ public class ConnectionProcessor extends Processor {
                 tConfiguration,
                 tPresentation);
         return tConnection;
-    }
-    
-    private SoundConfiguration parseSoundConfiguration() throws RepositoryException, XmlPullParserException, IOException {
-        // Process the tags
-        Integer tVolume = null;
-        mParser.next();
-        loop: while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
-            switch (mParser.getEventType()) {
-                case (XmlPullParser.END_TAG):
-                    mParser.next();
-                    break loop;
-                case (XmlPullParser.START_TAG):
-                    if (mParser.getName().equals("volume")) {
-                        tVolume = Integer.parseInt(parseTextElement());
-                    }
-                    break;
-                default:
-                    mParser.next();
-            }
-        }
-        
-        // Create the object
-        SoundConfiguration tSound = new SoundConfiguration(tVolume);
-        return tSound;
     }
 }

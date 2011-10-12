@@ -4,6 +4,7 @@
  */
 package be.mira.adastra3.server.repository.processors;
 
+import be.mira.adastra3.server.exceptions.InvalidStateException;
 import be.mira.adastra3.server.exceptions.RepositoryException;
 import be.mira.adastra3.server.repository.configuration.Configuration;
 import be.mira.adastra3.server.repository.configuration.SoundConfiguration;
@@ -60,6 +61,8 @@ public class ConfigurationProcessor extends Processor {
                     case (XmlPullParser.START_TAG):
                         if (mParser.getName().equals("configuration")) {
                             mConfiguration = parseConfiguration();
+                        } else {
+                            throw new InvalidStateException("inconsistency detected between validator and processor (unknown tag)");
                         }
                         break;
                     default:                        
@@ -94,6 +97,8 @@ public class ConfigurationProcessor extends Processor {
                 case (XmlPullParser.START_TAG):
                     if (mParser.getName().equals("sound")) {
                         tSoundConfiguration = parseSoundConfiguration();
+                    } else {
+                        throw new InvalidStateException("inconsistency detected between validator and processor (unknown tag)");
                     }
                     break;
                 default:
@@ -123,6 +128,8 @@ public class ConfigurationProcessor extends Processor {
                 case (XmlPullParser.START_TAG):
                     if (mParser.getName().equals("volume")) {
                         tVolume = Integer.parseInt(parseTextElement());
+                    } else {
+                        throw new InvalidStateException("inconsistency detected between validator and processor (unknown tag)");
                     }
                     break;
                 default:
