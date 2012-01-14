@@ -21,21 +21,21 @@ The main objectives of the system are:
 * Robustness
 * Future-proof technologies
 
-To keep the kiosk code (which is run on a very lightweight client) fast and lean, we opted to put as much logic as possible in the server application. Concretely, this means that when a kiosk comes on-line, it'll advertise its presence and functionality on the local network. After that, all will be managed by the server: the configuration will be loaded from storage, the kiosk will get configured using a RPC mechanism, and the location of the presentation files will be pushed as well. For more details, see the descriptions below.
+To keep the kiosk code (which is run on a very lightweight client) fast and lean, we opted to put as much logic as possible in the server application. Concretely, this means that when a kiosk comes on-line, it'll advertise its presence and functionality on the local network, after which all will be managed by the server: the configuration will be loaded from storage, the kiosk will get configured using an RPC mechanism, and the location of the relevant presentation files will be pushed as well. For more details, see the descriptions below.
 
 
 ### Presentation format
 
 HTML5 + Javascript
 
-TODO: clarify
+TODO: clarify (future proof, easy to render client-side, compact, compatible with a SCM)
 
 
 ### Storage
 
 Subversion SCM
 
-TODO: clarify
+TODO: clarify (allows versioning, easy-to-use as it's file based)
 
 
 ### Network communication
@@ -52,7 +52,7 @@ We chose to use UPnP, as it takes care of several tedious aspects:
 
 Web interface
 
-TODO: clarify
+TODO: clarify (user-friendly, easy to access)
 
 
 
