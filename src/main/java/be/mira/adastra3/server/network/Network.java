@@ -52,6 +52,11 @@ public final class Network {
         mUpnpService = new UpnpServiceImpl();
         mListeners = new ArrayList<INetworkListener>();
     }
+    
+    public void reset() {
+        mDevices.clear();
+        mListeners.clear();
+    }
 
 
     //
