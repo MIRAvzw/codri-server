@@ -41,6 +41,7 @@ TODO: clarify
 ### Network communication
 
 We chose to use UPnP, as it takes care of several tedious aspects:
+
 * Identification: each kiosk has to have a unique ID
 * Configuration: discovery enables the server to _discover_ the kiosks, which means that the kiosks itself won't need any local configuration
 * Eventing: allowing the server to respond to network (device entering, leaving, updating its status, ...) and custom events
