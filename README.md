@@ -28,7 +28,7 @@ To keep the kiosk code (which is run on a very lightweight client) fast and lean
 
 HTML5 + Javascript
 
-TODO: clarify (future proof, easy to render client-side, compact, compatible with a SCM)
+TODO: clarify (future proof, easy to render client-side, compact, compatible with a SCM, compatible with current format)
 
 
 ### Storage
@@ -53,6 +53,13 @@ We chose to use UPnP, as it takes care of several tedious aspects:
 Web interface
 
 TODO: clarify (user-friendly, easy to access)
+
+
+
+History
+-------
+
+The Ad-Astra 3 project originates in the master's dissertation of Tim Besard (2011, Hogeschool Gent), replacing the then DVD-based content format used within the MIRA museum.
 
 
 
