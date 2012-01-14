@@ -45,7 +45,7 @@ public class Main {
     // Static
     //
 
-    private static Main MAIN = new Main();
+    private final static Main MAIN = new Main();
     
     private static Map<ServiceType, Service> SUBSERVICES;
     private final static Map<ServiceType, String> cServiceNames;
@@ -210,23 +210,23 @@ public class Main {
     // Mainloop handling
     //
     
-    private Status mStatus = Status.IDLE;
+    private volatile Status mStatus = Status.IDLE;
     
-    public final synchronized void startLoop() throws InterruptedException {
+    public synchronized final void startLoop() throws InterruptedException {
         wait();
     }
 
     // TODO: use this, from a fatal() hook or whatever
-    public final synchronized void stopLoop() {
+    public synchronized final void stopLoop() {
         mStatus = Status.INTERRUPTED;
         notify();
     }
     
-    public final synchronized Status getStatus() {
+    public final Status getStatus() {
         return mStatus;
     }
     
-    public final synchronized void setStatus(final Status iStatus) {
+    public final void setStatus(final Status iStatus) {
         mStatus = iStatus;
     }
 }

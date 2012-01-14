@@ -16,7 +16,7 @@ import org.teleal.cling.UpnpServiceImpl;
 import org.teleal.cling.controlpoint.ControlPoint;
 
 /**
- *
+ * 
  * @author tim
  */
 public final class Network {
@@ -26,7 +26,7 @@ public final class Network {
     
     private Map<UUID, NetworkEntity> mDevices;
     private UpnpService mUpnpService;
-    private List<INetworkListener> mListeners;
+    private final List<INetworkListener> mListeners;
 
 
     //
@@ -35,7 +35,7 @@ public final class Network {
 
     private static Network INSTANCE;
 
-    public static Network getInstance() {
+    public static synchronized Network getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new Network();
         }
@@ -64,30 +64,34 @@ public final class Network {
     //
     
     public void addListener(final INetworkListener iListener) {
-        mListeners.add(iListener);
+        synchronized(mListeners) {
+            mListeners.add(iListener);
+        }
     }
     
     public void removeListener(final INetworkListener iListener) {
-        mListeners.remove(iListener);
+        synchronized(mListeners) {
+            mListeners.remove(iListener);
+        }
     }
     
     public static ControlPoint getControlPoint() {
         return Network.getInstance().getUpnpService().getControlPoint();
     }
     
-    public UpnpService getUpnpService() {
+    public synchronized UpnpService getUpnpService() {
         return mUpnpService;
     }
     
-    public Collection<NetworkEntity> getDevices() {
+    public synchronized Collection<NetworkEntity> getDevices() {
         return mDevices.values();
     }
     
-    public NetworkEntity getDevice(final UUID iUuid) {
+    public synchronized NetworkEntity getDevice(final UUID iUuid) {
         return mDevices.get(iUuid);
     }
     
-    public void addDevice(final NetworkEntity iDevice) throws NetworkException{
+    public synchronized void addDevice(final NetworkEntity iDevice) throws NetworkException{
         if (mDevices.containsKey(iDevice.getUuid())) {
             throw new NetworkException("device " + iDevice.getUuid() + " already present in network");
         }
@@ -95,7 +99,7 @@ public final class Network {
         emitDeviceAdded(iDevice);
     }
     
-    public void removeDevice(final NetworkEntity iDevice) throws NetworkException {
+    public synchronized void removeDevice(final NetworkEntity iDevice) throws NetworkException {
         if (!mDevices.containsKey(iDevice.getUuid())) {
             throw new NetworkException("device " + iDevice.getUuid() + " not present in network");
         }
@@ -109,26 +113,34 @@ public final class Network {
     //
     
     public void emitError(final String iMessage, final NetworkException iException) {
-        for (INetworkListener tListener : mListeners) {
-            tListener.doNetworkError(iMessage, iException);
+        synchronized(mListeners) {
+            for (INetworkListener tListener : mListeners) {
+                tListener.doNetworkError(iMessage, iException);
+            }
         }
     }
     
     public void emitWarning(final String iMessage) {
-        for (INetworkListener tListener : mListeners) {
-            tListener.doNetworkWarning(iMessage);
+        synchronized(mListeners) {
+                for (INetworkListener tListener : mListeners) {
+                tListener.doNetworkWarning(iMessage);
+            }
         }
     }
     
     private void emitDeviceAdded(final NetworkEntity iDevice) {
-        for (INetworkListener tListener : mListeners) {
-            tListener.doEntityAdded(iDevice);
+        synchronized(mListeners) {
+                for (INetworkListener tListener : mListeners) {
+                tListener.doEntityAdded(iDevice);
+            }
         }
     }
     
     private void emitDeviceRemoved(final NetworkEntity iDevice) {
-        for (INetworkListener tListener : mListeners) {
-            tListener.doEntityRemoved(iDevice);
-        }        
+        synchronized(mListeners) {
+                for (INetworkListener tListener : mListeners) {
+                tListener.doEntityRemoved(iDevice);
+            }
+        }
     }
 }
