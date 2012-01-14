@@ -5,13 +5,49 @@
     Configuration
   -->
   
+    <!-- Basics -->
     <modelVersion>4.0.0</modelVersion>
     <groupId>be.mira.adastra3</groupId>
-    <artifactId>server</artifactId>
+    <artifactId>aa3server</artifactId>
     <packaging>jar</packaging>
-    <version>0.1</version>
-    <name>server</name>
+
+    <!-- Project information -->
+    <version>0.2-SNAPSHOT</version>
+    <name>Ad-Astra 3 Server</name>
+    <description>Backend server for the MIRA Ad-Astra III content management system.</description>
     <url>https://sites.google.com/site/miraadastraiii/</url>
+    <inceptionYear>2011</inceptionYear>
+    <organization>
+        <name>MIRA vzw</name>
+        <url>http://mira.be/</url>
+    </organization>
+
+    <!-- People -->
+    <developers>
+        <developer>
+            <id>maleadt</id>
+            <name>Tim Besard</name>
+            <email>tim.besard@gmail.com</email>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+            <timezone>+2</timezone>
+        </developer>
+    </developers>
+
+    <!-- Source control and issue management -->
+    <scm>
+        <connection>scm:git:git://github.com/MIRAvzw/adastra3-server.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com:MIRAvzw/adastra3-server.git</developerConnection>
+        <url>https://github.com/MIRAvzw/adastra3-server</url>
+    </scm>
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/MIRAvzw/adastra3-server/issues</url>
+    </issueManagement>
+
+    <!-- Other -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
