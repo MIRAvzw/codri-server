@@ -16,6 +16,7 @@ Architecture
 ------------
 
 The main objectives of the system are:
+
 * Easy administration (user-friendly interface, minimal configuration)
 * Robustness
 * Future-proof technologies
@@ -26,12 +27,14 @@ To keep the kiosk code (which is run on a very lightweight client) fast and lean
 ### Presentation format
 
 HTML5 + Javascript
+
 TODO: clarify
 
 
 ### Storage
 
 Subversion SCM
+
 TODO: clarify
 
 
@@ -47,6 +50,7 @@ We chose to use UPnP, as it takes care of several tedious aspects:
 ### Administrative interface
 
 Web interface
+
 TODO: clarify
 
 
@@ -59,11 +63,13 @@ Libraries
 ---------
 
 Libraries used to implement the essential technologies used within the system:
+
 * Subversion: official JavaHL bindings
 * UPnP: Cling
 * Web interface: JWt
 
 Auxiliary libraries:
+
 * Servlet engine: Jetty
 * Logging: log4j (+ slj4j for Jetty)
 * Testing: TestNG
