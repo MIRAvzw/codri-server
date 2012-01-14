@@ -181,6 +181,7 @@
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-project-info-reports-plugin</artifactId>
                         </plugin>
+                        
                         <!-- Report about violations of coding standards -->
                         <plugin>
                             <artifactId>maven-checkstyle-plugin</artifactId>
@@ -188,6 +189,7 @@
                                 <configLocation>checkstyle.xml</configLocation>
                             </configuration>
                         </plugin>
+
                         <!-- Generate "PMD" and "CPD" reports -->
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
@@ -199,11 +201,13 @@
                                 <targetJdk>1.6</targetJdk>
                             </configuration>
                         </plugin>
+
                         <!-- Generate "JDepend" report -->
                         <plugin>
                             <groupId>org.codehaus.mojo</groupId>
                             <artifactId>jdepend-maven-plugin</artifactId>
                         </plugin>
+
                         <!-- Generate "FindBugs Report" report -->
                         <plugin>
                             <groupId>org.codehaus.mojo</groupId>
@@ -213,6 +217,7 @@
                                 <effort>Default</effort>
                             </configuration>
                         </plugin>
+
                         <!-- Generate "JavaNCSS Report" report -->
                         <plugin>
                             <groupId>org.codehaus.mojo</groupId>
