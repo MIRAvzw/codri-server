@@ -54,6 +54,7 @@ public final class Network {
     }
     
     public void reset() {
+        // TODO: warn if called in production context
         mDevices.clear();
         mListeners.clear();
     }

@@ -23,9 +23,9 @@ public final class Repository {
     // Member data
     //
     
-    private final Map<String, Connection> mConnections;
     private final Map<String, Configuration> mConfigurations;
-    private final Map<String, Presentation> mMedia;
+    private final Map<String, Presentation> mPresentations;
+    private final Map<String, Connection> mConnections;
     private final List<IRepositoryListener> mListeners;
     private String mServer;
 
@@ -42,6 +42,14 @@ public final class Repository {
         }
         return INSTANCE;
     }
+    
+    public void reset() {
+        // TODO: warn if called in production context
+        mConfigurations.clear();
+        mPresentations.clear();
+        mConnections.clear();
+        mListeners.clear();
+    }
 
 
     //
@@ -49,9 +57,9 @@ public final class Repository {
     //
 
     private Repository() {
-        mConnections = new HashMap<String, Connection>();
         mConfigurations = new HashMap<String, Configuration>();
-        mMedia = new HashMap<String, Presentation>();
+        mPresentations = new HashMap<String, Presentation>();
+        mConnections = new HashMap<String, Connection>();
         mListeners = new ArrayList<IRepositoryListener>();
     }
 
@@ -83,6 +91,7 @@ public final class Repository {
         }
     }
     
+    // TODO: why return a map?
     public synchronized Map<String, Connection> getConnections() {
         return mConnections;
     }
@@ -115,6 +124,7 @@ public final class Repository {
         emitConnectionRemoved(iConnection);
     }
     
+    // TODO: why return map?
     public synchronized Map<String, Configuration> getConfigurations() {
         return mConfigurations;
     }
@@ -147,35 +157,36 @@ public final class Repository {
         emitConfigurationRemoved(iConfiguration);
     }
     
+    // TODO: why return a map?
     public synchronized Map<String, Presentation> getPresentations() {
-        return mMedia;
+        return mPresentations;
     }
 
     public synchronized Presentation getPresentation(final String iId) {
-        return mMedia.get(iId);
+        return mPresentations.get(iId);
     }
 
     public synchronized void addPresentation(final Presentation iPresentation) throws RepositoryException {
-        if (mMedia.containsKey(iPresentation.getId())) {
+        if (mPresentations.containsKey(iPresentation.getId())) {
             throw new RepositoryException("presentation " + iPresentation.getId() + " already present in repository");
         }
-        mMedia.put(iPresentation.getId(), iPresentation);
+        mPresentations.put(iPresentation.getId(), iPresentation);
         emitPresentationAdded(iPresentation);
     }
     
     public synchronized void updatePresentation(final Presentation iPresentation) throws RepositoryException {
-        if (! mMedia.containsKey(iPresentation.getId())) {
+        if (! mPresentations.containsKey(iPresentation.getId())) {
             throw new RepositoryException("presentation " + iPresentation.getId() + " not present in repository");
         }
-        Presentation tOldMedia = mMedia.put(iPresentation.getId(), iPresentation);
+        Presentation tOldMedia = mPresentations.put(iPresentation.getId(), iPresentation);
         emitPresentationUpdated(tOldMedia, iPresentation);
     }
 
     public synchronized void removePresentation(final Presentation iPresentation) throws RepositoryException {
-        if (! mMedia.containsKey(iPresentation.getId())) {
+        if (! mPresentations.containsKey(iPresentation.getId())) {
             throw new RepositoryException("presentation " + iPresentation.getId() + " not present in repository");
         }
-        mMedia.remove(iPresentation.getId());
+        mPresentations.remove(iPresentation.getId());
         emitPresentationRemoved(iPresentation);
     }
     

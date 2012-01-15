@@ -19,7 +19,7 @@ import be.mira.adastra3.server.network.INetworkListener;
 @Test
 public class NetworkTest {
     //
-    // Mem
+    // Member data
     //
     
     private Network mNetwork;
@@ -42,18 +42,18 @@ public class NetworkTest {
     }
     
     public enum MessageType {
+        Warning,
+        Error,
         EntityAdded,
-        EntityRemoved,
-        NetworkError,
-        NetworkWarning
+        EntityRemoved
     }
     
     private class DummyListener implements INetworkListener {
         public volatile MessageType mType;
         public volatile int mCount;
-        public volatile NetworkEntity mDevice;
         public volatile String mMessage;
         public volatile NetworkException mException;
+        public volatile NetworkEntity mDevice;
         
         public void reset() {
             mCount = 0;
@@ -76,7 +76,7 @@ public class NetworkTest {
         @Override
         public void doNetworkError(String iMessage, NetworkException iException) {
             mCount++;
-            mType = MessageType.NetworkError;
+            mType = MessageType.Error;
             mMessage = iMessage;
             mException = iException;
         }
@@ -84,7 +84,7 @@ public class NetworkTest {
         @Override
         public void doNetworkWarning(String iMessage) {
             mCount++;
-            mType = MessageType.NetworkWarning;
+            mType = MessageType.Warning;
             mMessage = iMessage;
         }
         
@@ -166,7 +166,7 @@ public class NetworkTest {
         
         mNetwork.emitWarning(tMessage);
         Assert.assertEquals(mNetworkListener.mCount, 1);
-        Assert.assertEquals(mNetworkListener.mType, MessageType.NetworkWarning);
+        Assert.assertEquals(mNetworkListener.mType, MessageType.Warning);
         Assert.assertEquals(mNetworkListener.mMessage, tMessage);
     }
     
@@ -177,7 +177,7 @@ public class NetworkTest {
         
         mNetwork.emitError(tMessage, tException);
         Assert.assertEquals(mNetworkListener.mCount, 1);
-        Assert.assertEquals(mNetworkListener.mType, MessageType.NetworkError);
+        Assert.assertEquals(mNetworkListener.mType, MessageType.Error);
         Assert.assertEquals(mNetworkListener.mMessage, tMessage);
         Assert.assertEquals(mNetworkListener.mException, tException);
     }
