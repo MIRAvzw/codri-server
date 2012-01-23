@@ -16,16 +16,18 @@ public abstract class RepositoryEntity {
     private final String mId;
     private final long mRevision;
     private final String mPath;
+    private final String mServer; // FIXME: duplicate information
     
     
     //
     // Construction and destruction
     //
     
-    public RepositoryEntity(final String iId, final long iRevision, final String iPath) {
+    public RepositoryEntity(final String iId, final long iRevision, final String iPath, final String iServer) {
         mId = iId;
         mRevision = iRevision;
         mPath = iPath;
+        mServer = iServer;
     }
     
     
@@ -45,4 +47,7 @@ public abstract class RepositoryEntity {
         return mPath;
     }
     
+    public final String getLocation() {
+        return mServer + getPath();
+    }    
 }

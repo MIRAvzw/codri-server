@@ -23,19 +23,21 @@ public class ConfigurationProcessor extends Processor {
     //
     
     private Configuration mConfiguration;
-    private long mRevision;
-    private String mRepositoryäth;
-    private String mId;
+    private final long mRevision;
+    private final String mRepositoryPath;
+    private final String mRepositoryLocation;
+    private final String mId;
     
     
     //
     // Construction and destruction
     //
     
-    public ConfigurationProcessor(final long iRevision, final String iRepositoryPath, final String iId, final File iFile) throws RepositoryException {
+    public ConfigurationProcessor(final long iRevision, final String iRepositoryPath, final String iRepositoryLocation, final String iId, final File iFile) throws RepositoryException {
         super(iFile, "configuration.xsd");
         mRevision = iRevision;
-        mRepositoryäth = iRepositoryPath;
+        mRepositoryPath = iRepositoryPath;
+        mRepositoryLocation = iRepositoryLocation;
         mId = iId;
     }
     
@@ -111,7 +113,8 @@ public class ConfigurationProcessor extends Processor {
         Configuration tConfiguration = new Configuration(
                 mId,
                 mRevision,
-                mRepositoryäth,
+                mRepositoryPath,
+                mRepositoryLocation,
                 tSoundConfiguration);
         return tConfiguration;
     }

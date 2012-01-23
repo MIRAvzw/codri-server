@@ -5,7 +5,7 @@
 package be.mira.adastra3.server.network.controls;
 
 import be.mira.adastra3.server.exceptions.NetworkException;
-import be.mira.adastra3.server.network.Network;
+import be.mira.adastra3.server.beans.Network;
 import be.mira.adastra3.server.network.actions.device.GetVolumeAction;
 import be.mira.adastra3.server.network.actions.device.EchoAction;
 import be.mira.adastra3.server.network.actions.device.GetRevisionAction;
@@ -14,6 +14,7 @@ import be.mira.adastra3.server.network.actions.device.SetRevisionAction;
 import be.mira.adastra3.server.network.actions.device.SetVolumeAction;
 import be.mira.adastra3.server.network.actions.device.ShutdownAction;
 import org.teleal.cling.controlpoint.ActionCallback;
+import org.teleal.cling.controlpoint.ControlPoint;
 import org.teleal.cling.model.meta.RemoteService;
 import org.teleal.cling.model.types.ServiceId;
 
@@ -27,14 +28,16 @@ public class ConfigurationControl extends Control {
     //
     
     public final static ServiceId cIdentifier = new ServiceId("mira-be", "Configuration:1");
+    public final ControlPoint mControlPoint;
     
     
     //
     // Construction and destruction
     //
 
-    public ConfigurationControl(final RemoteService iService) throws NetworkException {
+    public ConfigurationControl(final RemoteService iService, final ControlPoint iControlPoint) throws NetworkException {
         super(iService);
+        mControlPoint = iControlPoint;
         if (! iService.getServiceId().equals(cIdentifier)) {
             throw new NetworkException("ConfigurationControl instantiated for a non-Device service");
         }
@@ -50,7 +53,7 @@ public class ConfigurationControl extends Control {
         
         new ActionCallback.Default(
                 tAction,
-                Network.getControlPoint()
+                mControlPoint
         ).run();
         
         return tAction.getConfigurationRevision();
@@ -61,7 +64,7 @@ public class ConfigurationControl extends Control {
         
         new ActionCallback.Default(
                 tAction,
-                Network.getControlPoint()
+                mControlPoint
         ).run();
     }
     
@@ -70,7 +73,7 @@ public class ConfigurationControl extends Control {
         
         new ActionCallback.Default(
                 tAction,
-                Network.getControlPoint()
+                mControlPoint
         ).run();     
     }
     
@@ -79,7 +82,7 @@ public class ConfigurationControl extends Control {
         
         new ActionCallback.Default(
                 tAction,
-                Network.getControlPoint()
+                mControlPoint
         ).run();
     }
     
@@ -88,7 +91,7 @@ public class ConfigurationControl extends Control {
         
         new ActionCallback.Default(
                 tAction,
-                Network.getControlPoint()
+                mControlPoint
         ).run();
         
         return tAction.getEcho();
@@ -99,7 +102,7 @@ public class ConfigurationControl extends Control {
         
         new ActionCallback.Default(
                 tAction,
-                Network.getControlPoint()
+                mControlPoint
         ).run();
     }
     
@@ -108,7 +111,7 @@ public class ConfigurationControl extends Control {
         
         new ActionCallback.Default(
                 tAction,
-                Network.getControlPoint()
+                mControlPoint
         ).run();
         
         return tAction.getVolume();

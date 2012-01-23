@@ -3,17 +3,20 @@
  * and open the template in the editor.
  */
 
-package be.mira.adastra3.server.network;
+package be.mira.adastra3.server.beans;
 
-import be.mira.adastra3.server.Service;
 import be.mira.adastra3.server.exceptions.NetworkException;
-import be.mira.adastra3.server.exceptions.ServiceRunException;
-import be.mira.adastra3.server.exceptions.ServiceSetupException;
+import be.mira.adastra3.server.network.Kiosk;
+import be.mira.adastra3.server.network.NetworkEntity;
 import be.mira.adastra3.server.network.controls.ConfigurationControl;
 import be.mira.adastra3.server.network.controls.PresentationControl;
+import be.mira.adastra3.server.beans.factory.Logger;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import org.apache.commons.logging.Log;
 import org.teleal.cling.UpnpService;
 import org.teleal.cling.model.message.header.STAllHeader;
 import org.teleal.cling.model.meta.ManufacturerDetails;
@@ -29,48 +32,49 @@ import org.teleal.cling.registry.RegistryListener;
  *
  * @author tim
  */
-public class NetworkMonitor extends Service {
+public class NetworkMonitor {
+    //
+    // Data members
+    //
+    
+    @Logger
+    private Log mLogger;
+    
+    private Network mNetwork;
+    
+    
     //
     // Construction and destruction
     //
 
-    public NetworkMonitor() throws ServiceSetupException {
-        super();
-        
+    public NetworkMonitor(Network iNetwork) throws Exception {
+        mNetwork = iNetwork;
+    }
+    
+    @PostConstruct
+    public final void init() throws Exception {
         // Add a listener for device registration events
         try {
-            Network.getInstance().getUpnpService().getRegistry().addListener(
-                    createRegistryListener(Network.getInstance().getUpnpService())
+            mNetwork.getUpnpService().getRegistry().addListener(
+                    createRegistryListener(mNetwork.getUpnpService())
             );
         } catch (Exception tException) {
-            throw new ServiceSetupException(tException);
+            throw new Exception(tException);
         }
-    }
-
-
-    //
-    // Service interface
-    //
-
-    @Override
-    public final void run() throws ServiceRunException {
+        
         // Broadcast a search message for all devices
-        try {
-            getLogger().debug("Looking for devices");
-            Network.getInstance().getUpnpService().getControlPoint().search(
-                    new STAllHeader()
-            );
-        } catch (Exception tException) {
-            throw new ServiceRunException(tException);
-        }
+        mLogger.debug("Looking for devices");
+        mNetwork.getUpnpService().getControlPoint().search(
+                new STAllHeader()
+        );
     }
-
-    @Override
-    public final void stop() throws ServiceRunException {
+    
+    @PreDestroy
+    public final void destroy() throws Exception {
         try {
-            Network.getInstance().getUpnpService().shutdown();
+            mNetwork.getUpnpService().shutdown();
         } catch (Exception tException) {
-            throw new ServiceRunException(tException);
+            throw new Exception(tException);
         }
     }
     
@@ -80,21 +84,20 @@ public class NetworkMonitor extends Service {
             @Override
             public void remoteDeviceAdded(final Registry iRegistry, final RemoteDevice iDevice) {
                 // Check for MIRA devices
-                getLogger().debug("New device entered the network: " + iDevice.getDisplayString());
+                mLogger.debug("New device entered the network: " + iDevice.getDisplayString());
                 ManufacturerDetails tManufacturer = iDevice.getDetails().getManufacturerDetails();
                 if (tManufacturer.getManufacturer().equals("Volkssterrenwacht MIRA vzw")) {                
                     // Get the device UUID
-                    Network tNetwork = Network.getInstance();
                     UUID tUuid = convertUdn(iDevice.getIdentity().getUdn());
                     if (tUuid == null) {
-                        tNetwork.emitWarning("could not convert device UDN '" + iDevice.getIdentity().getUdn() + "' to a valid UUID");
+                        mNetwork.emitWarning("could not convert device UDN '" + iDevice.getIdentity().getUdn() + "' to a valid UUID");
                         return;
                     }
 
                     // Check the device type
                     ModelDetails tModel = iDevice.getDetails().getModelDetails();
                     if (tModel.getModelName().equals("Ad-Astra Kiosk") && tModel.getModelNumber().equals("3.0")) {
-                        getLogger().debug("Identified device as Ad-Astra 3.0 model");
+                        mLogger.debug("Identified device as Ad-Astra 3.0 model");
                         
                         try {                        
                             // Extract services
@@ -105,15 +108,15 @@ public class NetworkMonitor extends Service {
                             }
                             
                             // Create device
-                            Kiosk tDevice = new Kiosk(tUuid, new ConfigurationControl(tServiceDevice), new PresentationControl(tServiceApplication));
+                            Kiosk tDevice = new Kiosk(tUuid, new ConfigurationControl(tServiceDevice, mNetwork.getControlPoint()), new PresentationControl(tServiceApplication, mNetwork.getControlPoint()));
                             tDevice.setName(iDevice.getDetails().getFriendlyName());
-                            tNetwork.addDevice(tDevice);
+                            mNetwork.addDevice(tDevice);
                         } catch (NetworkException tException) {
-                            tNetwork.emitError("could not register Ad-Astra 3.0 device", tException);
+                            mNetwork.emitError("could not register Ad-Astra 3.0 device", tException);
                             return;
                         }
                     } else {
-                        tNetwork.emitWarning("an unknown MIRA device has been detected: " + tModel.getModelName() + " " + tModel.getModelNumber());
+                        mNetwork.emitWarning("an unknown MIRA device has been detected: " + tModel.getModelName() + " " + tModel.getModelNumber());
                         return;
                     }
                 }
@@ -123,25 +126,24 @@ public class NetworkMonitor extends Service {
             @Override
             public void remoteDeviceRemoved(final Registry iRegistry, final RemoteDevice iDevice) {
                 // Check for MIRA devices
-                getLogger().debug("Device exited the network: " + iDevice.getDisplayString());
+                mLogger.debug("Device exited the network: " + iDevice.getDisplayString());
                 ManufacturerDetails tManufacturer = iDevice.getDetails().getManufacturerDetails();
                 if (tManufacturer.getManufacturer().equals("Volkssterrenwacht MIRA vzw")) {                
                     // Get the device UUID
-                    Network tNetwork = Network.getInstance();
                     UUID tUuid = convertUdn(iDevice.getIdentity().getUdn());
                     if (tUuid == null) {
-                        tNetwork.emitWarning("could not convert device UDN '" + iDevice.getIdentity().getUdn() + "' to a valid UUID");
+                        mNetwork.emitWarning("could not convert device UDN '" + iDevice.getIdentity().getUdn() + "' to a valid UUID");
                         return;
                     }
                     
                     // Remove the device
                     try {
-                        NetworkEntity tDevice = tNetwork.getDevice(tUuid); 
+                        NetworkEntity tDevice = mNetwork.getDevice(tUuid); 
                         if (tDevice != null) {
-                            tNetwork.removeDevice(tDevice);
+                            mNetwork.removeDevice(tDevice);
                         }
                     } catch (NetworkException tException) {
-                        tNetwork.emitError("could not remove a MIRA device", tException);
+                        mNetwork.emitError("could not remove a MIRA device", tException);
                     }
                 }
             }
@@ -151,19 +153,18 @@ public class NetworkMonitor extends Service {
             @Override
             public void remoteDeviceUpdated(Registry iRegistry, RemoteDevice iDevice) {
                 // Check for MIRA devices
-                getLogger().debug("Device in the network got updated: " + iDevice.getDisplayString());
+                mLogger.debug("Device in the network got updated: " + iDevice.getDisplayString());
                 ManufacturerDetails tManufacturer = iDevice.getDetails().getManufacturerDetails();
                 if (tManufacturer.getManufacturer().equals("Volkssterrenwacht MIRA vzw")) {                
                     // Get the device UUID
-                    Network tNetwork = Network.getInstance();
                     UUID tUuid = convertUdn(iDevice.getIdentity().getUdn());
                     if (tUuid == null) {
-                        tNetwork.emitWarning("could not convert device UDN '" + iDevice.getIdentity().getUdn() + "' to a valid UUID");
+                        mNetwork.emitWarning("could not convert device UDN '" + iDevice.getIdentity().getUdn() + "' to a valid UUID");
                         return;
                     }
                     
                     // Update the device
-                    NetworkEntity tDevice = tNetwork.getDevice(tUuid);
+                    NetworkEntity tDevice = mNetwork.getDevice(tUuid);
                     if (tDevice != null) {
                         tDevice.setMark();
                     }

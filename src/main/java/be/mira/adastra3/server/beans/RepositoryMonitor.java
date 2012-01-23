@@ -3,17 +3,16 @@
  * and open the template in the editor.
  */
 
-package be.mira.adastra3.server.repository;
+package be.mira.adastra3.server.beans;
 
 import be.mira.adastra3.server.repository.processors.ConfigurationProcessor;
-import be.mira.adastra3.server.Service;
 import be.mira.adastra3.server.exceptions.RepositoryException;
-import be.mira.adastra3.server.exceptions.ServiceRunException;
-import be.mira.adastra3.server.exceptions.ServiceSetupException;
+import be.mira.adastra3.server.repository.RepositoryEntity;
 import be.mira.adastra3.server.repository.configuration.Configuration;
 import be.mira.adastra3.server.repository.connection.Connection;
 import be.mira.adastra3.server.repository.presentation.Presentation;
 import be.mira.adastra3.server.repository.processors.ConnectionProcessor;
+import be.mira.adastra3.server.beans.factory.Logger;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -25,7 +24,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.logging.Log;
+import org.springframework.beans.factory.annotation.Value;
 import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.Depth;
 import org.tigris.subversion.javahl.Info2;
@@ -37,20 +40,100 @@ import org.tigris.subversion.javahl.SVNClient;
  *
  * @author tim
  */
-public class RepositoryMonitor extends Service {
+public class RepositoryMonitor {
     //
     // Data members
     //
+    
+    @Logger
+    private Log mLogger;
+    
+    private Repository mRepository;
 
-    private String mSVNLocation;
-    private File mSVNCheckoutRoot;
+    private @Value("${repository.location}") String mSVNLocation;
+    private @Value("${repository.checkout}") File mSVNCheckoutRoot;
+    private @Value("${repository.interval}") int mSVNMonitorInterval;
+    
     private SVNClient mSVNClient;
     private Timer mSVNMonitor;
-    private int mSVNMonitorInterval;
     
     private long mConnectionsRevision;
     private long mConfigurationsRevision;
     private long mPresentationsRevision;
+
+
+    //
+    // Construction and destruction
+    //
+
+    public RepositoryMonitor(Repository iRepository) {
+        mRepository = iRepository;
+    }
+
+    @PostConstruct
+    public void init() throws Exception {
+        // Subversion checkout root
+        if (!mSVNCheckoutRoot.exists())
+            mSVNCheckoutRoot.mkdirs();
+        if (!mSVNCheckoutRoot.exists() || !mSVNCheckoutRoot.canWrite())
+            throw new Exception("checkout path does not exist or is not writable");
+        
+        // Subversion location
+        Pattern tLocationPattern = Pattern.compile("^(https?|file|svn)://");
+        Matcher tLocationMatcher = tLocationPattern.matcher(mSVNLocation);
+        if (!tLocationMatcher.find()) {
+            throw new Exception("repository location '" + mSVNLocation + "' is not a valid URL");
+        }
+        mRepository.setServer(mSVNLocation);
+        mSVNClient = new SVNClient();
+
+        // Monitor timer
+        if (mSVNMonitorInterval <= 0) {
+            throw new Exception("Update interval out of valid range");
+        }
+        mLogger.debug("Scheduling SVN monitor with interval of " + mSVNMonitorInterval + " seconds");
+        mSVNMonitor = new Timer();
+        
+        // TODO: does this has to happen in the init()? Move to timer?
+        
+        // Get the connections
+        try {
+            mLogger.debug("Checking out and processing the connections");
+            mConnectionsRevision = getConnections();
+            processConnections();
+        } catch (RepositoryException tException) {
+            throw new Exception("could not fetch the connections", tException);
+        }
+        
+        // Get the configurations
+        try {
+            mLogger.debug("Checking out and processing the configurations");
+            mConfigurationsRevision = getConfigurations();
+            processConfigurations();
+        } catch (RepositoryException tException) {
+            throw new Exception("could not fetch the configurations", tException);
+        }
+        
+        // Get the media
+        try {
+            mLogger.debug("Processing the media");
+            mConfigurationsRevision = checkPresentations();
+            processPresentations();
+        } catch (RepositoryException tException) {
+            throw new Exception("could not fetch the media", tException);
+        }
+
+        // Schedule the monitor
+        mSVNMonitor.schedule(
+                new Monitor(),
+                mSVNMonitorInterval * 1000, // Initial delay
+                mSVNMonitorInterval * 1000  // Period
+            );
+    }
+    
+    @PreDestroy
+    public final void destroy() {
+    }
 
 
     //
@@ -64,43 +147,43 @@ public class RepositoryMonitor extends Service {
             //       RepositoryEntity interface
             // Check the connections
             try {
-                getLogger().debug("Checking the connections");
+                mLogger.debug("Checking the connections");
                 long tConnectionsRevision = checkConnections();
                 if (mConnectionsRevision != tConnectionsRevision) {
-                    getLogger().info("Connections changed to revision " + tConnectionsRevision);
+                    mLogger.info("Connections changed to revision " + tConnectionsRevision);
                     mConnectionsRevision = tConnectionsRevision;
                     getConnections();
                     processConnections();
                 }
             } catch (RepositoryException tException) {
-                Repository.getInstance().emitError("could not update the connections", tException);
+                mRepository.emitError("could not update the connections", tException);
             }
             
             // Check the configurations
             try {
-                getLogger().debug("Checking the configurations");
+                mLogger.debug("Checking the configurations");
                 long tConfigurationsRevision = checkConfigurations();
                 if (mConfigurationsRevision != tConfigurationsRevision) {
-                    getLogger().info("Configurations changed to revision " + tConfigurationsRevision);
+                    mLogger.info("Configurations changed to revision " + tConfigurationsRevision);
                     mConfigurationsRevision = tConfigurationsRevision;
                     getConfigurations();
                     processConfigurations();
                 }
             } catch (RepositoryException tException) {
-                Repository.getInstance().emitError("could not update the configurations", tException);
+                mRepository.emitError("could not update the configurations", tException);
             }
             
             // Check the presentations
             try {
-                getLogger().debug("Checking the presentations");
+                mLogger.debug("Checking the presentations");
                 long tPresentationRevision = checkPresentations();
                 if (mPresentationsRevision != tPresentationRevision) {
-                    getLogger().info("Presentations changed to revision " + tPresentationRevision);
+                    mLogger.info("Presentations changed to revision " + tPresentationRevision);
                     mPresentationsRevision = tPresentationRevision;
                     processPresentations();
                 }
             } catch (RepositoryException tException) {
-                Repository.getInstance().emitError("could not update the presentations", tException);
+                mRepository.emitError("could not update the presentations", tException);
             }
         }
         
@@ -113,85 +196,6 @@ public class RepositoryMonitor extends Service {
       public boolean accept(File iDirectory, String iFilename) {
           return mPattern.matcher(iFilename).find();
       }
-    }
-
-
-    //
-    // Construction and destruction
-    //
-
-    public RepositoryMonitor() throws ServiceSetupException {
-        // Subversion checkout root
-        mSVNCheckoutRoot = new File(getConfiguration().getString("repository.checkout"));
-        if (!mSVNCheckoutRoot.exists())
-            mSVNCheckoutRoot.mkdirs();
-        if (!mSVNCheckoutRoot.exists() || !mSVNCheckoutRoot.canWrite())
-            throw new ServiceSetupException("checkout path does not exist or is not writable");
-        
-        // Subversion location
-        Pattern tLocationPattern = Pattern.compile("^(https?|file|svn)://");
-        mSVNLocation = getConfiguration().getString("repository.location");
-        Matcher tLocationMatcher = tLocationPattern.matcher(mSVNLocation);
-        if (!tLocationMatcher.find()) {
-            throw new ServiceSetupException("repository location '" + mSVNLocation + "' is not a valid URL");
-        }
-        Repository.getInstance().setServer(mSVNLocation);
-        mSVNClient = new SVNClient();
-
-        // Monitor timer
-        Integer tInterval = getConfiguration().getInt("repository.interval");
-        if (tInterval <= 0) {
-            throw new ServiceSetupException("Update interval out of valid range");
-        }
-        mSVNMonitorInterval = tInterval;
-        getLogger().debug("Scheduling SVN monitor with interval of " + tInterval + " seconds");
-        mSVNMonitor = new Timer();
-    }
-
-
-    //
-    // Service interface
-    //
-
-    @Override
-    public final void run() throws ServiceRunException {
-        // Get the connections
-        try {
-            getLogger().debug("Checking out and processing the connections");
-            mConnectionsRevision = getConnections();
-            processConnections();
-        } catch (RepositoryException tException) {
-            throw new ServiceRunException("could not fetch the connections", tException);
-        }
-        
-        // Get the configurations
-        try {
-            getLogger().debug("Checking out and processing the configurations");
-            mConfigurationsRevision = getConfigurations();
-            processConfigurations();
-        } catch (RepositoryException tException) {
-            throw new ServiceRunException("could not fetch the configurations", tException);
-        }
-        
-        // Get the media
-        try {
-            getLogger().debug("Processing the media");
-            mConfigurationsRevision = checkPresentations();
-            processPresentations();
-        } catch (RepositoryException tException) {
-            throw new ServiceRunException("could not fetch the media", tException);
-        }
-
-        // Schedule the monitor
-        mSVNMonitor.schedule(
-                new Monitor(),
-                mSVNMonitorInterval * 1000, // Initial delay
-                mSVNMonitorInterval * 1000  // Period
-            );
-    }
-
-    @Override
-    public final void stop() throws ServiceRunException {
     }
     
     
@@ -222,13 +226,13 @@ public class RepositoryMonitor extends Service {
         // Checkout or update
         try {
             if (tConnectionRevision == null) {
-                getLogger().trace("Fetching connections");
+                mLogger.trace("Fetching connections");
                 if (tCheckout.exists()) {
                     FileUtils.cleanDirectory(tCheckout);
                 }
                 tConnectionRevision = checkoutRepository(tCheckout, tLocation);            
             } else {
-                getLogger().trace("Updating connections");
+                mLogger.trace("Updating connections");
                 tConnectionRevision = updateRepository(tCheckout);              
             }
         } catch (RepositoryException tException) {
@@ -242,20 +246,20 @@ public class RepositoryMonitor extends Service {
     
     private void processConnections() throws RepositoryException {        
         // Read
-        getLogger().debug("Reading connections");
+        mLogger.debug("Reading connections");
         Map<String, Connection> tNewConnections = new HashMap<String, Connection>();
         File tDirectory = new File(mSVNCheckoutRoot, "connections");
         for (File tFile: tDirectory.listFiles(new XMLFilter())) {
             // Generate an identifier
             String tFilename = tFile.getName();
-            getLogger().trace("Processing '" + tFilename + "'");
+            mLogger.trace("Processing '" + tFilename + "'");
             int tDotPosition = tFilename.lastIndexOf('.');
             String tId = tFilename.substring(0, tDotPosition);
             final long tRevision = getRevision(tFile);
             
             // Process the contents
             String tRepositoryPath = "/connections/" + tFilename;
-            ConnectionProcessor tReader = new ConnectionProcessor(tRevision, tRepositoryPath, tId, tFile);
+            ConnectionProcessor tReader = new ConnectionProcessor(tRevision, tRepositoryPath, mSVNLocation, tId, tFile);
             tReader.process();
             Connection tConnection = tReader.getConnection();
             if (tConnection == null) {
@@ -265,8 +269,8 @@ public class RepositoryMonitor extends Service {
         }
         
         // Save
-        getLogger().debug("Saving connections");
-        Repository tRepository = Repository.getInstance();
+        mLogger.debug("Saving connections");
+        Repository tRepository = mRepository;
         RepositoryChangeset<Connection> tChangeset = new RepositoryChangeset<Connection>(tRepository.getConnections(), tNewConnections);
         for (Connection tRemoval: tChangeset.getRemovals().values()) {
             tRepository.removeConnection(tRemoval);
@@ -304,13 +308,13 @@ public class RepositoryMonitor extends Service {
         // Checkout or update
         try {
             if (tConfigurationRevision == null) {
-                getLogger().trace("Fetching configurations");
+                mLogger.trace("Fetching configurations");
                 if (tCheckout.exists()) {
                     FileUtils.cleanDirectory(tCheckout);
                 }
                 tConfigurationRevision = checkoutRepository(tCheckout, tLocation);            
             } else {
-                getLogger().trace("Updating configurations");
+                mLogger.trace("Updating configurations");
                 tConfigurationRevision = updateRepository(tCheckout);              
             }
         } catch (RepositoryException tException) {
@@ -324,20 +328,20 @@ public class RepositoryMonitor extends Service {
     
     private void processConfigurations() throws RepositoryException {        
         // Read
-        getLogger().debug("Reading configurations");
+        mLogger.debug("Reading configurations");
         Map<String, Configuration> tNewConfigurations = new HashMap<String, Configuration>();
         File tDirectory = new File(mSVNCheckoutRoot, "configurations");
         for (File tFile: tDirectory.listFiles(new XMLFilter())) {
             // Generate an identifier
             String tFilename = tFile.getName();
-            getLogger().trace("Processing '" + tFilename + "'");
+            mLogger.trace("Processing '" + tFilename + "'");
             int tDotPosition = tFilename.lastIndexOf('.');
             String tId = tFilename.substring(0, tDotPosition);
             final long tRevision = getRevision(tFile);
             
             // Process the contents
             String tRepositoryPath = "/configurations/" + tFilename;
-            ConfigurationProcessor tReader = new ConfigurationProcessor(tRevision, tRepositoryPath, tId, tFile);
+            ConfigurationProcessor tReader = new ConfigurationProcessor(tRevision, tRepositoryPath, mSVNLocation, tId, tFile);
             tReader.process();
             Configuration tConfiguration = tReader.getConfiguration();
             if (tConfiguration == null) {
@@ -347,8 +351,8 @@ public class RepositoryMonitor extends Service {
         }
         
         // Save
-        getLogger().debug("Saving configurations");
-        Repository tRepository = Repository.getInstance();
+        mLogger.debug("Saving configurations");
+        Repository tRepository = mRepository;
         RepositoryChangeset<Configuration> tChangeset = new RepositoryChangeset<Configuration>(tRepository.getConfigurations(), tNewConfigurations);
         for (Configuration tRemoval: tChangeset.getRemovals().values()) {
             tRepository.removeConfiguration(tRemoval);
@@ -372,19 +376,19 @@ public class RepositoryMonitor extends Service {
     
     private void processPresentations() throws RepositoryException {        
         // List
-        getLogger().debug("Listing presentations");
+        mLogger.debug("Listing presentations");
         Map<String, Presentation> tNewPresentations = new HashMap<String, Presentation>();
         Map<String, Long> tPathEntries = getChildrenRevisions(mSVNLocation + "/presentations");
         for (String tId: tPathEntries.keySet()) {
             long tRevision = tPathEntries.get(tId);
-            String tPath = "/presentations/" + tId;            
-            Presentation tMedia = new Presentation(tId, tRevision, tPath);
+            String tPath = "/presentations/" + tId;
+            Presentation tMedia = new Presentation(tId, tRevision, tPath, mSVNLocation);
             tNewPresentations.put(tId, tMedia);
         }
         
         // Update
-        getLogger().debug("Updating presentations");
-        Repository tRepository = Repository.getInstance();
+        mLogger.debug("Updating presentations");
+        Repository tRepository = mRepository;
         RepositoryChangeset<Presentation> tChangeset = new RepositoryChangeset<Presentation>(tRepository.getPresentations(), tNewPresentations);
         for (Presentation tRemoval: tChangeset.getRemovals().values()) {
             tRepository.removePresentation(tRemoval);
@@ -516,7 +520,7 @@ public class RepositoryMonitor extends Service {
             mRemovals = new HashMap<String, T>();
             for (T tOldEntity: iOldEntities.values()) {
                 if (! iCurrentEntities.containsKey(tOldEntity.getId())) {
-                    getLogger().debug("Entity "
+                    mLogger.debug("Entity "
                             + tOldEntity.getId()
                             + " seems to have been deleted (last known rev "
                             + tOldEntity.getRevision()
@@ -531,14 +535,14 @@ public class RepositoryMonitor extends Service {
             for (T tCurrentEntity : iCurrentEntities.values()) {
                 T tOldEntity = iOldEntities.get(tCurrentEntity.getId());
                 if (tOldEntity == null) {
-                    getLogger().debug("Entity "
+                    mLogger.debug("Entity "
                             + tCurrentEntity.getId()
                             + " seems new (rev "
                             + tCurrentEntity.getRevision()
                             + "), adding to repository");
                     mAdditions.put(tCurrentEntity.getId(), tCurrentEntity);
                 } else if (tCurrentEntity.getRevision() > tOldEntity.getRevision()) {
-                    getLogger().debug("Entity "
+                    mLogger.debug("Entity "
                             + tCurrentEntity.getId()
                             + " is a more recent version (rev "
                             + tCurrentEntity.getRevision()

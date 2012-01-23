@@ -5,11 +5,12 @@
 package be.mira.adastra3.server.network.controls;
 
 import be.mira.adastra3.server.exceptions.NetworkException;
-import be.mira.adastra3.server.network.Network;
+import be.mira.adastra3.server.beans.Network;
 import be.mira.adastra3.server.network.actions.device.GetRevisionAction;
 import be.mira.adastra3.server.network.actions.media.GetLocationAction;
 import be.mira.adastra3.server.network.actions.media.SetLocationAction;
 import org.teleal.cling.controlpoint.ActionCallback;
+import org.teleal.cling.controlpoint.ControlPoint;
 import org.teleal.cling.model.meta.RemoteService;
 import org.teleal.cling.model.types.ServiceId;
 
@@ -23,14 +24,16 @@ public class PresentationControl extends Control {
     //
     
     public final static ServiceId cIdentifier = new ServiceId("mira-be", "Presentation:1");
+    public final ControlPoint mControlPoint;
     
     
     //
     // Construction and destruction
     //
 
-    public PresentationControl(final RemoteService iService) throws NetworkException {
+    public PresentationControl(final RemoteService iService, final ControlPoint iControlPoint) throws NetworkException {
         super(iService);
+        mControlPoint = iControlPoint;
         if (! iService.getServiceId().equals(cIdentifier)) {
             throw new NetworkException("PresentationControl instantiated for a non-Presentation service");
         }
@@ -46,7 +49,7 @@ public class PresentationControl extends Control {
         
         new ActionCallback.Default(
                 tAction,
-                Network.getControlPoint()
+                mControlPoint
         ).run();
         
         return tAction.getConfigurationRevision();
@@ -57,7 +60,7 @@ public class PresentationControl extends Control {
         
         new ActionCallback.Default(
                 tAction,
-                Network.getControlPoint()
+                mControlPoint
         ).run();
     }
     
@@ -66,7 +69,7 @@ public class PresentationControl extends Control {
         
         new ActionCallback.Default(
                 tAction,
-                Network.getControlPoint()
+                mControlPoint
         ).run();
         
         return tAction.getLocation();

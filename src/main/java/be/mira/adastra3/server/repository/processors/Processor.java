@@ -4,7 +4,6 @@
  */
 package be.mira.adastra3.server.repository.processors;
 
-import be.mira.adastra3.server.Service;
 import be.mira.adastra3.server.exceptions.RepositoryException;
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,11 +13,12 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
-import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  *
@@ -29,18 +29,19 @@ public class Processor {
     // Member data
     //
     
+    private Log mLogger;
+    
     protected static XmlPullParserFactory PARSER_FACTORY;
     protected XmlPullParser mParser;
-    protected Logger mLogger;
             
             
     //
     // Construction and destruction
     //
     
-    public Processor(final File iFile, final String iValidationFilename) throws RepositoryException {
-        // Set-up logging
-        mLogger = Service.getLogger(this);
+    public Processor(final File iFile, final String iValidationFilename) throws RepositoryException { 
+        // FIXME: acquire a configured logger properly. Bean?
+        mLogger = LogFactory.getLog(this.getClass());
         
         // Validate the file
         // TODO: do this within the pull parser

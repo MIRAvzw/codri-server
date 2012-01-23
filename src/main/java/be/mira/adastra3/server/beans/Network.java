@@ -2,15 +2,21 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package be.mira.adastra3.server.network;
+package be.mira.adastra3.server.beans;
 
 import be.mira.adastra3.server.exceptions.NetworkException;
+import be.mira.adastra3.server.network.INetworkListener;
+import be.mira.adastra3.server.network.NetworkEntity;
+import be.mira.adastra3.server.beans.factory.Logger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import org.apache.commons.logging.Log;
 import org.teleal.cling.UpnpService;
 import org.teleal.cling.UpnpServiceImpl;
 import org.teleal.cling.controlpoint.ControlPoint;
@@ -24,37 +30,31 @@ public final class Network {
     // Member data
     //
     
+    @Logger
+    private Log mLogger;
+    
     private Map<UUID, NetworkEntity> mDevices;
     private UpnpService mUpnpService;
     private final List<INetworkListener> mListeners;
 
 
     //
-    // Static functionality
-    //
-
-    private static Network INSTANCE;
-
-    public static synchronized Network getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new Network();
-        }
-        return INSTANCE;
-    }
-
-
-    //
     // Construction and destruction
     //
 
-    private Network() {
+    public Network() {
         mDevices = new HashMap<UUID, NetworkEntity>();
         mUpnpService = new UpnpServiceImpl();
         mListeners = new ArrayList<INetworkListener>();
     }
     
-    public void reset() {
-        // TODO: warn if called in production context
+    @PostConstruct
+    public void init() {
+        
+    }
+    
+    @PreDestroy
+    public void destroy() {
         mDevices.clear();
         mListeners.clear();
     }
@@ -76,8 +76,8 @@ public final class Network {
         }
     }
     
-    public static ControlPoint getControlPoint() {
-        return Network.getInstance().getUpnpService().getControlPoint();
+    public ControlPoint getControlPoint() {
+        return getUpnpService().getControlPoint();
     }
     
     public synchronized UpnpService getUpnpService() {

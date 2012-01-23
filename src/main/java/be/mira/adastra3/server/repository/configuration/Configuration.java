@@ -21,8 +21,8 @@ public class Configuration extends RepositoryEntity {
     // Construction and destruction
     //
     
-    public Configuration(final String iId, final long iRevision, final String iPath, final SoundConfiguration iSoundConfiguration) {
-        super(iId, iRevision, iPath);
+    public Configuration(final String iId, final long iRevision, final String iPath, final String iServer, final SoundConfiguration iSoundConfiguration) {
+        super(iId, iRevision, iPath, iServer);
         mSoundConfiguration = iSoundConfiguration;
     }
     

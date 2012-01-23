@@ -23,9 +23,10 @@ public class ConnectionProcessor extends Processor {
     //
     
     private Connection mConnection;
-    private long mRevision;
-    private String mRepositoryPath;
-    private String mId;
+    private final long mRevision;
+    private final String mRepositoryPath;
+    private final String mRepositoryLocation;
+    private final String mId;
     
     
     
@@ -34,10 +35,11 @@ public class ConnectionProcessor extends Processor {
     // Construction and destruction
     //
     
-    public ConnectionProcessor(final long iRevision, final String iRepositoryPath, final String iId, final File iFile) throws RepositoryException {
+    public ConnectionProcessor(final long iRevision, final String iRepositoryPath, final String iRepositoryLocation, final String iId, final File iFile) throws RepositoryException {
         super(iFile, "connection.xsd");
         mRevision = iRevision;
         mRepositoryPath = iRepositoryPath;
+        mRepositoryLocation = iRepositoryLocation;
         mId = iId;
     }
     
@@ -119,6 +121,7 @@ public class ConnectionProcessor extends Processor {
                 mId,
                 mRevision,
                 mRepositoryPath,
+                mRepositoryLocation,
                 tKiosk,
                 tConfiguration,
                 tPresentation);

@@ -3,16 +3,21 @@
  * and open the template in the editor.
  */
 
-package be.mira.adastra3.server.repository;
+package be.mira.adastra3.server.beans;
 
 import be.mira.adastra3.server.exceptions.RepositoryException;
+import be.mira.adastra3.server.repository.IRepositoryListener;
 import be.mira.adastra3.server.repository.configuration.Configuration;
 import be.mira.adastra3.server.repository.connection.Connection;
 import be.mira.adastra3.server.repository.presentation.Presentation;
+import be.mira.adastra3.server.beans.factory.Logger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import org.apache.commons.logging.Log;
 
 /**
  *
@@ -23,6 +28,9 @@ public final class Repository {
     // Member data
     //
     
+    @Logger
+    private Log mLogger;
+    
     private final Map<String, Configuration> mConfigurations;
     private final Map<String, Presentation> mPresentations;
     private final Map<String, Connection> mConnections;
@@ -31,36 +39,27 @@ public final class Repository {
 
 
     //
-    // Static functionality
-    //
-
-    private static Repository INSTANCE;
-
-    public static synchronized Repository getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new Repository();
-        }
-        return INSTANCE;
-    }
-    
-    public void reset() {
-        // TODO: warn if called in production context
-        mConfigurations.clear();
-        mPresentations.clear();
-        mConnections.clear();
-        mListeners.clear();
-    }
-
-
-    //
     // Construction and destruction
     //
 
-    private Repository() {
+    public Repository() {
         mConfigurations = new HashMap<String, Configuration>();
         mPresentations = new HashMap<String, Presentation>();
         mConnections = new HashMap<String, Connection>();
         mListeners = new ArrayList<IRepositoryListener>();
+    }
+    
+    @PostConstruct
+    public void init() {
+        
+    }
+    
+    @PreDestroy
+    public void destroy() {
+        mConfigurations.clear();
+        mPresentations.clear();
+        mConnections.clear();
+        mListeners.clear();
     }
 
 
