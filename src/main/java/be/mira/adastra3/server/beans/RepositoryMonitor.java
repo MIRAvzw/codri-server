@@ -156,7 +156,7 @@ public class RepositoryMonitor {
                     processConnections();
                 }
             } catch (RepositoryException tException) {
-                mRepository.emitError("could not update the connections", tException);
+                mLogger.error("could not update the connections", tException);
             }
             
             // Check the configurations
@@ -170,7 +170,7 @@ public class RepositoryMonitor {
                     processConfigurations();
                 }
             } catch (RepositoryException tException) {
-                mRepository.emitError("could not update the configurations", tException);
+                mLogger.error("could not update the configurations", tException);
             }
             
             // Check the presentations
@@ -183,7 +183,7 @@ public class RepositoryMonitor {
                     processPresentations();
                 }
             } catch (RepositoryException tException) {
-                mRepository.emitError("could not update the presentations", tException);
+                mLogger.error("could not update the presentations", tException);
             }
         }
         

@@ -5,18 +5,19 @@
 package be.mira.adastra3.server.beans;
 
 import be.mira.adastra3.server.exceptions.NetworkException;
-import be.mira.adastra3.server.network.INetworkListener;
 import be.mira.adastra3.server.network.NetworkEntity;
 import be.mira.adastra3.server.beans.factory.Logger;
-import java.util.ArrayList;
+import be.mira.adastra3.server.events.NetworkEvent;
+import be.mira.adastra3.server.events.NetworkEvent.NetworkEventType;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import org.apache.commons.logging.Log;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 import org.teleal.cling.UpnpService;
 import org.teleal.cling.UpnpServiceImpl;
 import org.teleal.cling.controlpoint.ControlPoint;
@@ -25,7 +26,7 @@ import org.teleal.cling.controlpoint.ControlPoint;
  * 
  * @author tim
  */
-public final class Network {
+public final class Network implements ApplicationEventPublisherAware {
     //
     // Member data
     //
@@ -33,9 +34,10 @@ public final class Network {
     @Logger
     private Log mLogger;
     
+    private ApplicationEventPublisher mPublisher;
+    
     private Map<UUID, NetworkEntity> mDevices;
     private UpnpService mUpnpService;
-    private final List<INetworkListener> mListeners;
 
 
     //
@@ -45,7 +47,11 @@ public final class Network {
     public Network() {
         mDevices = new HashMap<UUID, NetworkEntity>();
         mUpnpService = new UpnpServiceImpl();
-        mListeners = new ArrayList<INetworkListener>();
+    }
+    
+    @Override
+    public void setApplicationEventPublisher(ApplicationEventPublisher iPublisher) {
+        mPublisher = iPublisher;
     }
     
     @PostConstruct
@@ -56,25 +62,12 @@ public final class Network {
     @PreDestroy
     public void destroy() {
         mDevices.clear();
-        mListeners.clear();
     }
 
 
     //
-    // Getters and setters
+    // Basic I/O
     //
-    
-    public void addListener(final INetworkListener iListener) {
-        synchronized(mListeners) {
-            mListeners.add(iListener);
-        }
-    }
-    
-    public void removeListener(final INetworkListener iListener) {
-        synchronized(mListeners) {
-            mListeners.remove(iListener);
-        }
-    }
     
     public ControlPoint getControlPoint() {
         return getUpnpService().getControlPoint();
@@ -97,7 +90,9 @@ public final class Network {
             throw new NetworkException("device " + iDevice.getUuid() + " already present in network");
         }
         mDevices.put(iDevice.getUuid(), iDevice);
-        emitDeviceAdded(iDevice);
+        
+        NetworkEvent tEvent = new NetworkEvent(this, NetworkEventType.ADDED, iDevice);
+        mPublisher.publishEvent(tEvent);
     }
     
     public synchronized void removeDevice(final NetworkEntity iDevice) throws NetworkException {
@@ -105,43 +100,8 @@ public final class Network {
             throw new NetworkException("device " + iDevice.getUuid() + " not present in network");
         }
         mDevices.remove(iDevice.getUuid());
-        emitDeviceRemoved(iDevice);
-    }
-    
-    
-    //
-    // Signals
-    //
-    
-    public void emitError(final String iMessage, final NetworkException iException) {
-        synchronized(mListeners) {
-            for (INetworkListener tListener : mListeners) {
-                tListener.doNetworkError(iMessage, iException);
-            }
-        }
-    }
-    
-    public void emitWarning(final String iMessage) {
-        synchronized(mListeners) {
-                for (INetworkListener tListener : mListeners) {
-                tListener.doNetworkWarning(iMessage);
-            }
-        }
-    }
-    
-    private void emitDeviceAdded(final NetworkEntity iDevice) {
-        synchronized(mListeners) {
-                for (INetworkListener tListener : mListeners) {
-                tListener.doEntityAdded(iDevice);
-            }
-        }
-    }
-    
-    private void emitDeviceRemoved(final NetworkEntity iDevice) {
-        synchronized(mListeners) {
-                for (INetworkListener tListener : mListeners) {
-                tListener.doEntityRemoved(iDevice);
-            }
-        }
+        
+        NetworkEvent tEvent = new NetworkEvent(this, NetworkEventType.REMOVED, iDevice);
+        mPublisher.publishEvent(tEvent);
     }
 }

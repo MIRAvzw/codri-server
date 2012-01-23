@@ -6,24 +6,25 @@
 package be.mira.adastra3.server.beans;
 
 import be.mira.adastra3.server.exceptions.RepositoryException;
-import be.mira.adastra3.server.repository.IRepositoryListener;
 import be.mira.adastra3.server.repository.configuration.Configuration;
 import be.mira.adastra3.server.repository.connection.Connection;
 import be.mira.adastra3.server.repository.presentation.Presentation;
 import be.mira.adastra3.server.beans.factory.Logger;
-import java.util.ArrayList;
+import be.mira.adastra3.server.events.RepositoryEvent;
+import be.mira.adastra3.server.events.RepositoryEvent.RepositoryEventType;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import org.apache.commons.logging.Log;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 
 /**
  *
  * @author tim
  */
-public final class Repository {
+public final class Repository implements ApplicationEventPublisherAware {
     //
     // Member data
     //
@@ -31,10 +32,11 @@ public final class Repository {
     @Logger
     private Log mLogger;
     
+    private ApplicationEventPublisher mPublisher;
+    
     private final Map<String, Configuration> mConfigurations;
     private final Map<String, Presentation> mPresentations;
     private final Map<String, Connection> mConnections;
-    private final List<IRepositoryListener> mListeners;
     private String mServer;
 
 
@@ -46,7 +48,11 @@ public final class Repository {
         mConfigurations = new HashMap<String, Configuration>();
         mPresentations = new HashMap<String, Presentation>();
         mConnections = new HashMap<String, Connection>();
-        mListeners = new ArrayList<IRepositoryListener>();
+    }
+    
+    @Override
+    public void setApplicationEventPublisher(ApplicationEventPublisher iPublisher) {
+        mPublisher = iPublisher;
     }
     
     @PostConstruct
@@ -59,7 +65,6 @@ public final class Repository {
         mConfigurations.clear();
         mPresentations.clear();
         mConnections.clear();
-        mListeners.clear();
     }
 
 
@@ -78,18 +83,6 @@ public final class Repository {
         mServer = iServer;
     }
     
-    public void addListener(final IRepositoryListener iListener) {
-        synchronized(mListeners) {
-            mListeners.add(iListener);
-        }
-    }
-    
-    public void removeListener(final IRepositoryListener iListener) {
-        synchronized(mListeners) {
-            mListeners.remove(iListener);
-        }
-    }
-    
     // TODO: why return a map?
     public synchronized Map<String, Connection> getConnections() {
         return mConnections;
@@ -104,7 +97,9 @@ public final class Repository {
             throw new RepositoryException("connection " + iConnection.getId() + " already present in repository");
         }
         mConnections.put(iConnection.getId(), iConnection);
-        emitConnectionAdded(iConnection);
+        
+        RepositoryEvent tEvent = new RepositoryEvent(this, RepositoryEventType.ADDED, iConnection);
+        mPublisher.publishEvent(tEvent);
     }
     
     public synchronized void updateConnection(final Connection iConnection) throws RepositoryException {
@@ -112,7 +107,9 @@ public final class Repository {
             throw new RepositoryException("connection " + iConnection.getId() + " not present in repository");
         }
         Connection tOldConnection = mConnections.put(iConnection.getId(), iConnection);
-        emitConnectionUpdated(tOldConnection, iConnection);
+        
+        RepositoryEvent tEvent = new RepositoryEvent(this, RepositoryEventType.UPDATED, iConnection, tOldConnection);
+        mPublisher.publishEvent(tEvent);
     }
 
     public synchronized void removeConnection(final Connection iConnection) throws RepositoryException {
@@ -120,7 +117,9 @@ public final class Repository {
             throw new RepositoryException("connection " + iConnection.getId() + " not present in repository");
         }
         mConnections.remove(iConnection.getId());
-        emitConnectionRemoved(iConnection);
+        
+        RepositoryEvent tEvent = new RepositoryEvent(this, RepositoryEventType.REMOVED, iConnection);
+        mPublisher.publishEvent(tEvent);
     }
     
     // TODO: why return map?
@@ -137,7 +136,9 @@ public final class Repository {
             throw new RepositoryException("configuration " + iConfiguration.getId() + " already present in repository");
         }
         mConfigurations.put(iConfiguration.getId(), iConfiguration);
-        emitConfigurationAdded(iConfiguration);
+        
+        RepositoryEvent tEvent = new RepositoryEvent(this, RepositoryEventType.ADDED, iConfiguration);
+        mPublisher.publishEvent(tEvent);
     }
     
     public synchronized void updateConfiguration(final Configuration iConfiguration) throws RepositoryException {
@@ -145,7 +146,9 @@ public final class Repository {
             throw new RepositoryException("configuration " + iConfiguration.getId() + " not present in repository");
         }
         Configuration tOldConfiguration = mConfigurations.put(iConfiguration.getId(), iConfiguration);
-        emitConfigurationUpdated(tOldConfiguration, iConfiguration);
+        
+        RepositoryEvent tEvent = new RepositoryEvent(this, RepositoryEventType.UPDATED, iConfiguration, tOldConfiguration);
+        mPublisher.publishEvent(tEvent);
     }
 
     public synchronized void removeConfiguration(final Configuration iConfiguration) throws RepositoryException {
@@ -153,7 +156,9 @@ public final class Repository {
             throw new RepositoryException("configuration " + iConfiguration.getId() + " not present in repository");
         }
         mConfigurations.remove(iConfiguration.getId());
-        emitConfigurationRemoved(iConfiguration);
+        
+        RepositoryEvent tEvent = new RepositoryEvent(this, RepositoryEventType.REMOVED, iConfiguration);
+        mPublisher.publishEvent(tEvent);
     }
     
     // TODO: why return a map?
@@ -170,15 +175,19 @@ public final class Repository {
             throw new RepositoryException("presentation " + iPresentation.getId() + " already present in repository");
         }
         mPresentations.put(iPresentation.getId(), iPresentation);
-        emitPresentationAdded(iPresentation);
+        
+        RepositoryEvent tEvent = new RepositoryEvent(this, RepositoryEventType.ADDED, iPresentation);
+        mPublisher.publishEvent(tEvent);
     }
     
     public synchronized void updatePresentation(final Presentation iPresentation) throws RepositoryException {
         if (! mPresentations.containsKey(iPresentation.getId())) {
             throw new RepositoryException("presentation " + iPresentation.getId() + " not present in repository");
         }
-        Presentation tOldMedia = mPresentations.put(iPresentation.getId(), iPresentation);
-        emitPresentationUpdated(tOldMedia, iPresentation);
+        Presentation tOldPresentation = mPresentations.put(iPresentation.getId(), iPresentation);
+        
+        RepositoryEvent tEvent = new RepositoryEvent(this, RepositoryEventType.UPDATED, iPresentation, tOldPresentation);
+        mPublisher.publishEvent(tEvent);
     }
 
     public synchronized void removePresentation(final Presentation iPresentation) throws RepositoryException {
@@ -186,99 +195,8 @@ public final class Repository {
             throw new RepositoryException("presentation " + iPresentation.getId() + " not present in repository");
         }
         mPresentations.remove(iPresentation.getId());
-        emitPresentationRemoved(iPresentation);
-    }
-    
-    
-    //
-    // Signals
-    //
-    
-    public void emitError(final String iMessage, final RepositoryException iException) {
-        synchronized (mListeners) {
-            for (IRepositoryListener tListener : mListeners) {
-                tListener.doRepositoryError(iMessage, iException);
-            }
-        }
-    }
-
-    public void emitWarning(final String iMessage) {
-        synchronized (mListeners) {
-            for (IRepositoryListener tListener : mListeners) {
-                tListener.doRepositoryWarning(iMessage);
-            }
-        }
-    }
-
-    private void emitConnectionAdded(final Connection iConnection) {
-        synchronized (mListeners) {
-            for (IRepositoryListener tListener : mListeners) {
-                tListener.doConnectionAdded(iConnection);
-            }
-        }
-    }
-
-    private void emitConnectionUpdated(final Connection iOldConnection, final Connection iConnection) {
-        synchronized (mListeners) {
-            for (IRepositoryListener tListener : mListeners) {
-                tListener.doConnectionUpdated(iOldConnection, iConnection);
-            }
-        }
-    }
-
-    private void emitConnectionRemoved(final Connection iConnection) {
-        synchronized (mListeners) {
-            for (IRepositoryListener tListener : mListeners) {
-                tListener.doConnectionRemoved(iConnection);
-            }
-        }
-    }
-
-    private void emitConfigurationAdded(final Configuration iConfiguration) {
-        synchronized (mListeners) {
-            for (IRepositoryListener tListener : mListeners) {
-                tListener.doConfigurationAdded(iConfiguration);
-            }
-        }
-    }
-
-    private void emitConfigurationUpdated(final Configuration iOldConfiguration, final Configuration iConfiguration) {
-        synchronized (mListeners) {
-            for (IRepositoryListener tListener : mListeners) {
-                tListener.doConfigurationUpdated(iOldConfiguration, iConfiguration);
-            }
-        }
-    }
-
-    private void emitConfigurationRemoved(final Configuration iConfiguration) {
-        synchronized (mListeners) {
-            for (IRepositoryListener tListener : mListeners) {
-                tListener.doConfigurationRemoved(iConfiguration);
-            }
-        }
-    }
-
-    private void emitPresentationAdded(final Presentation iMedia) {
-        synchronized (mListeners) {
-            for (IRepositoryListener tListener : mListeners) {
-                tListener.doPresentationAdded(iMedia);
-            }
-        }
-    }
-
-    private void emitPresentationUpdated(final Presentation iOldMedia, final Presentation iMedia) {
-        synchronized (mListeners) {
-            for (IRepositoryListener tListener : mListeners) {
-                tListener.doPresentationUpdated(iOldMedia, iMedia);
-            }
-        }
-    }
-
-    private void emitPresentationRemoved(final Presentation iMedia) {
-        synchronized (mListeners) {
-            for (IRepositoryListener tListener : mListeners) {
-                tListener.doPresentationRemoved(iMedia);
-            }
-        }
+        
+        RepositoryEvent tEvent = new RepositoryEvent(this, RepositoryEventType.REMOVED, iPresentation);
+        mPublisher.publishEvent(tEvent);
     }
 }

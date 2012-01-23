@@ -90,7 +90,7 @@ public class NetworkMonitor {
                     // Get the device UUID
                     UUID tUuid = convertUdn(iDevice.getIdentity().getUdn());
                     if (tUuid == null) {
-                        mNetwork.emitWarning("could not convert device UDN '" + iDevice.getIdentity().getUdn() + "' to a valid UUID");
+                        mLogger.warn("could not convert device UDN '" + iDevice.getIdentity().getUdn() + "' to a valid UUID");
                         return;
                     }
 
@@ -112,11 +112,11 @@ public class NetworkMonitor {
                             tDevice.setName(iDevice.getDetails().getFriendlyName());
                             mNetwork.addDevice(tDevice);
                         } catch (NetworkException tException) {
-                            mNetwork.emitError("could not register Ad-Astra 3.0 device", tException);
+                            mLogger.error("could not register Ad-Astra 3.0 device", tException);
                             return;
                         }
                     } else {
-                        mNetwork.emitWarning("an unknown MIRA device has been detected: " + tModel.getModelName() + " " + tModel.getModelNumber());
+                        mLogger.warn("an unknown MIRA device has been detected: " + tModel.getModelName() + " " + tModel.getModelNumber());
                         return;
                     }
                 }
@@ -132,7 +132,7 @@ public class NetworkMonitor {
                     // Get the device UUID
                     UUID tUuid = convertUdn(iDevice.getIdentity().getUdn());
                     if (tUuid == null) {
-                        mNetwork.emitWarning("could not convert device UDN '" + iDevice.getIdentity().getUdn() + "' to a valid UUID");
+                        mLogger.warn("could not convert device UDN '" + iDevice.getIdentity().getUdn() + "' to a valid UUID");
                         return;
                     }
                     
@@ -143,7 +143,7 @@ public class NetworkMonitor {
                             mNetwork.removeDevice(tDevice);
                         }
                     } catch (NetworkException tException) {
-                        mNetwork.emitError("could not remove a MIRA device", tException);
+                        mLogger.error("could not remove a MIRA device", tException);
                     }
                 }
             }
@@ -159,7 +159,7 @@ public class NetworkMonitor {
                     // Get the device UUID
                     UUID tUuid = convertUdn(iDevice.getIdentity().getUdn());
                     if (tUuid == null) {
-                        mNetwork.emitWarning("could not convert device UDN '" + iDevice.getIdentity().getUdn() + "' to a valid UUID");
+                        mLogger.warn("could not convert device UDN '" + iDevice.getIdentity().getUdn() + "' to a valid UUID");
                         return;
                     }
                     
