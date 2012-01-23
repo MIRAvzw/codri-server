@@ -47,7 +47,7 @@ public class NetworkMonitor {
     // Construction and destruction
     //
 
-    public NetworkMonitor(Network iNetwork) throws Exception {
+    public NetworkMonitor(Network iNetwork) {
         mNetwork = iNetwork;
     }
     
@@ -71,11 +71,7 @@ public class NetworkMonitor {
     
     @PreDestroy
     public final void destroy() throws Exception {
-        try {
-            mNetwork.getUpnpService().shutdown();
-        } catch (Exception tException) {
-            throw new Exception(tException);
-        }
+        mNetwork.getUpnpService().shutdown();
     }
     
     final RegistryListener createRegistryListener(final UpnpService iService) {

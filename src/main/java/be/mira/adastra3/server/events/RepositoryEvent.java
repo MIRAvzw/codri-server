@@ -12,7 +12,7 @@ import org.springframework.util.Assert;
  *
  * @author tim
  */
-public class RepositoryEvent extends ApplicationEvent {
+public abstract class RepositoryEvent extends ApplicationEvent {
     //
     // Public types
     //

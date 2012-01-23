@@ -130,10 +130,6 @@ public class RepositoryMonitor {
                 mSVNMonitorInterval * 1000  // Period
             );
     }
-    
-    @PreDestroy
-    public final void destroy() {
-    }
 
 
     //

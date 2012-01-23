@@ -4,6 +4,7 @@
  */
 package be.mira.adastra3.server;
 
+import be.mira.adastra3.server.beans.Controller;
 import be.mira.adastra3.server.beans.Network;
 import be.mira.adastra3.server.beans.NetworkMonitor;
 import be.mira.adastra3.server.beans.Repository;
@@ -20,6 +21,10 @@ import org.springframework.core.io.DefaultResourceLoader;
  */
 @Configuration
 public class Services {
+    //
+    // Special beans (processors, configurers, ...)
+    //
+    
     @Bean
     public static PropertyPlaceholderConfigurer propertyPlaceholderConfigurer() {
         PropertyPlaceholderConfigurer tPropertyPlaceholderConfigurer = new PropertyPlaceholderConfigurer();
@@ -32,23 +37,43 @@ public class Services {
         return new LoggerPostProcessor();
     }
     
+    
+    //
+    // Repository beans
+    //
+    
     @Bean
-    public Repository repository() throws Exception {
+    public Repository repository() {
         return new Repository();
     }
     
     @Bean
-    public RepositoryMonitor repositoryMonitor() throws Exception {
+    public RepositoryMonitor repositoryMonitor() {
         return new RepositoryMonitor(repository());
     }
     
+    
+    //
+    // Network beans
+    //
+    
     @Bean
-    public Network network() throws Exception {
+    public Network network() {
         return new Network();
     }
     
     @Bean
-    public NetworkMonitor networkMonitor() throws Exception {
+    public NetworkMonitor networkMonitor() {
         return new NetworkMonitor(network());
+    }
+    
+    
+    //
+    // Controller bean
+    //
+    
+    @Bean
+    public Controller controller() {
+        return new Controller(network(), repository());
     }
 }

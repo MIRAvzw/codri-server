@@ -10,8 +10,11 @@ import be.mira.adastra3.server.repository.configuration.Configuration;
 import be.mira.adastra3.server.repository.connection.Connection;
 import be.mira.adastra3.server.repository.presentation.Presentation;
 import be.mira.adastra3.server.beans.factory.Logger;
+import be.mira.adastra3.server.events.RepositoryConfigurationEvent;
+import be.mira.adastra3.server.events.RepositoryConnectionEvent;
 import be.mira.adastra3.server.events.RepositoryEvent;
 import be.mira.adastra3.server.events.RepositoryEvent.RepositoryEventType;
+import be.mira.adastra3.server.events.RepositoryPresentationEvent;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.PostConstruct;
@@ -98,7 +101,7 @@ public final class Repository implements ApplicationEventPublisherAware {
         }
         mConnections.put(iConnection.getId(), iConnection);
         
-        RepositoryEvent tEvent = new RepositoryEvent(this, RepositoryEventType.ADDED, iConnection);
+        RepositoryEvent tEvent = new RepositoryConnectionEvent(this, RepositoryEventType.ADDED, iConnection);
         mPublisher.publishEvent(tEvent);
     }
     
@@ -108,7 +111,7 @@ public final class Repository implements ApplicationEventPublisherAware {
         }
         Connection tOldConnection = mConnections.put(iConnection.getId(), iConnection);
         
-        RepositoryEvent tEvent = new RepositoryEvent(this, RepositoryEventType.UPDATED, iConnection, tOldConnection);
+        RepositoryEvent tEvent = new RepositoryConnectionEvent(this, RepositoryEventType.UPDATED, iConnection, tOldConnection);
         mPublisher.publishEvent(tEvent);
     }
 
@@ -118,7 +121,7 @@ public final class Repository implements ApplicationEventPublisherAware {
         }
         mConnections.remove(iConnection.getId());
         
-        RepositoryEvent tEvent = new RepositoryEvent(this, RepositoryEventType.REMOVED, iConnection);
+        RepositoryEvent tEvent = new RepositoryConnectionEvent(this, RepositoryEventType.REMOVED, iConnection);
         mPublisher.publishEvent(tEvent);
     }
     
@@ -137,7 +140,7 @@ public final class Repository implements ApplicationEventPublisherAware {
         }
         mConfigurations.put(iConfiguration.getId(), iConfiguration);
         
-        RepositoryEvent tEvent = new RepositoryEvent(this, RepositoryEventType.ADDED, iConfiguration);
+        RepositoryEvent tEvent = new RepositoryConfigurationEvent(this, RepositoryEventType.ADDED, iConfiguration);
         mPublisher.publishEvent(tEvent);
     }
     
@@ -147,7 +150,7 @@ public final class Repository implements ApplicationEventPublisherAware {
         }
         Configuration tOldConfiguration = mConfigurations.put(iConfiguration.getId(), iConfiguration);
         
-        RepositoryEvent tEvent = new RepositoryEvent(this, RepositoryEventType.UPDATED, iConfiguration, tOldConfiguration);
+        RepositoryEvent tEvent = new RepositoryConfigurationEvent(this, RepositoryEventType.UPDATED, iConfiguration, tOldConfiguration);
         mPublisher.publishEvent(tEvent);
     }
 
@@ -157,7 +160,7 @@ public final class Repository implements ApplicationEventPublisherAware {
         }
         mConfigurations.remove(iConfiguration.getId());
         
-        RepositoryEvent tEvent = new RepositoryEvent(this, RepositoryEventType.REMOVED, iConfiguration);
+        RepositoryEvent tEvent = new RepositoryConfigurationEvent(this, RepositoryEventType.REMOVED, iConfiguration);
         mPublisher.publishEvent(tEvent);
     }
     
@@ -176,7 +179,7 @@ public final class Repository implements ApplicationEventPublisherAware {
         }
         mPresentations.put(iPresentation.getId(), iPresentation);
         
-        RepositoryEvent tEvent = new RepositoryEvent(this, RepositoryEventType.ADDED, iPresentation);
+        RepositoryEvent tEvent = new RepositoryPresentationEvent(this, RepositoryEventType.ADDED, iPresentation);
         mPublisher.publishEvent(tEvent);
     }
     
@@ -186,7 +189,7 @@ public final class Repository implements ApplicationEventPublisherAware {
         }
         Presentation tOldPresentation = mPresentations.put(iPresentation.getId(), iPresentation);
         
-        RepositoryEvent tEvent = new RepositoryEvent(this, RepositoryEventType.UPDATED, iPresentation, tOldPresentation);
+        RepositoryEvent tEvent = new RepositoryPresentationEvent(this, RepositoryEventType.UPDATED, iPresentation, tOldPresentation);
         mPublisher.publishEvent(tEvent);
     }
 
@@ -196,7 +199,7 @@ public final class Repository implements ApplicationEventPublisherAware {
         }
         mPresentations.remove(iPresentation.getId());
         
-        RepositoryEvent tEvent = new RepositoryEvent(this, RepositoryEventType.REMOVED, iPresentation);
+        RepositoryEvent tEvent = new RepositoryPresentationEvent(this, RepositoryEventType.REMOVED, iPresentation);
         mPublisher.publishEvent(tEvent);
     }
 }
