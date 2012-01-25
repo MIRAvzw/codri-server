@@ -30,9 +30,11 @@
         <constructor-arg ref="network"/>
     </bean>
 
+    <!--
     <bean class="be.mira.adastra3.server.business.RepositoryMonitor" id="repositoryMonitor">
         <constructor-arg ref="repository"/>
     </bean>
+    -->
     
     <bean class="be.mira.adastra3.server.web.RepositoryController" id="repositoryController">
         <constructor-arg ref="repository"/>

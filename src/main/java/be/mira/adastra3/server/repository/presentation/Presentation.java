@@ -21,7 +21,7 @@ public class Presentation extends RepositoryEntity {
     // FIXME: dummy constructor for JAXB (shouldn't be neccesary as JAXB never
     // has to unmarshal this class)
     public Presentation() {
-        this(null, null, null, null);
+        throw new UnsupportedOperationException();
     }
     
     public Presentation(final String iId, final Long iRevision, final String iPath, final String iServer) {

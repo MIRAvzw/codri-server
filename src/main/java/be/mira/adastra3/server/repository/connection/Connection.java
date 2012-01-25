@@ -31,7 +31,7 @@ public class Connection extends RepositoryEntity {
     // FIXME: dummy constructor for JAXB (shouldn't be neccesary as JAXB never
     // has to unmarshal this class)
     public Connection() {
-        this(null, null, null, null, null, null, null);
+        throw new UnsupportedOperationException();
     }
     
     public Connection(final String iId, final Long iRevision, final String iPath, final String iServer, final UUID iKiosk, final String iConfiguration, final String iPresentation) {

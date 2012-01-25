@@ -27,7 +27,7 @@ public class Configuration extends RepositoryEntity {
     // FIXME: dummy constructor for JAXB (shouldn't be neccesary as JAXB never
     // has to unmarshal this class)
     public Configuration() {
-        this(null, null, null, null, null);
+        throw new UnsupportedOperationException();
     }
     
     public Configuration(final String iId, final Long iRevision, final String iPath, final String iServer, final SoundConfiguration iSoundConfiguration) {

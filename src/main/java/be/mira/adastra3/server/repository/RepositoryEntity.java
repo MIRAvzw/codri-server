@@ -26,7 +26,7 @@ public abstract class RepositoryEntity {
     // FIXME: dummy constructor for JAXB (shouldn't be neccesary as JAXB never
     // has to unmarshal this class)
     public RepositoryEntity() {
-        this(null, null, null, null);
+        throw new UnsupportedOperationException();
     }
     
     public RepositoryEntity(final String iId, final Long iRevision, final String iPath, final String iServer) {
