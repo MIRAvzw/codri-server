@@ -6,11 +6,14 @@ package be.mira.adastra3.server.repository.connection;
 
 import be.mira.adastra3.server.repository.RepositoryEntity;
 import java.util.UUID;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
  * @author tim
  */
+@XmlRootElement(name="connection")
 public class Connection extends RepositoryEntity {
     //
     // Member data
@@ -25,7 +28,13 @@ public class Connection extends RepositoryEntity {
     // Construction and destruction
     //
     
-    public Connection(final String iId, final long iRevision, final String iPath, final String iServer, final UUID iKiosk, final String iConfiguration, final String iPresentation) {
+    // FIXME: dummy constructor for JAXB (shouldn't be neccesary as JAXB never
+    // has to unmarshal this class)
+    public Connection() {
+        this(null, null, null, null, null, null, null);
+    }
+    
+    public Connection(final String iId, final Long iRevision, final String iPath, final String iServer, final UUID iKiosk, final String iConfiguration, final String iPresentation) {
         super(iId, iRevision, iPath, iServer);
         mKiosk = iKiosk;
         mConfiguration = iConfiguration;
@@ -37,14 +46,17 @@ public class Connection extends RepositoryEntity {
     // Getters & setters
     //
     
+    @XmlElement
     public final UUID getKiosk() {
         return mKiosk;
     }
     
+    @XmlElement
     public final String getConfiguration() {
         return mConfiguration;
     }
     
+    @XmlElement
     public final String getPresentation() {
         return mPresentation;
     }

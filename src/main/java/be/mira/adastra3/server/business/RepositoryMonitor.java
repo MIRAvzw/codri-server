@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package be.mira.adastra3.server.beans;
+package be.mira.adastra3.server.business;
 
 import be.mira.adastra3.server.repository.processors.ConfigurationProcessor;
 import be.mira.adastra3.server.exceptions.RepositoryException;
@@ -12,7 +12,7 @@ import be.mira.adastra3.server.repository.configuration.Configuration;
 import be.mira.adastra3.server.repository.connection.Connection;
 import be.mira.adastra3.server.repository.presentation.Presentation;
 import be.mira.adastra3.server.repository.processors.ConnectionProcessor;
-import be.mira.adastra3.server.beans.factory.Logger;
+import be.mira.adastra3.spring.Logger;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -267,7 +267,7 @@ public class RepositoryMonitor {
         // Save
         mLogger.debug("Saving connections");
         Repository tRepository = mRepository;
-        RepositoryChangeset<Connection> tChangeset = new RepositoryChangeset<Connection>(tRepository.getConnections(), tNewConnections);
+        RepositoryChangeset<Connection> tChangeset = new RepositoryChangeset<Connection>(tRepository.getConnectionsMap(), tNewConnections);
         for (Connection tRemoval: tChangeset.getRemovals().values()) {
             tRepository.removeConnection(tRemoval);
         }
@@ -349,7 +349,7 @@ public class RepositoryMonitor {
         // Save
         mLogger.debug("Saving configurations");
         Repository tRepository = mRepository;
-        RepositoryChangeset<Configuration> tChangeset = new RepositoryChangeset<Configuration>(tRepository.getConfigurations(), tNewConfigurations);
+        RepositoryChangeset<Configuration> tChangeset = new RepositoryChangeset<Configuration>(tRepository.getConfigurationsMap(), tNewConfigurations);
         for (Configuration tRemoval: tChangeset.getRemovals().values()) {
             tRepository.removeConfiguration(tRemoval);
         }
@@ -385,7 +385,7 @@ public class RepositoryMonitor {
         // Update
         mLogger.debug("Updating presentations");
         Repository tRepository = mRepository;
-        RepositoryChangeset<Presentation> tChangeset = new RepositoryChangeset<Presentation>(tRepository.getPresentations(), tNewPresentations);
+        RepositoryChangeset<Presentation> tChangeset = new RepositoryChangeset<Presentation>(tRepository.getPresentationsMap(), tNewPresentations);
         for (Presentation tRemoval: tChangeset.getRemovals().values()) {
             tRepository.removePresentation(tRemoval);
         }

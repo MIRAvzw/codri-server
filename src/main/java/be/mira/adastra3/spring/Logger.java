@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package be.mira.adastra3.server.beans.factory;
+package be.mira.adastra3.spring;
 
 /**
  * Indicates Logger of appropriate type to be supplied at runtime to the

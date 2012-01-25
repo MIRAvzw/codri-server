@@ -5,11 +5,14 @@
 package be.mira.adastra3.server.repository.configuration;
 
 import be.mira.adastra3.server.repository.RepositoryEntity;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
  * @author tim
  */
+@XmlRootElement(name="configuration")
 public class Configuration extends RepositoryEntity {
     //
     // Member data
@@ -21,7 +24,13 @@ public class Configuration extends RepositoryEntity {
     // Construction and destruction
     //
     
-    public Configuration(final String iId, final long iRevision, final String iPath, final String iServer, final SoundConfiguration iSoundConfiguration) {
+    // FIXME: dummy constructor for JAXB (shouldn't be neccesary as JAXB never
+    // has to unmarshal this class)
+    public Configuration() {
+        this(null, null, null, null, null);
+    }
+    
+    public Configuration(final String iId, final Long iRevision, final String iPath, final String iServer, final SoundConfiguration iSoundConfiguration) {
         super(iId, iRevision, iPath, iServer);
         mSoundConfiguration = iSoundConfiguration;
     }
@@ -31,6 +40,7 @@ public class Configuration extends RepositoryEntity {
     // Getters and setters
     //
     
+    @XmlElement
     public final SoundConfiguration getSoundConfiguration() {
         return mSoundConfiguration;
     }

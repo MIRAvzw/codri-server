@@ -2,11 +2,11 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package be.mira.adastra3.server.beans;
+package be.mira.adastra3.server.business;
 
 import be.mira.adastra3.server.exceptions.NetworkException;
 import be.mira.adastra3.server.network.NetworkEntity;
-import be.mira.adastra3.server.beans.factory.Logger;
+import be.mira.adastra3.spring.Logger;
 import be.mira.adastra3.server.events.NetworkEvent;
 import be.mira.adastra3.server.events.NetworkEvent.NetworkEventType;
 import java.util.Collection;
@@ -18,9 +18,6 @@ import javax.annotation.PreDestroy;
 import org.apache.commons.logging.Log;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
-import org.teleal.cling.UpnpService;
-import org.teleal.cling.UpnpServiceImpl;
-import org.teleal.cling.controlpoint.ControlPoint;
 
 /**
  * 
@@ -37,7 +34,6 @@ public final class Network implements ApplicationEventPublisherAware {
     private ApplicationEventPublisher mPublisher;
     
     private Map<UUID, NetworkEntity> mDevices;
-    private UpnpService mUpnpService;
 
 
     //
@@ -46,7 +42,6 @@ public final class Network implements ApplicationEventPublisherAware {
 
     public Network() {
         mDevices = new HashMap<UUID, NetworkEntity>();
-        mUpnpService = new UpnpServiceImpl();
     }
     
     @Override
@@ -68,14 +63,6 @@ public final class Network implements ApplicationEventPublisherAware {
     //
     // Basic I/O
     //
-    
-    public ControlPoint getControlPoint() {
-        return getUpnpService().getControlPoint();
-    }
-    
-    public synchronized UpnpService getUpnpService() {
-        return mUpnpService;
-    }
     
     public synchronized Collection<NetworkEntity> getDevices() {
         return mDevices.values();

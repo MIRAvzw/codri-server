@@ -9,7 +9,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>be.mira.adastra3</groupId>
     <artifactId>aa3server</artifactId>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
 
     <!-- Project information -->
     <version>0.2-SNAPSHOT</version>
@@ -79,7 +79,7 @@
   -->
   
     <dependencies>
-        <!-- Spring -->
+        <!-- Spring (core) -->
         <dependency>
            <groupId>org.springframework</groupId>
            <artifactId>spring-context</artifactId>
@@ -96,22 +96,27 @@
             <artifactId>cglib</artifactId>
             <version>2.2.2</version>
         </dependency>
-    
-        <!-- Cling -->  
+
+        <!-- Spring (web) -->
         <dependency>
-            <groupId>org.teleal.cling</groupId>
-            <artifactId>cling-core</artifactId>
-            <version>1.0.3</version>
+           <groupId>org.springframework</groupId>
+           <artifactId>spring-webmvc</artifactId>
+           <version>3.1.0.RELEASE</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpcore</artifactId>
-            <version>4.0.1</version>
+           <groupId>org.springframework</groupId>
+           <artifactId>spring-oxm</artifactId>
+           <version>3.1.0.RELEASE</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.0.1</version>
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>1.4.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>1.9.3</version>
         </dependency>
     
         <!-- Subversion -->
@@ -129,6 +134,11 @@
         </dependency>
     
         <!-- Logging -->
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1.1</version>
+        </dependency>
         <dependency>
            <groupId>org.slf4j</groupId>
            <artifactId>jcl-over-slf4j</artifactId>
@@ -168,36 +178,7 @@
   -->
   
     <build>
-        <plugins>
-            <!-- Fatjar generation -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <finalName>aa3server</finalName>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>package-jar-with-dependencies</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <appendAssemblyId>false</appendAssemblyId>
-                            <descriptorRefs>
-                                <descriptorRef>jar-with-dependencies</descriptorRef>
-                            </descriptorRefs>
-                            <archive>
-                                <manifest>
-                                    <mainClass>be.mira.adastra3.server.Main</mainClass>
-                                </manifest>
-                            </archive>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            
+        <plugins>            
             <!-- Compiler -->
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -206,6 +187,19 @@
                     <source>1.6</source>
                     <target>1.6</target>
                 </configuration>
+            </plugin>
+
+            <!-- Development Tomcat -->
+            <plugin>
+               <groupId>org.codehaus.mojo</groupId>
+               <artifactId>tomcat-maven-plugin</artifactId>
+               <version>1.1</version>
+            </plugin>
+
+            <!-- WAR generation -->
+            <plugin>
+               <artifactId>maven-war-plugin</artifactId>
+               <version>2.1.1</version>
             </plugin>
             
             <!-- Site generation -->

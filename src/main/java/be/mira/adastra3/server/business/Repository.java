@@ -3,22 +3,27 @@
  * and open the template in the editor.
  */
 
-package be.mira.adastra3.server.beans;
+package be.mira.adastra3.server.business;
 
 import be.mira.adastra3.server.exceptions.RepositoryException;
 import be.mira.adastra3.server.repository.configuration.Configuration;
 import be.mira.adastra3.server.repository.connection.Connection;
 import be.mira.adastra3.server.repository.presentation.Presentation;
-import be.mira.adastra3.server.beans.factory.Logger;
+import be.mira.adastra3.spring.Logger;
 import be.mira.adastra3.server.events.RepositoryConfigurationEvent;
 import be.mira.adastra3.server.events.RepositoryConnectionEvent;
 import be.mira.adastra3.server.events.RepositoryEvent;
 import be.mira.adastra3.server.events.RepositoryEvent.RepositoryEventType;
 import be.mira.adastra3.server.events.RepositoryPresentationEvent;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.logging.Log;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
@@ -27,6 +32,7 @@ import org.springframework.context.ApplicationEventPublisherAware;
  *
  * @author tim
  */
+@XmlRootElement(name="repository")
 public final class Repository implements ApplicationEventPublisherAware {
     //
     // Member data
@@ -78,6 +84,7 @@ public final class Repository implements ApplicationEventPublisherAware {
     // TODO: Remove the quite identical Connection/Configuration/Presentation setters
     //       somehow make it using the RepositoryEntity interface
     
+    @XmlElement
     public synchronized String getServer() {
         return mServer;
     }
@@ -87,7 +94,13 @@ public final class Repository implements ApplicationEventPublisherAware {
     }
     
     // TODO: why return a map?
-    public synchronized Map<String, Connection> getConnections() {
+    @XmlElementWrapper(name="connections")
+    @XmlElement(name="connection")
+    public synchronized Collection<Connection> getConnections() {
+        return mConnections.values();
+    }
+    
+    public synchronized Map<String, Connection> getConnectionsMap() {
         return mConnections;
     }
 
@@ -126,7 +139,13 @@ public final class Repository implements ApplicationEventPublisherAware {
     }
     
     // TODO: why return map?
-    public synchronized Map<String, Configuration> getConfigurations() {
+    @XmlElementWrapper(name="configurations")
+    @XmlElement(name="configuration")
+    public synchronized Collection<Configuration> getConfigurations() {
+        return mConfigurations.values();
+    }
+    
+    public synchronized Map<String, Configuration> getConfigurationsMap() {
         return mConfigurations;
     }
 
@@ -164,8 +183,14 @@ public final class Repository implements ApplicationEventPublisherAware {
         mPublisher.publishEvent(tEvent);
     }
     
-    // TODO: why return a map?
-    public synchronized Map<String, Presentation> getPresentations() {
+    // TODO: why return a map?    
+    @XmlElementWrapper(name="presentations")
+    @XmlElement(name="presentation")
+    public synchronized Collection<Presentation> getPresentations() {
+        return mPresentations.values();
+    }
+    
+    public synchronized Map<String, Presentation> getPresentationsMap() {
         return mPresentations;
     }
 

@@ -2,9 +2,9 @@
 * To change this template, choose Tools | Templates
 * and open the template in the editor.
 */
-package be.mira.adastra3.server.beans;
+package be.mira.adastra3.server.business;
 
-import be.mira.adastra3.server.beans.factory.Logger;
+import be.mira.adastra3.spring.Logger;
 import be.mira.adastra3.server.events.*;
 import be.mira.adastra3.server.exceptions.DeviceException;
 import be.mira.adastra3.server.network.NetworkEntity;
@@ -22,7 +22,7 @@ import org.springframework.context.ApplicationListener;
 *
 * @author tim
 */
-public class Controller implements ApplicationListener {
+public class Coordinator implements ApplicationListener {
     //
     // Data members
     //
@@ -38,7 +38,7 @@ public class Controller implements ApplicationListener {
     // Construction and destruction
     //
     
-    public Controller(Network iNetwork, Repository iRepository) {
+    public Coordinator(Network iNetwork, Repository iRepository) {
         mNetwork = iNetwork;
         mRepository = iRepository;
     }
@@ -69,7 +69,7 @@ public class Controller implements ApplicationListener {
 
                 // Find the connections this device is a part of
                 List<Connection> tRelevantConnections = new ArrayList<Connection>();
-                for (Connection tConnection : mRepository.getConnections().values()) {
+                for (Connection tConnection : mRepository.getConnectionsMap().values()) {
                     if (tConnection.getKiosk().equals(tDevice.getUuid())) {
                         tRelevantConnections.add(tConnection);
                     }
@@ -136,7 +136,7 @@ public class Controller implements ApplicationListener {
     private void pushPresentation(final Presentation iPresentation) {
         // Find the connections this presentation is a part of
         List<Connection> tRelevantConnections = new ArrayList<Connection>();
-        for (Connection tConnection: mRepository.getConnections().values()) {
+        for (Connection tConnection: mRepository.getConnectionsMap().values()) {
             if (tConnection.getPresentation().equals(iPresentation.getId())) {
                 tRelevantConnections.add(tConnection);
             }
@@ -199,7 +199,7 @@ public class Controller implements ApplicationListener {
     private void pushConfiguration(final Configuration iConfiguration) {
         // Find the connections this configuration is a part of
         List<Connection> tRelevantConnections = new ArrayList<Connection>();
-        for (Connection tConnection: mRepository.getConnections().values()) {
+        for (Connection tConnection: mRepository.getConnectionsMap().values()) {
             if (tConnection.getConfiguration().equals(iConfiguration.getId())) {
                 tRelevantConnections.add(tConnection);
             }

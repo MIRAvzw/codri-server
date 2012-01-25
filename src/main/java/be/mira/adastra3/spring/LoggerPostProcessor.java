@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package be.mira.adastra3.server.beans.factory;
+package be.mira.adastra3.spring;
 
 /**
  * Auto injects the underlying implementation of logger into the bean with field

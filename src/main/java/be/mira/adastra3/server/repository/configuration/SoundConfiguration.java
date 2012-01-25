@@ -4,10 +4,14 @@
  */
 package be.mira.adastra3.server.repository.configuration;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  *
  * @author tim
  */
+@XmlRootElement(name="sound")
 public final class SoundConfiguration {
     //
     // Data members
@@ -20,6 +24,12 @@ public final class SoundConfiguration {
     // Constructors
     //
     
+    // FIXME: dummy constructor for JAXB (shouldn't be neccesary as JAXB never
+    // has to unmarshal this class)
+    public SoundConfiguration() {
+        this(null);
+    }
+    
     public SoundConfiguration(final Integer iVolume) {
         mVolume = iVolume;
     }
@@ -29,6 +39,7 @@ public final class SoundConfiguration {
     // Getters
     //
     
+    @XmlElement
     public Integer getVolume() {
         return mVolume;
     }

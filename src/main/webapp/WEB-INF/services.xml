@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/mvc 
+        http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd">
+
+    <context:annotation-config />
+    <mvc:annotation-driven />
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <value>classpath:services.properties</value>
+        </property>
+    </bean>
+    <bean class="be.mira.adastra3.spring.LoggerPostProcessor" />
+    
+    <bean class="be.mira.adastra3.server.business.Repository" id="repository" />
+    <bean class="be.mira.adastra3.server.business.Network" id="network" />
+
+    <bean class="be.mira.adastra3.server.business.Coordinator">
+        <constructor-arg ref="repository"/>
+        <constructor-arg ref="network"/>
+    </bean>
+
+    <bean class="be.mira.adastra3.server.business.RepositoryMonitor" id="repositoryMonitor">
+        <constructor-arg ref="repository"/>
+    </bean>
+    
+    <bean class="be.mira.adastra3.server.web.RepositoryController" id="repositoryController">
+        <constructor-arg ref="repository"/>
+    </bean>
+</beans>

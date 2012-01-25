@@ -14,7 +14,7 @@ public abstract class RepositoryEntity {
     //
     
     private final String mId;
-    private final long mRevision;
+    private final Long mRevision;
     private final String mPath;
     private final String mServer; // FIXME: duplicate information
     
@@ -23,7 +23,13 @@ public abstract class RepositoryEntity {
     // Construction and destruction
     //
     
-    public RepositoryEntity(final String iId, final long iRevision, final String iPath, final String iServer) {
+    // FIXME: dummy constructor for JAXB (shouldn't be neccesary as JAXB never
+    // has to unmarshal this class)
+    public RepositoryEntity() {
+        this(null, null, null, null);
+    }
+    
+    public RepositoryEntity(final String iId, final Long iRevision, final String iPath, final String iServer) {
         mId = iId;
         mRevision = iRevision;
         mPath = iPath;
