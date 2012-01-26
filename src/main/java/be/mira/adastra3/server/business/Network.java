@@ -49,7 +49,7 @@ public final class Network implements ApplicationEventPublisherAware {
     }
     
     @Override
-    public void setApplicationEventPublisher(ApplicationEventPublisher iPublisher) {
+    public void setApplicationEventPublisher(final ApplicationEventPublisher iPublisher) {
         mPublisher = iPublisher;
     }
     

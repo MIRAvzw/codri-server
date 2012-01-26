@@ -87,7 +87,7 @@ public class Processor {
     // Parsing methods
     //    
     
-    protected String parseTextElement()  throws RepositoryException, XmlPullParserException, IOException {   
+    protected final String parseTextElement()  throws RepositoryException, XmlPullParserException, IOException {   
         // Parse the contents
         mParser.next();
         if (mParser.getEventType() != XmlPullParser.TEXT) {

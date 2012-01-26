@@ -58,7 +58,7 @@ public final class Repository implements ApplicationEventPublisherAware {
     }
     
     @Override
-    public void setApplicationEventPublisher(ApplicationEventPublisher iPublisher) {
+    public void setApplicationEventPublisher(final ApplicationEventPublisher iPublisher) {
         mPublisher = iPublisher;
     }
     

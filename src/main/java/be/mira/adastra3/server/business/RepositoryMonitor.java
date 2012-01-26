@@ -25,7 +25,6 @@ import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Value;
@@ -66,17 +65,19 @@ public class RepositoryMonitor {
     // Construction and destruction
     //
 
-    public RepositoryMonitor(Repository iRepository) {
+    public RepositoryMonitor(final Repository iRepository) {
         mRepository = iRepository;
     }
 
     @PostConstruct
-    public void init() throws Exception {
+    public final void init() throws Exception {
         // Subversion checkout root
-        if (!mSVNCheckoutRoot.exists())
+        if (!mSVNCheckoutRoot.exists()) {
             mSVNCheckoutRoot.mkdirs();
-        if (!mSVNCheckoutRoot.exists() || !mSVNCheckoutRoot.canWrite())
+        }
+        if (!mSVNCheckoutRoot.exists() || !mSVNCheckoutRoot.canWrite()) {
             throw new Exception("checkout path does not exist or is not writable");
+        }
         
         // Subversion location
         Pattern tLocationPattern = Pattern.compile("^(https?|file|svn)://");
@@ -185,11 +186,11 @@ public class RepositoryMonitor {
         
     }
     
-    public class XMLFilter implements FilenameFilter {
-      protected Pattern mPattern = Pattern.compile("\\.xml$", Pattern.CASE_INSENSITIVE);
+    private class XMLFilter implements FilenameFilter {
+      private Pattern mPattern = Pattern.compile("\\.xml$", Pattern.CASE_INSENSITIVE);
 
       @Override
-      public boolean accept(File iDirectory, String iFilename) {
+      public final boolean accept(final File iDirectory, final String iFilename) {
           return mPattern.matcher(iFilename).find();
       }
     }
@@ -431,12 +432,13 @@ public class RepositoryMonitor {
                     null,
                     new InfoCallback() {
                         @Override
-                        public void singleInfo(Info2 iInfo) {
+                        public void singleInfo(final Info2 iInfo) {
                             tRevisions.add(iInfo.getLastChangedRev());
                         }
                     });
-            if (tRevisions.size() != 1)
+            if (tRevisions.size() != 1) {
                 throw new RepositoryException("unexpected amount of info entries");
+            }
             return tRevisions.get(0);
         } catch (ClientException tException) {
             throw new RepositoryException("could not check the repository", tException);
@@ -463,9 +465,10 @@ public class RepositoryMonitor {
                     null,
                     new InfoCallback() {
                         @Override
-                        public void singleInfo(Info2 iInfo) {
-                            if (iInfo.getPath().equals(iPath))
+                        public void singleInfo(final Info2 iInfo) {
+                            if (iInfo.getPath().equals(iPath)) {
                                 return;
+                            }
                             tChildren.put(iInfo.getPath(), iInfo.getLastChangedRev());
                         }
                     });
@@ -520,7 +523,7 @@ public class RepositoryMonitor {
         // Construction and destruction
         //
         
-        public RepositoryChangeset(Map<String, T> iOldEntities, Map<String, T> iCurrentEntities) {
+        public RepositoryChangeset(final Map<String, T> iOldEntities, final Map<String, T> iCurrentEntities) {
             // Check for removed entities
             mRemovals = new HashMap<String, T>();
             for (String tOldId: iOldEntities.keySet()) {

@@ -38,7 +38,7 @@ public class NetworkController {
     // Construction and destruction
     //
     
-    public NetworkController(Network iNetwork) {
+    public NetworkController(final Network iNetwork) {
         mNetwork = iNetwork;
     }
     
@@ -48,29 +48,28 @@ public class NetworkController {
     //
     
     @RequestMapping(method=RequestMethod.GET)
-    public @ResponseBody
+    public final @ResponseBody
     Network getNetwork() {        
         return mNetwork;
     }
     
     @RequestMapping(value="/kiosks/{id}", method=RequestMethod.POST)
-    public @ResponseBody
-    void addKiosk(@RequestBody Kiosk iKiosk, @PathVariable("id") UUID iId, HttpServletRequest iRequest, HttpServletResponse iResponse) throws IOException {
+    public final @ResponseBody
+    void addKiosk(final @RequestBody Kiosk iKiosk, final @PathVariable("id") UUID iId, final HttpServletRequest iRequest, final HttpServletResponse iResponse) throws IOException {
         try {
             iKiosk.setAddress(iRequest.getRemoteAddr());
             mNetwork.addKiosk(iId, iKiosk);
         } catch (NetworkException tException) {
-            iResponse.sendError(409, tException.getLocalizedMessage());
+            iResponse.sendError(HttpStatus.CONFLICT.value(), tException.getLocalizedMessage());
         }
     }
     
     @RequestMapping(value="/kiosks/{id}", method=RequestMethod.PUT)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public @ResponseBody
-    void updateKiosk(@PathVariable("id") UUID iId, HttpServletRequest iRequest, HttpServletResponse iResponse) throws IOException {
+    public final @ResponseBody
+    void updateKiosk(final @PathVariable("id") UUID iId, final HttpServletRequest iRequest, final HttpServletResponse iResponse) throws IOException {
         Kiosk tKiosk = mNetwork.getKiosk(iId);
         if (tKiosk == null) {
-            iResponse.sendError(404);            
+            iResponse.sendError(HttpStatus.NOT_FOUND.value());            
         } else {
             tKiosk.updateHeartbeat();
         }

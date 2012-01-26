@@ -4,14 +4,13 @@
  */
 package be.mira.adastra3.server.network;
 
-import java.net.InetAddress;
 import java.util.Date;
 
 /**
  *
  * @author tim
  */
-abstract public class NetworkEntity {
+public abstract class NetworkEntity {
     //
     // Member data
     //
@@ -44,11 +43,11 @@ abstract public class NetworkEntity {
         return mModel;
     }
     
-    public String getAddress() {
+    public final String getAddress() {
         return mAddress;
     }
     
-    public void setAddress(String iAddress) {
+    public final void setAddress(final String iAddress) {
         mAddress = iAddress;
     }
     

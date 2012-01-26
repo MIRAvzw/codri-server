@@ -36,11 +36,11 @@ public abstract class NetworkEvent extends ApplicationEvent {
     // Construction and destruction
     //
     
-    public NetworkEvent(Object iSource, NetworkEventType iType, UUID iId, NetworkEntity iEntity) {
+    public NetworkEvent(final Object iSource, final NetworkEventType iType, final UUID iId, final NetworkEntity iEntity) {
         this(iSource, iType, iId, iEntity, null);
     }
     
-    public NetworkEvent(Object iSource, NetworkEventType iType, UUID iId, NetworkEntity iEntity, NetworkEntity iOldEntity) {
+    public NetworkEvent(final Object iSource, final NetworkEventType iType, final UUID iId, final NetworkEntity iEntity, final NetworkEntity iOldEntity) {
         super(iSource);
         mType = iType;
         mId = iId;

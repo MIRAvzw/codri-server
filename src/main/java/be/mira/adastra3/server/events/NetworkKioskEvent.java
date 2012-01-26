@@ -16,11 +16,11 @@ public class NetworkKioskEvent extends NetworkEvent {
     // Construction and destruction
     //
     
-    public NetworkKioskEvent(Object iSource, NetworkEvent.NetworkEventType iType, UUID iId, Kiosk iKiosk) {
+    public NetworkKioskEvent(final Object iSource, final NetworkEvent.NetworkEventType iType, final UUID iId, final Kiosk iKiosk) {
         super(iSource, iType, iId, iKiosk);
     }
     
-    public NetworkKioskEvent(Object iSource, NetworkEvent.NetworkEventType iType, UUID iId, Kiosk iKiosk, Kiosk iOldKiosk) {
+    public NetworkKioskEvent(final Object iSource, final NetworkEvent.NetworkEventType iType, final UUID iId, final Kiosk iKiosk, final Kiosk iOldKiosk) {
         super(iSource, iType, iId, iKiosk, iOldKiosk);
     }
     
@@ -29,7 +29,7 @@ public class NetworkKioskEvent extends NetworkEvent {
     // Basic I/O
     //
     
-    public Kiosk getKiosk() {
+    public final Kiosk getKiosk() {
         return (Kiosk) getEntity();
     }
 }

@@ -4,8 +4,8 @@
 */
 package be.mira.adastra3.server.business;
 
-import be.mira.adastra3.spring.Logger;
 import be.mira.adastra3.server.events.*;
+import be.mira.adastra3.spring.Logger;
 import be.mira.adastra3.server.exceptions.DeviceException;
 import be.mira.adastra3.server.network.Kiosk;
 import be.mira.adastra3.server.repository.configuration.Configuration;
@@ -39,7 +39,7 @@ public class Coordinator implements ApplicationListener<ApplicationEvent> {
     // Construction and destruction
     //
     
-    public Coordinator(Network iNetwork, Repository iRepository) {
+    public Coordinator(final Network iNetwork, final Repository iRepository) {
         mNetwork = iNetwork;
         mRepository = iRepository;
     }
@@ -50,7 +50,7 @@ public class Coordinator implements ApplicationListener<ApplicationEvent> {
     //
     
     @Override
-    public void onApplicationEvent(ApplicationEvent iEvent) {
+    public final void onApplicationEvent(final ApplicationEvent iEvent) {
         // TODO: this is ugly
         if (iEvent instanceof NetworkEvent) {
             if (iEvent instanceof NetworkKioskEvent) {
@@ -72,11 +72,11 @@ public class Coordinator implements ApplicationListener<ApplicationEvent> {
     // NetworkEvent handler
     //
     
-    public void onNetworkKioskEvent(NetworkKioskEvent iEvent) {
+    public final void onNetworkKioskEvent(final NetworkKioskEvent iEvent) {
         Kiosk tKiosk = iEvent.getKiosk();
         
         switch (iEvent.getType()) {
-            case ADDED: {
+            case ADDED:
                 mLogger.info("Kiosk added: " + iEvent.getId());
 
                 // Find the connections this device is a part of
@@ -99,12 +99,9 @@ public class Coordinator implements ApplicationListener<ApplicationEvent> {
                 }
                 
                 break;
-            }
                 
-            case REMOVED: {
+            case REMOVED:
                 mLogger.info("Kiosk removed: " + iEvent.getId());                
-            }
-                
         }
     }
     
@@ -116,33 +113,30 @@ public class Coordinator implements ApplicationListener<ApplicationEvent> {
     // TODO: the doRepository as well as doPresentation(Update|Added) functions are
     // quite similar, it would be nice to deduplicate this code&
     
-    public void onRepositoryPresentationEvent(RepositoryPresentationEvent iEvent) {
+    public final void onRepositoryPresentationEvent(final RepositoryPresentationEvent iEvent) {
         Presentation tPresentation = (Presentation) iEvent.getEntity();
         
         switch (iEvent.getType()) {
-            case ADDED: {
+            case ADDED:
                 mLogger.info("Presentation added: " + iEvent.getId());
                 pushPresentation(iEvent.getId(), tPresentation);
                 
-                break;                
-            }
+                break; 
                 
-            case UPDATED: {
+            case UPDATED:
                 // TODO: do something with old one
                 
                 mLogger.info("Presentation updated: " + iEvent.getId());
                 pushPresentation(iEvent.getId(), tPresentation);
                 
-                break;              
-            }
+                break;
                 
-            case REMOVED: {
+            case REMOVED:
                 mLogger.info("Presentation removed: " + iEvent.getId());
 
                 // TODO
                 
-                break;                
-            }
+                break;
         }
     }
         
@@ -176,33 +170,30 @@ public class Coordinator implements ApplicationListener<ApplicationEvent> {
     // RepositoryConfigurationEvent handler
     //
     
-    public void onRepositoryConfigurationEvent(RepositoryConfigurationEvent iEvent) {
+    public final void onRepositoryConfigurationEvent(final RepositoryConfigurationEvent iEvent) {
         Configuration tConfiguration = (Configuration) iEvent.getEntity();
         
         switch (iEvent.getType()) {
-            case ADDED: {
+            case ADDED:
                 mLogger.info("Configuration added: " + iEvent.getId());
                 pushConfiguration(iEvent.getId(), tConfiguration);
                 
                 break;
-            }
                 
-            case UPDATED: {
+            case UPDATED:
                 // TODO: do something with old one
                 
                 mLogger.info("Configuration updated: " + iEvent.getId());
                 pushConfiguration(iEvent.getId(), tConfiguration);
                 
                 break;
-            }
                 
-            case REMOVED: {
+            case REMOVED:
                 mLogger.info("Configuration removed: " + iEvent.getId());
 
                 // TODO: Erase the configuration on the device
                 
                 break;
-            }
         }
     }
     
@@ -235,33 +226,30 @@ public class Coordinator implements ApplicationListener<ApplicationEvent> {
     // RepositoryConnectionEvent handler
     //
     
-    public void onRepositoryConnectionEvent(RepositoryConnectionEvent iEvent) {
+    public final void onRepositoryConnectionEvent(final RepositoryConnectionEvent iEvent) {
         Connection tConnection = (Connection) iEvent.getEntity();
         
         switch (iEvent.getType()) {
-            case ADDED: {
+            case ADDED:
                 mLogger.info("Connection added: " + iEvent.getId());
                 pushConnection(iEvent.getId(), tConnection);
                 
                 break;
-            }
                 
-            case UPDATED: {
+            case UPDATED:
                 // TODO: do something with old one
                 
                 mLogger.info("Connection updated: " + iEvent.getId());
                 pushConnection(iEvent.getId(), tConnection);
                 
                 break;
-            }
                 
-            case REMOVED: {
+            case REMOVED:
                 mLogger.info("Connection removed: " + iEvent.getId());
 
                 // TODO: Erase the connection on the device
                 
                 break;
-            }
         }
     }
     

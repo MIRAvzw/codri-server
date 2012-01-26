@@ -15,11 +15,11 @@ public class RepositoryPresentationEvent extends RepositoryEvent {
     // Construction and destruction
     //
     
-    public RepositoryPresentationEvent(Object iSource, RepositoryEvent.RepositoryEventType iType, String iId, Presentation iPresentation) {
+    public RepositoryPresentationEvent(final Object iSource, final RepositoryEvent.RepositoryEventType iType, final String iId, final Presentation iPresentation) {
         super(iSource, iType, iId, iPresentation);
     }
     
-    public RepositoryPresentationEvent(Object iSource, RepositoryEvent.RepositoryEventType iType, String iId, Presentation iPresentation, Presentation iOldPresentation) {
+    public RepositoryPresentationEvent(final Object iSource, final RepositoryEvent.RepositoryEventType iType, final String iId, final Presentation iPresentation, final Presentation iOldPresentation) {
         super(iSource, iType, iId, iPresentation, iOldPresentation);
     }
 }

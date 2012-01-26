@@ -21,26 +21,28 @@ import org.springframework.util.ReflectionUtils;
 import static org.springframework.util.ReflectionUtils.FieldCallback;
 
 public class LoggerPostProcessor implements BeanPostProcessor {
+    //
+    // BeanPostProcessor interface
+    //
 
-    public Object postProcessAfterInitialization(Object bean, String beanName)
-            throws BeansException {
-        return bean;
+    @Override
+    public final Object postProcessAfterInitialization(final Object iBean, final String iBeanName) {
+        return iBean;
     }
 
-    public Object postProcessBeforeInitialization(final Object bean,
-            String beanName) throws BeansException {
-        ReflectionUtils.doWithFields(bean.getClass(), new FieldCallback() {
-
-            public void doWith(Field field) throws IllegalArgumentException,
-                    IllegalAccessException {
-                // make the field accessible if defined private  
-                ReflectionUtils.makeAccessible(field);
-                if (field.getAnnotation(Logger.class) != null) {
-                    Log log = LogFactory.getLog(bean.getClass());
-                    field.set(bean, log);
+    @Override
+    public final Object postProcessBeforeInitialization(final Object iBean, final String iBeanName) {
+        ReflectionUtils.doWithFields(iBean.getClass(), new FieldCallback() {
+            @Override
+            public final void doWith(final Field iField) throws IllegalAccessException {
+                // Make the field accessible if defined private  
+                ReflectionUtils.makeAccessible(iField);
+                if (iField.getAnnotation(Logger.class) != null) {
+                    Log tLog = LogFactory.getLog(iBean.getClass());
+                    iField.set(iBean, tLog);
                 }
             }
         });
-        return bean;
+        return iBean;
     }
 }

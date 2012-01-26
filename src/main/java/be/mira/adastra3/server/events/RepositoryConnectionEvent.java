@@ -15,11 +15,11 @@ public class RepositoryConnectionEvent extends RepositoryEvent {
     // Construction and destruction
     //
     
-    public RepositoryConnectionEvent(Object iSource, RepositoryEvent.RepositoryEventType iType, String iId, Connection iConnection) {
+    public RepositoryConnectionEvent(final Object iSource, final RepositoryEvent.RepositoryEventType iType, final String iId, final Connection iConnection) {
         super(iSource, iType, iId, iConnection);
     }
     
-    public RepositoryConnectionEvent(Object iSource, RepositoryEvent.RepositoryEventType iType, String iId, Connection iConnection, Connection iOldConnection) {
+    public RepositoryConnectionEvent(final Object iSource, final RepositoryEvent.RepositoryEventType iType, final String iId, final Connection iConnection, final Connection iOldConnection) {
         super(iSource, iType, iId, iConnection, iOldConnection);
     }
 }

@@ -37,11 +37,11 @@ public abstract class RepositoryEvent extends ApplicationEvent {
     // Construction and destruction
     //
     
-    public RepositoryEvent(Object iSource, RepositoryEvent.RepositoryEventType iType, String iId, RepositoryEntity iEntity) {
+    public RepositoryEvent(final Object iSource, final RepositoryEvent.RepositoryEventType iType, final String iId, final RepositoryEntity iEntity) {
         this(iSource, iType, iId, iEntity, null);
     }
     
-    public RepositoryEvent(Object iSource, RepositoryEvent.RepositoryEventType iType, String iId, RepositoryEntity iEntity, RepositoryEntity iOldEntity) {
+    public RepositoryEvent(final Object iSource, final RepositoryEvent.RepositoryEventType iType, final String iId, final RepositoryEntity iEntity, final RepositoryEntity iOldEntity) {
         super(iSource);
         mType = iType;
         mId = iId;

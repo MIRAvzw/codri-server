@@ -13,7 +13,7 @@ import org.springframework.core.convert.converter.Converter;
  */
 public class UUIDConverter implements Converter<String, UUID> {
     @Override
-    public UUID convert(String iSource) {
+    public final UUID convert(final String iSource) {
         return UUID.fromString(iSource);
     }
 }

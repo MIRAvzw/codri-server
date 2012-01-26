@@ -15,11 +15,11 @@ public class RepositoryConfigurationEvent extends RepositoryEvent {
     // Construction and destruction
     //
     
-    public RepositoryConfigurationEvent(Object iSource, RepositoryEvent.RepositoryEventType iType, String iId, Configuration iConfiguration) {
+    public RepositoryConfigurationEvent(final Object iSource, final RepositoryEvent.RepositoryEventType iType, final String iId, final Configuration iConfiguration) {
         super(iSource, iType, iId, iConfiguration);
     }
     
-    public RepositoryConfigurationEvent(Object iSource, RepositoryEvent.RepositoryEventType iType, String iId, Configuration iConfiguration, Configuration iOldConfiguration) {
+    public RepositoryConfigurationEvent(final Object iSource, final RepositoryEvent.RepositoryEventType iType, final String iId, final Configuration iConfiguration, final Configuration iOldConfiguration) {
         super(iSource, iType, iId, iConfiguration, iOldConfiguration);
     }
 }

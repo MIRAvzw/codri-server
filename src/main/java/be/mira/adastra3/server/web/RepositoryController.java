@@ -33,7 +33,7 @@ public class RepositoryController {
     // Construction and destruction
     //
     
-    public RepositoryController(Repository iRepository) {
+    public RepositoryController(final Repository iRepository) {
         mRepository = iRepository;
     }
     
@@ -43,7 +43,7 @@ public class RepositoryController {
     //
     
     @RequestMapping(method = RequestMethod.GET)
-    public @ResponseBody
+    public final @ResponseBody
     Repository getRepository() {        
         return mRepository;
     }
