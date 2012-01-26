@@ -24,7 +24,7 @@ public class Presentation extends RepositoryEntity {
         throw new UnsupportedOperationException();
     }
     
-    public Presentation(final String iId, final Long iRevision, final String iPath, final String iServer) {
-        super(iId, iRevision, iPath, iServer);
+    public Presentation(final Long iRevision, final String iPath, final String iServer) {
+        super(iRevision, iPath, iServer);
     }
 }

@@ -255,27 +255,30 @@ public class RepositoryMonitor {
             
             // Process the contents
             String tRepositoryPath = "/connections/" + tFilename;
-            ConnectionProcessor tReader = new ConnectionProcessor(tRevision, tRepositoryPath, mSVNLocation, tId, tFile);
+            ConnectionProcessor tReader = new ConnectionProcessor(tRevision, tRepositoryPath, mSVNLocation, tFile);
             tReader.process();
             Connection tConnection = tReader.getConnection();
             if (tConnection == null) {
                 throw new RepositoryException("found empty connection file");
             }
-            tNewConnections.put(tConnection.getId(), tConnection);
+            tNewConnections.put(tId, tConnection);
         }
         
         // Save
         mLogger.debug("Saving connections");
         Repository tRepository = mRepository;
-        RepositoryChangeset<Connection> tChangeset = new RepositoryChangeset<Connection>(tRepository.getConnectionsMap(), tNewConnections);
-        for (Connection tRemoval: tChangeset.getRemovals().values()) {
-            tRepository.removeConnection(tRemoval);
+        RepositoryChangeset<Connection> tChangeset = new RepositoryChangeset<Connection>(tRepository.getConnections(), tNewConnections);
+        for (String tId: tChangeset.getRemovals().keySet()) {
+            Connection tRemoval = tChangeset.getRemovals().get(tId);
+            tRepository.removeConnection(tId, tRemoval);
         }
-        for (Connection tAddition: tChangeset.getAdditions().values()) {
-            tRepository.addConnection(tAddition);
+        for (String tId: tChangeset.getAdditions().keySet()) {
+            Connection tAddition = tChangeset.getAdditions().get(tId);
+            tRepository.addConnection(tId, tAddition);
         }
-        for (Connection tRemoval: tChangeset.getUpdates().values()) {
-            tRepository.addConnection(tRemoval);
+        for (String tId: tChangeset.getUpdates().keySet()) {
+            Connection tUpdate = tChangeset.getUpdates().get(tId);
+            tRepository.addConnection(tId, tUpdate);
         }
     }
     
@@ -337,27 +340,30 @@ public class RepositoryMonitor {
             
             // Process the contents
             String tRepositoryPath = "/configurations/" + tFilename;
-            ConfigurationProcessor tReader = new ConfigurationProcessor(tRevision, tRepositoryPath, mSVNLocation, tId, tFile);
+            ConfigurationProcessor tReader = new ConfigurationProcessor(tRevision, tRepositoryPath, mSVNLocation, tFile);
             tReader.process();
             Configuration tConfiguration = tReader.getConfiguration();
             if (tConfiguration == null) {
                 throw new RepositoryException("found empty configuration file");
             }
-            tNewConfigurations.put(tConfiguration.getId(), tConfiguration);
+            tNewConfigurations.put(tId, tConfiguration);
         }
         
         // Save
         mLogger.debug("Saving configurations");
         Repository tRepository = mRepository;
-        RepositoryChangeset<Configuration> tChangeset = new RepositoryChangeset<Configuration>(tRepository.getConfigurationsMap(), tNewConfigurations);
-        for (Configuration tRemoval: tChangeset.getRemovals().values()) {
-            tRepository.removeConfiguration(tRemoval);
+        RepositoryChangeset<Configuration> tChangeset = new RepositoryChangeset<Configuration>(tRepository.getConfigurations(), tNewConfigurations);
+        for (String tId: tChangeset.getRemovals().keySet()) {
+            Configuration tRemoval = tChangeset.getRemovals().get(tId);
+            tRepository.removeConfiguration(tId, tRemoval);
         }
-        for (Configuration tAddition: tChangeset.getAdditions().values()) {
-            tRepository.addConfiguration(tAddition);
+        for (String tId: tChangeset.getAdditions().keySet()) {
+            Configuration tAddition = tChangeset.getAdditions().get(tId);
+            tRepository.addConfiguration(tId, tAddition);
         }
-        for (Configuration tRemoval: tChangeset.getUpdates().values()) {
-            tRepository.addConfiguration(tRemoval);
+        for (String tId: tChangeset.getUpdates().keySet()) {
+            Configuration tUpdate = tChangeset.getUpdates().get(tId);
+            tRepository.addConfiguration(tId, tUpdate);
         }
     }
     
@@ -378,22 +384,25 @@ public class RepositoryMonitor {
         for (String tId: tPathEntries.keySet()) {
             long tRevision = tPathEntries.get(tId);
             String tPath = "/presentations/" + tId;
-            Presentation tMedia = new Presentation(tId, tRevision, tPath, mSVNLocation);
+            Presentation tMedia = new Presentation(tRevision, tPath, mSVNLocation);
             tNewPresentations.put(tId, tMedia);
         }
         
         // Update
         mLogger.debug("Updating presentations");
         Repository tRepository = mRepository;
-        RepositoryChangeset<Presentation> tChangeset = new RepositoryChangeset<Presentation>(tRepository.getPresentationsMap(), tNewPresentations);
-        for (Presentation tRemoval: tChangeset.getRemovals().values()) {
-            tRepository.removePresentation(tRemoval);
+        RepositoryChangeset<Presentation> tChangeset = new RepositoryChangeset<Presentation>(tRepository.getPresentations(), tNewPresentations);
+        for (String tId: tChangeset.getRemovals().keySet()) {
+            Presentation tRemoval = tChangeset.getRemovals().get(tId);
+            tRepository.removePresentation(tId, tRemoval);
         }
-        for (Presentation tAddition: tChangeset.getAdditions().values()) {
-            tRepository.addPresentation(tAddition);
+        for (String tId: tChangeset.getAdditions().keySet()) {
+            Presentation tAddition = tChangeset.getAdditions().get(tId);
+            tRepository.addPresentation(tId, tAddition);
         }
-        for (Presentation tRemoval: tChangeset.getUpdates().values()) {
-            tRepository.updatePresentation(tRemoval);
+        for (String tId: tChangeset.getUpdates().keySet()) {
+            Presentation tUpdate = tChangeset.getUpdates().get(tId);
+            tRepository.updatePresentation(tId, tUpdate);
         }
     }
 
@@ -514,38 +523,40 @@ public class RepositoryMonitor {
         public RepositoryChangeset(Map<String, T> iOldEntities, Map<String, T> iCurrentEntities) {
             // Check for removed entities
             mRemovals = new HashMap<String, T>();
-            for (T tOldEntity: iOldEntities.values()) {
-                if (! iCurrentEntities.containsKey(tOldEntity.getId())) {
+            for (String tOldId: iOldEntities.keySet()) {
+                T tOldEntity = iOldEntities.get(tOldId);
+                if (! iCurrentEntities.containsKey(tOldId)) {
                     mLogger.debug("Entity "
-                            + tOldEntity.getId()
+                            + tOldId
                             + " seems to have been deleted (last known rev "
                             + tOldEntity.getRevision()
                             + "), removing from repository");
-                    mRemovals.put(tOldEntity.getId(), tOldEntity);
+                    mRemovals.put(tOldId, tOldEntity);
                 }
             }
 
             // Check for new and updated entities      
             mAdditions = new HashMap<String, T>();
             mUpdates = new HashMap<String, T>();
-            for (T tCurrentEntity : iCurrentEntities.values()) {
-                T tOldEntity = iOldEntities.get(tCurrentEntity.getId());
+            for (String tCurrentId: iCurrentEntities.keySet()) {
+                T tCurrentEntity = iCurrentEntities.get(tCurrentId);
+                T tOldEntity = iOldEntities.get(tCurrentId);
                 if (tOldEntity == null) {
                     mLogger.debug("Entity "
-                            + tCurrentEntity.getId()
+                            + tCurrentId
                             + " seems new (rev "
                             + tCurrentEntity.getRevision()
                             + "), adding to repository");
-                    mAdditions.put(tCurrentEntity.getId(), tCurrentEntity);
+                    mAdditions.put(tCurrentId, tCurrentEntity);
                 } else if (tCurrentEntity.getRevision() > tOldEntity.getRevision()) {
                     mLogger.debug("Entity "
-                            + tCurrentEntity.getId()
+                            + tCurrentId
                             + " is a more recent version (rev "
                             + tCurrentEntity.getRevision()
                             + ") of an existing media (rev "
                             + tOldEntity.getRevision()
                             + "), updating the repository");
-                    mUpdates.put(tCurrentEntity.getId(), tCurrentEntity);
+                    mUpdates.put(tCurrentId, tCurrentEntity);
                 }
             }
         }

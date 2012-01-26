@@ -30,8 +30,8 @@ public class Configuration extends RepositoryEntity {
         throw new UnsupportedOperationException();
     }
     
-    public Configuration(final String iId, final Long iRevision, final String iPath, final String iServer, final SoundConfiguration iSoundConfiguration) {
-        super(iId, iRevision, iPath, iServer);
+    public Configuration(final Long iRevision, final String iPath, final String iServer, final SoundConfiguration iSoundConfiguration) {
+        super(iRevision, iPath, iServer);
         mSoundConfiguration = iSoundConfiguration;
     }
     

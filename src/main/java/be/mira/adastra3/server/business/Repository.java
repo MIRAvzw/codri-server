@@ -93,101 +93,89 @@ public final class Repository implements ApplicationEventPublisherAware {
     // TODO: why return a map?
     @XmlElementWrapper(name="connections")
     @XmlElement(name="connection")
-    public synchronized Collection<Connection> getConnections() {
-        return mConnections.values();
-    }
-    
-    public synchronized Map<String, Connection> getConnectionsMap() {
+    public synchronized Map<String, Connection> getConnections() {
         return mConnections;
     }
 
-    public synchronized Connection getConnection(final String iName) {
-        return mConnections.get(iName);
+    public synchronized Connection getConnection(final String iId) {
+        return mConnections.get(iId);
     }
 
-    public synchronized void addConnection(final Connection iConnection) throws RepositoryException {
-        if (mConnections.containsKey(iConnection.getId())) {
-            throw new RepositoryException("connection " + iConnection.getId() + " already present in repository");
+    public synchronized void addConnection(final String iId, final Connection iConnection) throws RepositoryException {
+        if (mConnections.containsKey(iId)) {
+            throw new RepositoryException("connection " + iId + " already present in repository");
         }
-        mConnections.put(iConnection.getId(), iConnection);
+        mConnections.put(iId, iConnection);
         
-        RepositoryEvent tEvent = new RepositoryConnectionEvent(this, RepositoryEventType.ADDED, iConnection);
+        RepositoryEvent tEvent = new RepositoryConnectionEvent(this, RepositoryEventType.ADDED, iId, iConnection);
         mPublisher.publishEvent(tEvent);
     }
     
-    public synchronized void updateConnection(final Connection iConnection) throws RepositoryException {
-        if (! mConnections.containsKey(iConnection.getId())) {
-            throw new RepositoryException("connection " + iConnection.getId() + " not present in repository");
+    public synchronized void updateConnection(final String iId, final Connection iConnection) throws RepositoryException {
+        if (! mConnections.containsKey(iId)) {
+            throw new RepositoryException("connection " + iId + " not present in repository");
         }
-        Connection tOldConnection = mConnections.put(iConnection.getId(), iConnection);
+        Connection tOldConnection = mConnections.put(iId, iConnection);
         
-        RepositoryEvent tEvent = new RepositoryConnectionEvent(this, RepositoryEventType.UPDATED, iConnection, tOldConnection);
+        RepositoryEvent tEvent = new RepositoryConnectionEvent(this, RepositoryEventType.UPDATED, iId, iConnection, tOldConnection);
         mPublisher.publishEvent(tEvent);
     }
 
-    public synchronized void removeConnection(final Connection iConnection) throws RepositoryException {
-        if (! mConnections.containsKey(iConnection.getId())) {
-            throw new RepositoryException("connection " + iConnection.getId() + " not present in repository");
+    public synchronized void removeConnection(final String iId, final Connection iConnection) throws RepositoryException {
+        if (! mConnections.containsKey(iId)) {
+            throw new RepositoryException("connection " + iId + " not present in repository");
         }
-        mConnections.remove(iConnection.getId());
+        mConnections.remove(iId);
         
-        RepositoryEvent tEvent = new RepositoryConnectionEvent(this, RepositoryEventType.REMOVED, iConnection);
+        RepositoryEvent tEvent = new RepositoryConnectionEvent(this, RepositoryEventType.REMOVED, iId, iConnection);
         mPublisher.publishEvent(tEvent);
     }
     
     // TODO: why return map?
     @XmlElementWrapper(name="configurations")
     @XmlElement(name="configuration")
-    public synchronized Collection<Configuration> getConfigurations() {
-        return mConfigurations.values();
-    }
-    
-    public synchronized Map<String, Configuration> getConfigurationsMap() {
+    public synchronized Map<String, Configuration> getConfigurations() {
         return mConfigurations;
     }
 
-    public synchronized Configuration getConfiguration(final String iName) {
-        return mConfigurations.get(iName);
+    public synchronized Configuration getConfiguration(final String iId) {
+        return mConfigurations.get(iId);
     }
 
-    public synchronized void addConfiguration(final Configuration iConfiguration) throws RepositoryException {
-        if (mConfigurations.containsKey(iConfiguration.getId())) {
-            throw new RepositoryException("configuration " + iConfiguration.getId() + " already present in repository");
+    public synchronized void addConfiguration(final String iId, final Configuration iConfiguration) throws RepositoryException {
+        if (mConfigurations.containsKey(iId)) {
+            throw new RepositoryException("configuration " + iId + " already present in repository");
         }
-        mConfigurations.put(iConfiguration.getId(), iConfiguration);
+        mConfigurations.put(iId, iConfiguration);
         
-        RepositoryEvent tEvent = new RepositoryConfigurationEvent(this, RepositoryEventType.ADDED, iConfiguration);
+        RepositoryEvent tEvent = new RepositoryConfigurationEvent(this, RepositoryEventType.ADDED, iId, iConfiguration);
         mPublisher.publishEvent(tEvent);
     }
     
-    public synchronized void updateConfiguration(final Configuration iConfiguration) throws RepositoryException {
-        if (! mConfigurations.containsKey(iConfiguration.getId())) {
-            throw new RepositoryException("configuration " + iConfiguration.getId() + " not present in repository");
+    public synchronized void updateConfiguration(final String iId, final Configuration iConfiguration) throws RepositoryException {
+        if (! mConfigurations.containsKey(iId)) {
+            throw new RepositoryException("configuration " + iId + " not present in repository");
         }
-        Configuration tOldConfiguration = mConfigurations.put(iConfiguration.getId(), iConfiguration);
+        Configuration tOldConfiguration = mConfigurations.put(iId, iConfiguration);
         
-        RepositoryEvent tEvent = new RepositoryConfigurationEvent(this, RepositoryEventType.UPDATED, iConfiguration, tOldConfiguration);
+        RepositoryEvent tEvent = new RepositoryConfigurationEvent(this, RepositoryEventType.UPDATED, iId, iConfiguration, tOldConfiguration);
         mPublisher.publishEvent(tEvent);
     }
 
-    public synchronized void removeConfiguration(final Configuration iConfiguration) throws RepositoryException {
-        if (! mConfigurations.containsKey(iConfiguration.getId())) {
-            throw new RepositoryException("configuration " + iConfiguration.getId() + " not present in repository");
+    public synchronized void removeConfiguration(final String iId, final Configuration iConfiguration) throws RepositoryException {
+        if (! mConfigurations.containsKey(iId)) {
+            throw new RepositoryException("configuration " + iId + " not present in repository");
         }
-        mConfigurations.remove(iConfiguration.getId());
+        mConfigurations.remove(iId);
         
-        RepositoryEvent tEvent = new RepositoryConfigurationEvent(this, RepositoryEventType.REMOVED, iConfiguration);
+        RepositoryEvent tEvent = new RepositoryConfigurationEvent(this, RepositoryEventType.REMOVED, iId, iConfiguration);
         mPublisher.publishEvent(tEvent);
     }
     
     // TODO: why return a map?    
     @XmlElementWrapper(name="presentations")
     @XmlElement(name="presentation")
-    public synchronized Collection<Presentation> getPresentations() {
-        return mPresentations.values();
-    }
-    
-    public synchronized Map<String, Presentation> getPresentationsMap() {
+    public synchronized Map<String, Presentation> getPresentations() {
         return mPresentations;
     }
 
@@ -195,33 +183,33 @@ public final class Repository implements ApplicationEventPublisherAware {
         return mPresentations.get(iId);
     }
 
-    public synchronized void addPresentation(final Presentation iPresentation) throws RepositoryException {
-        if (mPresentations.containsKey(iPresentation.getId())) {
-            throw new RepositoryException("presentation " + iPresentation.getId() + " already present in repository");
+    public synchronized void addPresentation(final String iId, final Presentation iPresentation) throws RepositoryException {
+        if (mPresentations.containsKey(iId)) {
+            throw new RepositoryException("presentation " + iId + " already present in repository");
         }
-        mPresentations.put(iPresentation.getId(), iPresentation);
+        mPresentations.put(iId, iPresentation);
         
-        RepositoryEvent tEvent = new RepositoryPresentationEvent(this, RepositoryEventType.ADDED, iPresentation);
+        RepositoryEvent tEvent = new RepositoryPresentationEvent(this, RepositoryEventType.ADDED, iId, iPresentation);
         mPublisher.publishEvent(tEvent);
     }
     
-    public synchronized void updatePresentation(final Presentation iPresentation) throws RepositoryException {
-        if (! mPresentations.containsKey(iPresentation.getId())) {
-            throw new RepositoryException("presentation " + iPresentation.getId() + " not present in repository");
+    public synchronized void updatePresentation(final String iId, final Presentation iPresentation) throws RepositoryException {
+        if (! mPresentations.containsKey(iId)) {
+            throw new RepositoryException("presentation " + iId + " not present in repository");
         }
-        Presentation tOldPresentation = mPresentations.put(iPresentation.getId(), iPresentation);
+        Presentation tOldPresentation = mPresentations.put(iId, iPresentation);
         
-        RepositoryEvent tEvent = new RepositoryPresentationEvent(this, RepositoryEventType.UPDATED, iPresentation, tOldPresentation);
+        RepositoryEvent tEvent = new RepositoryPresentationEvent(this, RepositoryEventType.UPDATED, iId, iPresentation, tOldPresentation);
         mPublisher.publishEvent(tEvent);
     }
 
-    public synchronized void removePresentation(final Presentation iPresentation) throws RepositoryException {
-        if (! mPresentations.containsKey(iPresentation.getId())) {
-            throw new RepositoryException("presentation " + iPresentation.getId() + " not present in repository");
+    public synchronized void removePresentation(final String iId, final Presentation iPresentation) throws RepositoryException {
+        if (! mPresentations.containsKey(iId)) {
+            throw new RepositoryException("presentation " + iId + " not present in repository");
         }
-        mPresentations.remove(iPresentation.getId());
+        mPresentations.remove(iId);
         
-        RepositoryEvent tEvent = new RepositoryPresentationEvent(this, RepositoryEventType.REMOVED, iPresentation);
+        RepositoryEvent tEvent = new RepositoryPresentationEvent(this, RepositoryEventType.REMOVED, iId, iPresentation);
         mPublisher.publishEvent(tEvent);
     }
 }

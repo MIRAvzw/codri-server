@@ -28,6 +28,7 @@ public abstract class RepositoryEvent extends ApplicationEvent {
     // Member data
     //
     
+    private final String mId;
     private final RepositoryEvent.RepositoryEventType mType;
     private final RepositoryEntity mEntity, mOldEntity;
     
@@ -36,13 +37,14 @@ public abstract class RepositoryEvent extends ApplicationEvent {
     // Construction and destruction
     //
     
-    public RepositoryEvent(Object iSource, RepositoryEvent.RepositoryEventType iType, RepositoryEntity iEntity) {
-        this(iSource, iType, iEntity, null);
+    public RepositoryEvent(Object iSource, RepositoryEvent.RepositoryEventType iType, String iId, RepositoryEntity iEntity) {
+        this(iSource, iType, iId, iEntity, null);
     }
     
-    public RepositoryEvent(Object iSource, RepositoryEvent.RepositoryEventType iType, RepositoryEntity iEntity, RepositoryEntity iOldEntity) {
+    public RepositoryEvent(Object iSource, RepositoryEvent.RepositoryEventType iType, String iId, RepositoryEntity iEntity, RepositoryEntity iOldEntity) {
         super(iSource);
         mType = iType;
+        mId = iId;
         mEntity = iEntity;
         mOldEntity = iOldEntity;
         Assert.isTrue(mOldEntity == null || mType == RepositoryEventType.UPDATED);
@@ -55,6 +57,10 @@ public abstract class RepositoryEvent extends ApplicationEvent {
     
     public final RepositoryEvent.RepositoryEventType getType() {
         return mType;
+    }
+    
+    public final String getId() {
+        return mId;
     }
     
     public final RepositoryEntity getEntity() {

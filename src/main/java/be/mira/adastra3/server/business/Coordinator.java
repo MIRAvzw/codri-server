@@ -13,7 +13,9 @@ import be.mira.adastra3.server.repository.configuration.Configuration;
 import be.mira.adastra3.server.repository.connection.Connection;
 import be.mira.adastra3.server.repository.presentation.Presentation;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
@@ -68,10 +70,11 @@ public class Coordinator implements ApplicationListener {
                 mLogger.info("MIRA network entity added: " + tDevice.getUuid());
 
                 // Find the connections this device is a part of
-                List<Connection> tRelevantConnections = new ArrayList<Connection>();
-                for (Connection tConnection : mRepository.getConnectionsMap().values()) {
+                Map<String, Connection> tRelevantConnections = new HashMap<String, Connection>();
+                for (String tId : mRepository.getConnections().keySet()) {
+                    Connection tConnection = mRepository.getConnection(tId);
                     if (tConnection.getKiosk().equals(tDevice.getUuid())) {
-                        tRelevantConnections.add(tConnection);
+                        tRelevantConnections.put(tId, tConnection);
                     }
                 }
 
@@ -81,8 +84,8 @@ public class Coordinator implements ApplicationListener {
                 } else if (tRelevantConnections.size() > 1) {
                     mLogger.warn("Ambiguous connections found for device " + tDevice.getUuid() + ", it'll remain unconfigured");
                 } else {
-                    Connection tConnection = tRelevantConnections.get(0);
-                    pushConnection(tConnection);
+                    String tId = tRelevantConnections.keySet().iterator().next();
+                    pushConnection(tId, mRepository.getConnection(tId));
                 }
                 
                 break;
@@ -108,8 +111,8 @@ public class Coordinator implements ApplicationListener {
         
         switch (iEvent.getType()) {
             case ADDED: {
-                mLogger.info("Presentation added: " + tPresentation.getId());
-                pushPresentation(tPresentation);
+                mLogger.info("Presentation added: " + iEvent.getId());
+                pushPresentation(iEvent.getId(), tPresentation);
                 
                 break;                
             }
@@ -117,14 +120,14 @@ public class Coordinator implements ApplicationListener {
             case UPDATED: {
                 // TODO: do something with old one
                 
-                mLogger.info("Presentation updated: " + tPresentation.getId());
-                pushPresentation(tPresentation);
+                mLogger.info("Presentation updated: " + iEvent.getId());
+                pushPresentation(iEvent.getId(), tPresentation);
                 
                 break;              
             }
                 
             case REMOVED: {
-                mLogger.info("Presentation removed: " + tPresentation.getId());
+                mLogger.info("Presentation removed: " + iEvent.getId());
 
                 // TODO
                 
@@ -133,11 +136,11 @@ public class Coordinator implements ApplicationListener {
         }
     }
         
-    private void pushPresentation(final Presentation iPresentation) {
+    private void pushPresentation(final String iId, final Presentation iPresentation) {
         // Find the connections this presentation is a part of
         List<Connection> tRelevantConnections = new ArrayList<Connection>();
-        for (Connection tConnection: mRepository.getConnectionsMap().values()) {
-            if (tConnection.getPresentation().equals(iPresentation.getId())) {
+        for (Connection tConnection: mRepository.getConnections().values()) {
+            if (tConnection.getPresentation().equals(iId)) {
                 tRelevantConnections.add(tConnection);
             }
         }
@@ -154,7 +157,7 @@ public class Coordinator implements ApplicationListener {
                     try {
                         tKiosk.setPresentation(iPresentation);
                     } catch (DeviceException tException) {
-                        mLogger.error("Could not push presentation " + iPresentation.getId() + " to target device '" + tDevice.getUuid() + "'", tException);
+                        mLogger.error("Could not push presentation " + iId + " to target device '" + tDevice.getUuid() + "'", tException);
                     }
                 }
             }
@@ -171,8 +174,8 @@ public class Coordinator implements ApplicationListener {
         
         switch (iEvent.getType()) {
             case ADDED: {
-                mLogger.info("Configuration added: " + tConfiguration.getId());
-                pushConfiguration(tConfiguration);
+                mLogger.info("Configuration added: " + iEvent.getId());
+                pushConfiguration(iEvent.getId(), tConfiguration);
                 
                 break;
             }
@@ -180,14 +183,14 @@ public class Coordinator implements ApplicationListener {
             case UPDATED: {
                 // TODO: do something with old one
                 
-                mLogger.info("Configuration updated: " + tConfiguration.getId());
-                pushConfiguration(tConfiguration);
+                mLogger.info("Configuration updated: " + iEvent.getId());
+                pushConfiguration(iEvent.getId(), tConfiguration);
                 
                 break;
             }
                 
             case REMOVED: {
-                mLogger.info("Configuration removed: " + tConfiguration.getId());
+                mLogger.info("Configuration removed: " + iEvent.getId());
 
                 // TODO: Erase the configuration on the device
                 
@@ -196,11 +199,11 @@ public class Coordinator implements ApplicationListener {
         }
     }
     
-    private void pushConfiguration(final Configuration iConfiguration) {
+    private void pushConfiguration(final String iId, final Configuration iConfiguration) {
         // Find the connections this configuration is a part of
         List<Connection> tRelevantConnections = new ArrayList<Connection>();
-        for (Connection tConnection: mRepository.getConnectionsMap().values()) {
-            if (tConnection.getConfiguration().equals(iConfiguration.getId())) {
+        for (Connection tConnection: mRepository.getConnections().values()) {
+            if (tConnection.getConfiguration().equals(iId)) {
                 tRelevantConnections.add(tConnection);
             }
         }
@@ -217,7 +220,7 @@ public class Coordinator implements ApplicationListener {
                     try {
                         tKiosk.setConfiguration(iConfiguration);
                     } catch (DeviceException tException) {
-                        mLogger.error("Could not push configuration " + iConfiguration.getId() + " to target device '" + tDevice.getUuid() + "'", tException);
+                        mLogger.error("Could not push configuration " + iId + " to target device '" + tDevice.getUuid() + "'", tException);
                     }
                 }
             }
@@ -233,8 +236,8 @@ public class Coordinator implements ApplicationListener {
         
         switch (iEvent.getType()) {
             case ADDED: {
-                mLogger.info("Connection added: " + tConnection.getId());
-                pushConnection(tConnection);
+                mLogger.info("Connection added: " + iEvent.getId());
+                pushConnection(iEvent.getId(), tConnection);
                 
                 break;
             }
@@ -242,14 +245,14 @@ public class Coordinator implements ApplicationListener {
             case UPDATED: {
                 // TODO: do something with old one
                 
-                mLogger.info("Connection updated: " + tConnection.getId());
-                pushConnection(tConnection);
+                mLogger.info("Connection updated: " + iEvent.getId());
+                pushConnection(iEvent.getId(), tConnection);
                 
                 break;
             }
                 
             case REMOVED: {
-                mLogger.info("Connection removed: " + tConnection.getId());
+                mLogger.info("Connection removed: " + iEvent.getId());
 
                 // TODO: Erase the connection on the device
                 
@@ -258,11 +261,11 @@ public class Coordinator implements ApplicationListener {
         }
     }
     
-    private void pushConnection(final Connection iConnection) {
+    private void pushConnection(final String iId, final Connection iConnection) {
         // Check if there is a valid target device
         NetworkEntity tDevice = mNetwork.getDevice(iConnection.getKiosk());
         if (tDevice == null) {
-            mLogger.warn("Connection " + iConnection.getId() + " does not point to a valid device");
+            mLogger.warn("Connection " + iId + " does not point to a valid device");
             return;
         }
         
@@ -276,10 +279,10 @@ public class Coordinator implements ApplicationListener {
                 try {
                     tKiosk.setConfiguration(tConfiguration);
                 } catch (DeviceException tException) {
-                    mLogger.error("Could not upload configuration " + tConfiguration.getId(), tException);
+                    mLogger.error("Could not upload configuration " + iId, tException);
                 }
             } else {
-                mLogger.warn("Connection " + iConnection.getId() + " does not point to a valid configuration");
+                mLogger.warn("Connection " + iId + " does not point to a valid configuration");
             }
             
             // Push the presentation
@@ -288,10 +291,10 @@ public class Coordinator implements ApplicationListener {
                 try {
                     tKiosk.setPresentation(tPresentation);
                 } catch (DeviceException tException) {
-                    mLogger.error("Could not upload presentation " + tConfiguration.getId(), tException);
+                    mLogger.error("Could not upload presentation " + iId, tException);
                 }
             } else {
-                mLogger.warn("Connection " + iConnection.getId() + " does not point to a valid presentation");
+                mLogger.warn("Connection " + iId + " does not point to a valid presentation");
             }
         } else {
             mLogger.error("Cannot handle a device of type " + tDevice.getType());

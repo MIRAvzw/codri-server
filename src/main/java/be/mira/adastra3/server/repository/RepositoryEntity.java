@@ -13,7 +13,6 @@ public abstract class RepositoryEntity {
     // Member data
     //
     
-    private final String mId;
     private final Long mRevision;
     private final String mPath;
     private final String mServer; // FIXME: duplicate information
@@ -29,8 +28,7 @@ public abstract class RepositoryEntity {
         throw new UnsupportedOperationException();
     }
     
-    public RepositoryEntity(final String iId, final Long iRevision, final String iPath, final String iServer) {
-        mId = iId;
+    public RepositoryEntity(final Long iRevision, final String iPath, final String iServer) {
         mRevision = iRevision;
         mPath = iPath;
         mServer = iServer;
@@ -40,10 +38,6 @@ public abstract class RepositoryEntity {
     //
     // Getters & setters
     //
-
-    public final String getId() {
-        return mId;
-    }
     
     public final long getRevision() {
         return mRevision;

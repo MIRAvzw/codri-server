@@ -34,8 +34,8 @@ public class Connection extends RepositoryEntity {
         throw new UnsupportedOperationException();
     }
     
-    public Connection(final String iId, final Long iRevision, final String iPath, final String iServer, final UUID iKiosk, final String iConfiguration, final String iPresentation) {
-        super(iId, iRevision, iPath, iServer);
+    public Connection(final Long iRevision, final String iPath, final String iServer, final UUID iKiosk, final String iConfiguration, final String iPresentation) {
+        super(iRevision, iPath, iServer);
         mKiosk = iKiosk;
         mConfiguration = iConfiguration;
         mPresentation = iPresentation;
