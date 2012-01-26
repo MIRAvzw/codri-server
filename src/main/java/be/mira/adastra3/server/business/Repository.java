@@ -89,7 +89,7 @@ public final class Repository implements ApplicationEventPublisherAware {
         }
     }
     
-    public synchronized void setServer(final String iServer) {
+    public void setServer(final String iServer) {
         synchronized (mServer) {
             mServer = iServer;
         }

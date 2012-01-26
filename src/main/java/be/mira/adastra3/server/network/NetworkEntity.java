@@ -17,7 +17,7 @@ public abstract class NetworkEntity {
     
     private final String mVendor, mModel;
     private String mAddress;
-    private Date mMark;
+    private Date mHeartbeat;
     
     
     //
@@ -52,14 +52,14 @@ public abstract class NetworkEntity {
     }
     
     public final Date getHeartbeat() {
-        return mMark;
+        return mHeartbeat;
     }
     
     public final void updateHeartbeat() {
-        mMark = new Date();
+        mHeartbeat = new Date();
     }
     
     public final long getHeartbeatDelta() {
-        return (new Date().getTime()) - mMark.getTime();
+        return (new Date().getTime()) - mHeartbeat.getTime();
     }
 }
