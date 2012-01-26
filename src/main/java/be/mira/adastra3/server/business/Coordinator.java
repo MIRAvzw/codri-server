@@ -219,7 +219,7 @@ public class Coordinator implements ApplicationListener {
                     try {
                         tKiosk.setConfiguration(iConfiguration);
                     } catch (DeviceException tException) {
-                        mLogger.error("Could not push configuration " + tConnection.getConfiguration() + " to target device '" + tConnection.getKiosk() + "'", tException);
+                        mLogger.error("Could not push configuration " + tConnection.getConfiguration() + " to target device '" + tConnection.getKiosk()  + "'", tException);
                     }
                 }
             }
@@ -296,7 +296,7 @@ public class Coordinator implements ApplicationListener {
                 mLogger.warn("Connection " + iId + " does not point to a valid presentation");
             }
         } else {
-            mLogger.error("Cannot handle a device of type " + tDevice.getType());
+            mLogger.error("Cannot handle a " + tDevice.getClass().getSimpleName() + " entity");
         }
     }
 }

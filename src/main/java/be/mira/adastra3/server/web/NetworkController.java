@@ -53,14 +53,24 @@ public class NetworkController {
     }
     
     @RequestMapping(value="/kiosks/{id}", method=RequestMethod.POST)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     public @ResponseBody
-    void addKiosk(@PathVariable("id") UUID iId, HttpServletResponse iResponse) throws IOException {
+    void addKiosk(@RequestBody Kiosk iKiosk, @PathVariable("id") UUID iId, HttpServletResponse iResponse) throws IOException {
         try {
-            Kiosk tKiosk = new Kiosk();
-            mNetwork.addKiosk(iId, tKiosk);
+            mNetwork.addKiosk(iId, iKiosk);
         } catch (NetworkException tException) {
             iResponse.sendError(409, tException.getLocalizedMessage());
+        }
+    }
+    
+    @RequestMapping(value="/kiosks/{id}", method=RequestMethod.PUT)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public @ResponseBody
+    void updateKiosk(@PathVariable("id") UUID iId, HttpServletResponse iResponse) throws IOException {
+        Kiosk tKiosk = mNetwork.getKiosk(iId);
+        if (tKiosk == null) {
+            iResponse.sendError(404);            
+        } else {
+            tKiosk.updateHeartbeat();
         }
     }
 }

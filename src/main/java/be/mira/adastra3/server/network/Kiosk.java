@@ -8,6 +8,7 @@ import be.mira.adastra3.server.exceptions.DeviceException;
 import be.mira.adastra3.server.repository.configuration.Configuration;
 import be.mira.adastra3.server.repository.presentation.Presentation;
 import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 /**
  *
@@ -24,8 +25,8 @@ public class Kiosk extends NetworkEntity {
     //
     
     @JsonCreator
-    public Kiosk() {
-        super();
+    public Kiosk(final @JsonProperty("vendor") String iVendor, final @JsonProperty("model") String iModel) {
+        super(iVendor, iModel);
     }
     
     

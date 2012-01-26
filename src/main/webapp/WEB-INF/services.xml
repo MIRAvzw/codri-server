@@ -48,9 +48,16 @@
 
     <!-- JSON message conversion -->
     <bean id="jaxbAnnotationIntrospector" class="org.codehaus.jackson.xc.JaxbAnnotationIntrospector" />
+    <bean id="jacksonAnnotationIntrospector" class="org.codehaus.jackson.map.introspect.JacksonAnnotationIntrospector" />
     <bean id="jacksonObjectMapper" class="org.codehaus.jackson.map.ObjectMapper">
         <property name="serializationConfig.annotationIntrospector" ref="jaxbAnnotationIntrospector" />
-        <property name="deserializationConfig.annotationIntrospector" ref="jaxbAnnotationIntrospector" />
+        <!--
+            We need the Jackson annotator as well, since JAXB doesn't provide a way to construct immutable
+            objects and hence we need to use the Jackson-specific @JsonCreator annotation.
+
+            <property name="deserializationConfig.annotationIntrospector" ref="jaxbAnnotationIntrospector" />
+        -->
+        <property name="deserializationConfig.annotationIntrospector" ref="jacksonAnnotationIntrospector" />
     </bean>
     <bean id="jsonMessageConverter" class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
         <property name="objectMapper" ref="jacksonObjectMapper"/>

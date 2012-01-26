@@ -5,7 +5,6 @@
 package be.mira.adastra3.server.network;
 
 import java.util.Date;
-import java.util.UUID;
 
 /**
  *
@@ -16,7 +15,7 @@ abstract public class NetworkEntity {
     // Member data
     //
     
-    private String mName;
+    private final String mVendor, mModel;
     private Date mMark;
     
     
@@ -24,8 +23,10 @@ abstract public class NetworkEntity {
     // Construction and destruction
     //
     
-    public NetworkEntity() {
-        setMark();
+    public NetworkEntity(final String iVendor, final String iModel) {
+        mVendor = iVendor;
+        mModel = iModel;
+        updateHeartbeat();
     }
     
     
@@ -33,27 +34,23 @@ abstract public class NetworkEntity {
     // Getters and setters
     //
     
-    public final String getName() {
-        return mName;
+    public final String getVendor() {
+        return mVendor;
     }
     
-    public final void setName(final String iName) {
-        mName = iName;
+    public final String getModel() {
+        return mModel;
     }
     
-    public final void setMark() {
+    public final void updateHeartbeat() {
         mMark = new Date();
     }
     
-    public final Date getMark() {
+    public final Date getHeartbeat() {
         return mMark;
     }
     
-    public final long getMarkDelta() {
+    public final long getHeartbeatDelta() {
         return (new Date().getTime()) - mMark.getTime();
-    }
-    
-    public final String getType() {
-        return getClass().getSimpleName();
     }
 }
