@@ -4,6 +4,7 @@
  */
 package be.mira.adastra3.server.network;
 
+import java.net.InetAddress;
 import java.util.Date;
 
 /**
@@ -16,6 +17,7 @@ abstract public class NetworkEntity {
     //
     
     private final String mVendor, mModel;
+    private String mAddress;
     private Date mMark;
     
     
@@ -42,12 +44,20 @@ abstract public class NetworkEntity {
         return mModel;
     }
     
-    public final void updateHeartbeat() {
-        mMark = new Date();
+    public String getAddress() {
+        return mAddress;
+    }
+    
+    public void setAddress(String iAddress) {
+        mAddress = iAddress;
     }
     
     public final Date getHeartbeat() {
         return mMark;
+    }
+    
+    public final void updateHeartbeat() {
+        mMark = new Date();
     }
     
     public final long getHeartbeatDelta() {

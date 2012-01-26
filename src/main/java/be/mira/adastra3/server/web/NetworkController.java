@@ -10,6 +10,7 @@ import be.mira.adastra3.server.network.Kiosk;
 import be.mira.adastra3.spring.Logger;
 import java.io.IOException;
 import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.springframework.http.HttpStatus;
@@ -54,8 +55,9 @@ public class NetworkController {
     
     @RequestMapping(value="/kiosks/{id}", method=RequestMethod.POST)
     public @ResponseBody
-    void addKiosk(@RequestBody Kiosk iKiosk, @PathVariable("id") UUID iId, HttpServletResponse iResponse) throws IOException {
+    void addKiosk(@RequestBody Kiosk iKiosk, @PathVariable("id") UUID iId, HttpServletRequest iRequest, HttpServletResponse iResponse) throws IOException {
         try {
+            iKiosk.setAddress(iRequest.getRemoteAddr());
             mNetwork.addKiosk(iId, iKiosk);
         } catch (NetworkException tException) {
             iResponse.sendError(409, tException.getLocalizedMessage());
@@ -65,7 +67,7 @@ public class NetworkController {
     @RequestMapping(value="/kiosks/{id}", method=RequestMethod.PUT)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public @ResponseBody
-    void updateKiosk(@PathVariable("id") UUID iId, HttpServletResponse iResponse) throws IOException {
+    void updateKiosk(@PathVariable("id") UUID iId, HttpServletRequest iRequest, HttpServletResponse iResponse) throws IOException {
         Kiosk tKiosk = mNetwork.getKiosk(iId);
         if (tKiosk == null) {
             iResponse.sendError(404);            
