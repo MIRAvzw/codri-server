@@ -4,7 +4,7 @@
  */
 package be.mira.adastra3.server.web;
 
-import be.mira.adastra3.server.business.Repository;
+import be.mira.adastra3.server.business.Network;
 import be.mira.adastra3.spring.Logger;
 import org.apache.commons.logging.Log;
 import org.springframework.stereotype.Controller;
@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @author tim
  */
 @Controller
-@RequestMapping("/repository")
-public class RepositoryController {
+@RequestMapping("/network")
+public class NetworkController {
     //
     // Member data
     //
@@ -26,15 +26,15 @@ public class RepositoryController {
     @Logger
     private Log mLogger;
     
-    private Repository mRepository;
+    private Network mNetwork;
     
     
     //
     // Construction and destruction
     //
     
-    public RepositoryController(Repository iRepository) {
-        mRepository = iRepository;
+    public NetworkController(Network iNetwork) {
+        mNetwork = iNetwork;
     }
     
     
@@ -44,7 +44,7 @@ public class RepositoryController {
     
     @RequestMapping(method = RequestMethod.GET)
     public @ResponseBody
-    Repository getRepository() {        
-        return mRepository;
+    Network getNetwork() {        
+        return mNetwork;
     }
 }

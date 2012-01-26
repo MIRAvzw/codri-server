@@ -15,13 +15,13 @@ import be.mira.adastra3.server.events.RepositoryConnectionEvent;
 import be.mira.adastra3.server.events.RepositoryEvent;
 import be.mira.adastra3.server.events.RepositoryEvent.RepositoryEventType;
 import be.mira.adastra3.server.events.RepositoryPresentationEvent;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.logging.Log;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
@@ -30,6 +30,7 @@ import org.springframework.context.ApplicationEventPublisherAware;
  *
  * @author tim
  */
+@XmlRootElement(name="repository")
 public final class Repository implements ApplicationEventPublisherAware {
     //
     // Member data
@@ -81,7 +82,7 @@ public final class Repository implements ApplicationEventPublisherAware {
     // TODO: Remove the quite identical Connection/Configuration/Presentation setters
     //       somehow make it using the RepositoryEntity interface
     
-    @XmlElement
+    @XmlElement(nillable=true)
     public synchronized String getServer() {
         return mServer;
     }
@@ -90,7 +91,6 @@ public final class Repository implements ApplicationEventPublisherAware {
         mServer = iServer;
     }
     
-    // TODO: why return a map?
     @XmlElementWrapper(name="connections")
     @XmlElement(name="connection")
     public synchronized Map<String, Connection> getConnections() {
@@ -131,7 +131,6 @@ public final class Repository implements ApplicationEventPublisherAware {
         mPublisher.publishEvent(tEvent);
     }
     
-    // TODO: why return map?
     @XmlElementWrapper(name="configurations")
     @XmlElement(name="configuration")
     public synchronized Map<String, Configuration> getConfigurations() {
@@ -171,8 +170,7 @@ public final class Repository implements ApplicationEventPublisherAware {
         RepositoryEvent tEvent = new RepositoryConfigurationEvent(this, RepositoryEventType.REMOVED, iId, iConfiguration);
         mPublisher.publishEvent(tEvent);
     }
-    
-    // TODO: why return a map?    
+     
     @XmlElementWrapper(name="presentations")
     @XmlElement(name="presentation")
     public synchronized Map<String, Presentation> getPresentations() {

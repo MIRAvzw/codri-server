@@ -9,12 +9,14 @@ import be.mira.adastra3.server.network.NetworkEntity;
 import be.mira.adastra3.spring.Logger;
 import be.mira.adastra3.server.events.NetworkEvent;
 import be.mira.adastra3.server.events.NetworkEvent.NetworkEventType;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.logging.Log;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
@@ -23,6 +25,7 @@ import org.springframework.context.ApplicationEventPublisherAware;
  * 
  * @author tim
  */
+@XmlRootElement(name="network")
 public final class Network implements ApplicationEventPublisherAware {
     //
     // Member data
@@ -64,8 +67,10 @@ public final class Network implements ApplicationEventPublisherAware {
     // Basic I/O
     //
     
-    public synchronized Collection<NetworkEntity> getDevices() {
-        return mDevices.values();
+    @XmlElementWrapper(name="devices")
+    @XmlElement(name="device")
+    public synchronized Map<UUID, NetworkEntity> getDevices() {
+        return mDevices;
     }
     
     public synchronized NetworkEntity getDevice(final UUID iUuid) {
