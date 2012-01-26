@@ -28,12 +28,6 @@ public class Connection extends RepositoryEntity {
     // Construction and destruction
     //
     
-    // FIXME: dummy constructor for JAXB (shouldn't be neccesary as JAXB never
-    // has to unmarshal this class)
-    public Connection() {
-        throw new UnsupportedOperationException();
-    }
-    
     public Connection(final Long iRevision, final String iPath, final String iServer, final UUID iKiosk, final String iConfiguration, final String iPresentation) {
         super(iRevision, iPath, iServer);
         mKiosk = iKiosk;

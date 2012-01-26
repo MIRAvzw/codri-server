@@ -30,6 +30,9 @@
     <!-- Bean postprocessors -->
     <bean class="be.mira.adastra3.spring.LoggerPostProcessor" />
 
+    <!-- Field converters -->
+    <bean class="be.mira.adastra3.spring.UUIDConverter" />
+
 
     <!--
       HTTP message conversion

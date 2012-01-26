@@ -7,7 +7,7 @@ package be.mira.adastra3.server.network;
 import be.mira.adastra3.server.exceptions.DeviceException;
 import be.mira.adastra3.server.repository.configuration.Configuration;
 import be.mira.adastra3.server.repository.presentation.Presentation;
-import java.util.UUID;
+import org.codehaus.jackson.annotate.JsonCreator;
 
 /**
  *
@@ -23,6 +23,7 @@ public class Kiosk extends NetworkEntity {
     // Construction and destruction
     //
     
+    @JsonCreator
     public Kiosk() {
         super();
     }

@@ -109,6 +109,14 @@
            <version>3.1.0.RELEASE</version>
         </dependency>
 
+        <!-- Servlet API -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+            <scope>provided</scope>
+         </dependency>
+
         <!-- JSON output (with JAXB annotation support) -->
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
