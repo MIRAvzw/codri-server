@@ -108,15 +108,22 @@
            <artifactId>spring-oxm</artifactId>
            <version>3.1.0.RELEASE</version>
         </dependency>
+
+        <!-- JSON output (with JAXB annotation support) -->
         <dependency>
-            <groupId>com.thoughtworks.xstream</groupId>
-            <artifactId>xstream</artifactId>
-            <version>1.4.2</version>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-core-lgpl</artifactId>
+            <version>1.6.4</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
-            <version>1.9.3</version>
+            <artifactId>jackson-mapper-lgpl</artifactId>
+            <version>1.6.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-xc</artifactId>
+            <version>1.6.4</version>
         </dependency>
     
         <!-- Subversion -->

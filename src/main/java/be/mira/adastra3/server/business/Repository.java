@@ -17,13 +17,11 @@ import be.mira.adastra3.server.events.RepositoryEvent.RepositoryEventType;
 import be.mira.adastra3.server.events.RepositoryPresentationEvent;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.logging.Log;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
@@ -32,7 +30,6 @@ import org.springframework.context.ApplicationEventPublisherAware;
  *
  * @author tim
  */
-@XmlRootElement(name="repository")
 public final class Repository implements ApplicationEventPublisherAware {
     //
     // Member data

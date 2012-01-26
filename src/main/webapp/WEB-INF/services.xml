@@ -3,6 +3,7 @@
     xmlns:mvc="http://www.springframework.org/schema/mvc"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:util="http://www.springframework.org/schema/util"
     xmlns:p="http://www.springframework.org/schema/p"
     xsi:schemaLocation="
         http://www.springframework.org/schema/beans 
@@ -10,17 +11,52 @@
         http://www.springframework.org/schema/context 
         http://www.springframework.org/schema/context/spring-context-3.1.xsd
         http://www.springframework.org/schema/mvc 
-        http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd">
+        http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+
+    <!--
+      Framework configuration
+      -->
 
     <context:annotation-config />
-    <mvc:annotation-driven />
 
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <value>classpath:services.properties</value>
         </property>
     </bean>
+
+    <!-- Bean postprocessors -->
     <bean class="be.mira.adastra3.spring.LoggerPostProcessor" />
+
+
+    <!--
+      HTTP message conversion
+      -->
+
+    <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+        <property name="messageConverters">
+            <util:list id="beanList">
+                <ref bean="jsonMessageConverter"/>
+            </util:list>
+        </property>
+    </bean>
+
+    <!-- JSON message conversion -->
+    <bean id="jaxbAnnotationIntrospector" class="org.codehaus.jackson.xc.JaxbAnnotationIntrospector" />
+    <bean id="jacksonObjectMapper" class="org.codehaus.jackson.map.ObjectMapper">
+        <property name="serializationConfig.annotationIntrospector" ref="jaxbAnnotationIntrospector" />
+        <property name="deserializationConfig.annotationIntrospector" ref="jaxbAnnotationIntrospector" />
+    </bean>
+    <bean id="jsonMessageConverter" class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
+        <property name="objectMapper" ref="jacksonObjectMapper"/>
+    </bean>
+
+
+    <!--
+      Business beans
+      -->
     
     <bean class="be.mira.adastra3.server.business.Repository" id="repository" />
     <bean class="be.mira.adastra3.server.business.Network" id="network" />
@@ -35,6 +71,11 @@
         <constructor-arg ref="repository"/>
     </bean>
     -->
+
+
+    <!--
+      Web beans
+      -->
     
     <bean class="be.mira.adastra3.server.web.RepositoryController" id="repositoryController">
         <constructor-arg ref="repository"/>
