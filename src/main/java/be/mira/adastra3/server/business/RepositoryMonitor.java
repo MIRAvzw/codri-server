@@ -197,89 +197,36 @@ public class RepositoryMonitor {
     
     
     //
-    // Connection helpers
+    // Presentation helpers
     //
     
-    // TODO: Remove the quite identical Connection/Configuration/Presentation setters
-    //       somehow make it using the RepositoryEntity interface
-    
-    private long checkConnections() throws RepositoryException {
-        return getRevision(mSVNLocation + "/connections");
+    private long checkPresentations() throws RepositoryException {
+        return getRevision(mSVNLocation + "/presentations");
     }
     
-    private long getConnections() throws RepositoryException {
-        // Get a local checkout and location
-        final File tCheckout =  new File(mSVNCheckoutRoot, "connections");
-        final String tLocation = mSVNLocation + "/connections";
-        
-        // Check if the repository exists and is valid
-        Long tConnectionRevision = null;
-        try {
-            tConnectionRevision = getRevision(tCheckout);
-        } catch (RepositoryException tException) {
-            // Do nothing
+    private void processPresentations() throws RepositoryException {        
+        // List
+        mLogger.debug("Listing presentations");
+        Map<String, Presentation> tNewPresentations = new HashMap<String, Presentation>();
+        Map<String, Long> tPathEntries = getChildrenRevisions(mSVNLocation + "/presentations");
+        for (Map.Entry<String, Long> tEntry: tPathEntries.entrySet()) {
+            String tPath = "/presentations/" + tEntry.getKey();
+            Presentation tMedia = new Presentation(tEntry.getValue(), tPath, mSVNLocation);
+            tNewPresentations.put(tEntry.getKey(), tMedia);
         }
         
-        // Checkout or update
-        try {
-            if (tConnectionRevision == null) {
-                mLogger.trace("Fetching connections");
-                if (tCheckout.exists()) {
-                    FileUtils.cleanDirectory(tCheckout);
-                }
-                tConnectionRevision = checkoutRepository(tCheckout, tLocation);            
-            } else {
-                mLogger.trace("Updating connections");
-                tConnectionRevision = updateRepository(tCheckout);              
-            }
-        } catch (RepositoryException tException) {
-            throw new RepositoryException("could not download the repository", tException);
-        } catch (IOException tException) {
-            throw new RepositoryException("could not clean the existing (and seemingly invalid) copy of the repository", tException);
-        }
-        
-        return tConnectionRevision;
-    }
-    
-    private void processConnections() throws RepositoryException {        
-        // Read
-        mLogger.debug("Reading connections");
-        Map<String, Connection> tNewConnections = new HashMap<String, Connection>();
-        File tDirectory = new File(mSVNCheckoutRoot, "connections");
-        for (File tFile: tDirectory.listFiles(new XMLFilter())) {
-            // Generate an identifier
-            String tFilename = tFile.getName();
-            mLogger.trace("Processing '" + tFilename + "'");
-            int tDotPosition = tFilename.lastIndexOf('.');
-            String tId = tFilename.substring(0, tDotPosition);
-            final long tRevision = getRevision(tFile);
-            
-            // Process the contents
-            String tRepositoryPath = "/connections/" + tFilename;
-            ConnectionProcessor tReader = new ConnectionProcessor(tRevision, tRepositoryPath, mSVNLocation, tFile);
-            tReader.process();
-            Connection tConnection = tReader.getConnection();
-            if (tConnection == null) {
-                throw new RepositoryException("found empty connection file");
-            }
-            tNewConnections.put(tId, tConnection);
-        }
-        
-        // Save
-        mLogger.debug("Saving connections");
+        // Update
+        mLogger.debug("Updating presentations");
         Repository tRepository = mRepository;
-        RepositoryChangeset<Connection> tChangeset = new RepositoryChangeset<Connection>(tRepository.getConnections(), tNewConnections);
-        for (String tId: tChangeset.getRemovals().keySet()) {
-            Connection tRemoval = tChangeset.getRemovals().get(tId);
-            tRepository.removeConnection(tId, tRemoval);
+        RepositoryChangeset<Presentation> tChangeset = new RepositoryChangeset<Presentation>(tRepository.getPresentations(), tNewPresentations);
+        for (Map.Entry<String, Presentation> tEntry: tChangeset.getRemovals().entrySet()) {
+            tRepository.removePresentation(tEntry.getKey(), tEntry.getValue());
         }
-        for (String tId: tChangeset.getAdditions().keySet()) {
-            Connection tAddition = tChangeset.getAdditions().get(tId);
-            tRepository.addConnection(tId, tAddition);
+        for (Map.Entry<String, Presentation> tEntry: tChangeset.getAdditions().entrySet()) {
+            tRepository.addPresentation(tEntry.getKey(), tEntry.getValue());
         }
-        for (String tId: tChangeset.getUpdates().keySet()) {
-            Connection tUpdate = tChangeset.getUpdates().get(tId);
-            tRepository.addConnection(tId, tUpdate);
+        for (Map.Entry<String, Presentation> tEntry: tChangeset.getUpdates().entrySet()) {
+            tRepository.updatePresentation(tEntry.getKey(), tEntry.getValue());
         }
     }
     
@@ -354,56 +301,99 @@ public class RepositoryMonitor {
         mLogger.debug("Saving configurations");
         Repository tRepository = mRepository;
         RepositoryChangeset<Configuration> tChangeset = new RepositoryChangeset<Configuration>(tRepository.getConfigurations(), tNewConfigurations);
-        for (String tId: tChangeset.getRemovals().keySet()) {
-            Configuration tRemoval = tChangeset.getRemovals().get(tId);
-            tRepository.removeConfiguration(tId, tRemoval);
+        for (Map.Entry<String, Configuration> tEntry: tChangeset.getRemovals().entrySet()) {
+            tRepository.removeConfiguration(tEntry.getKey(), tEntry.getValue());
         }
-        for (String tId: tChangeset.getAdditions().keySet()) {
-            Configuration tAddition = tChangeset.getAdditions().get(tId);
-            tRepository.addConfiguration(tId, tAddition);
+        for (Map.Entry<String, Configuration> tEntry: tChangeset.getAdditions().entrySet()) {
+            tRepository.addConfiguration(tEntry.getKey(), tEntry.getValue());
         }
-        for (String tId: tChangeset.getUpdates().keySet()) {
-            Configuration tUpdate = tChangeset.getUpdates().get(tId);
-            tRepository.addConfiguration(tId, tUpdate);
+        for (Map.Entry<String, Configuration> tEntry: tChangeset.getUpdates().entrySet()) {
+            tRepository.addConfiguration(tEntry.getKey(), tEntry.getValue());
         }
     }
     
     
     //
-    // Presentation helpers
+    // Connection helpers
     //
     
-    private long checkPresentations() throws RepositoryException {
-        return getRevision(mSVNLocation + "/presentations");
+    // TODO: Remove the quite identical Connection/Configuration/Presentation setters
+    //       somehow make it using the RepositoryEntity interface
+    
+    private long checkConnections() throws RepositoryException {
+        return getRevision(mSVNLocation + "/connections");
     }
     
-    private void processPresentations() throws RepositoryException {        
-        // List
-        mLogger.debug("Listing presentations");
-        Map<String, Presentation> tNewPresentations = new HashMap<String, Presentation>();
-        Map<String, Long> tPathEntries = getChildrenRevisions(mSVNLocation + "/presentations");
-        for (String tId: tPathEntries.keySet()) {
-            long tRevision = tPathEntries.get(tId);
-            String tPath = "/presentations/" + tId;
-            Presentation tMedia = new Presentation(tRevision, tPath, mSVNLocation);
-            tNewPresentations.put(tId, tMedia);
+    private long getConnections() throws RepositoryException {
+        // Get a local checkout and location
+        final File tCheckout =  new File(mSVNCheckoutRoot, "connections");
+        final String tLocation = mSVNLocation + "/connections";
+        
+        // Check if the repository exists and is valid
+        Long tConnectionRevision = null;
+        try {
+            tConnectionRevision = getRevision(tCheckout);
+        } catch (RepositoryException tException) {
+            // Do nothing
         }
         
-        // Update
-        mLogger.debug("Updating presentations");
+        // Checkout or update
+        try {
+            if (tConnectionRevision == null) {
+                mLogger.trace("Fetching connections");
+                if (tCheckout.exists()) {
+                    FileUtils.cleanDirectory(tCheckout);
+                }
+                tConnectionRevision = checkoutRepository(tCheckout, tLocation);            
+            } else {
+                mLogger.trace("Updating connections");
+                tConnectionRevision = updateRepository(tCheckout);              
+            }
+        } catch (RepositoryException tException) {
+            throw new RepositoryException("could not download the repository", tException);
+        } catch (IOException tException) {
+            throw new RepositoryException("could not clean the existing (and seemingly invalid) copy of the repository", tException);
+        }
+        
+        return tConnectionRevision;
+    }
+    
+    private void processConnections() throws RepositoryException {        
+        // Read
+        mLogger.debug("Reading connections");
+        Map<String, Connection> tNewConnections = new HashMap<String, Connection>();
+        File tDirectory = new File(mSVNCheckoutRoot, "connections");
+        for (File tFile: tDirectory.listFiles(new XMLFilter())) {
+            // Generate an identifier
+            String tFilename = tFile.getName();
+            mLogger.trace("Processing '" + tFilename + "'");
+            int tDotPosition = tFilename.lastIndexOf('.');
+            String tId = tFilename.substring(0, tDotPosition);
+            final long tRevision = getRevision(tFile);
+            
+            // Process the contents
+            String tRepositoryPath = "/connections/" + tFilename;
+            ConnectionProcessor tReader = new ConnectionProcessor(tRevision, tRepositoryPath, mSVNLocation, tFile);
+            tReader.process();
+            Connection tConnection = tReader.getConnection();
+            if (tConnection == null) {
+                throw new RepositoryException("found empty connection file");
+            }
+            tNewConnections.put(tId, tConnection);
+        }
+        
+        // Save
+        mLogger.debug("Saving connections");
         Repository tRepository = mRepository;
-        RepositoryChangeset<Presentation> tChangeset = new RepositoryChangeset<Presentation>(tRepository.getPresentations(), tNewPresentations);
-        for (String tId: tChangeset.getRemovals().keySet()) {
-            Presentation tRemoval = tChangeset.getRemovals().get(tId);
-            tRepository.removePresentation(tId, tRemoval);
+        RepositoryChangeset<Connection> tChangeset = new RepositoryChangeset<Connection>(tRepository.getConnections(), tNewConnections);
+        for (Map.Entry<String, Connection> tEntry: tChangeset.getRemovals().entrySet()) {
+            tRepository.removeConnection(tEntry.getKey(), tEntry.getValue());
         }
-        for (String tId: tChangeset.getAdditions().keySet()) {
-            Presentation tAddition = tChangeset.getAdditions().get(tId);
-            tRepository.addPresentation(tId, tAddition);
+        for (Map.Entry<String, Connection> tEntry: tChangeset.getAdditions().entrySet()) {
+            tRepository.addConnection(tEntry.getKey(), tEntry.getValue());
         }
-        for (String tId: tChangeset.getUpdates().keySet()) {
-            Presentation tUpdate = tChangeset.getUpdates().get(tId);
-            tRepository.updatePresentation(tId, tUpdate);
+        for (Map.Entry<String, Connection> tEntry: tChangeset.getUpdates().entrySet()) {
+            tRepository.addConnection(tEntry.getKey(), tEntry.getValue());
         }
     }
 
@@ -526,40 +516,38 @@ public class RepositoryMonitor {
         public RepositoryChangeset(final Map<String, T> iOldEntities, final Map<String, T> iCurrentEntities) {
             // Check for removed entities
             mRemovals = new HashMap<String, T>();
-            for (String tOldId: iOldEntities.keySet()) {
-                T tOldEntity = iOldEntities.get(tOldId);
-                if (! iCurrentEntities.containsKey(tOldId)) {
+            for (Map.Entry<String, T> tOldEntry: iOldEntities.entrySet()) {
+                if (! iCurrentEntities.containsKey(tOldEntry.getKey())) {
                     mLogger.debug("Entity "
-                            + tOldId
+                            + tOldEntry.getKey()
                             + " seems to have been deleted (last known rev "
-                            + tOldEntity.getRevision()
+                            + tOldEntry.getValue().getRevision()
                             + "), removing from repository");
-                    mRemovals.put(tOldId, tOldEntity);
+                    mRemovals.put(tOldEntry.getKey(), tOldEntry.getValue());
                 }
             }
 
             // Check for new and updated entities      
             mAdditions = new HashMap<String, T>();
             mUpdates = new HashMap<String, T>();
-            for (String tCurrentId: iCurrentEntities.keySet()) {
-                T tCurrentEntity = iCurrentEntities.get(tCurrentId);
-                T tOldEntity = iOldEntities.get(tCurrentId);
+            for (Map.Entry<String, T> tCurrentEntry: iCurrentEntities.entrySet()) {
+                T tOldEntity = iOldEntities.get(tCurrentEntry.getKey());
                 if (tOldEntity == null) {
                     mLogger.debug("Entity "
-                            + tCurrentId
+                            + tCurrentEntry.getKey()
                             + " seems new (rev "
-                            + tCurrentEntity.getRevision()
+                            + tCurrentEntry.getValue().getRevision()
                             + "), adding to repository");
-                    mAdditions.put(tCurrentId, tCurrentEntity);
-                } else if (tCurrentEntity.getRevision() > tOldEntity.getRevision()) {
+                    mAdditions.put(tCurrentEntry.getKey(),  tCurrentEntry.getValue());
+                } else if ( tCurrentEntry.getValue().getRevision() > tOldEntity.getRevision()) {
                     mLogger.debug("Entity "
-                            + tCurrentId
+                            + tCurrentEntry.getKey()
                             + " is a more recent version (rev "
-                            + tCurrentEntity.getRevision()
+                            +  tCurrentEntry.getValue().getRevision()
                             + ") of an existing media (rev "
                             + tOldEntity.getRevision()
                             + "), updating the repository");
-                    mUpdates.put(tCurrentId, tCurrentEntity);
+                    mUpdates.put(tCurrentEntry.getKey(),  tCurrentEntry.getValue());
                 }
             }
         }

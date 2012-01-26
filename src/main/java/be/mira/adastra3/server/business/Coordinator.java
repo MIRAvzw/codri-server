@@ -79,10 +79,9 @@ public class Coordinator implements ApplicationListener<ApplicationEvent> {
 
                 // Find the connections this device is a part of
                 Map<String, Connection> tRelevantConnections = new HashMap<String, Connection>();
-                for (String tId : mRepository.getConnections().keySet()) {
-                    Connection tConnection = mRepository.getConnection(tId);
-                    if (tConnection.getKiosk().equals(iEvent.getId())) {
-                        tRelevantConnections.put(tId, tConnection);
+                for (Map.Entry<String, Connection> tEntry: mRepository.getConnections().entrySet()) {
+                    if (tEntry.getValue().getKiosk().equals(iEvent.getId())) {
+                        tRelevantConnections.put(tEntry.getKey(), tEntry.getValue());
                     }
                 }
 
@@ -92,8 +91,8 @@ public class Coordinator implements ApplicationListener<ApplicationEvent> {
                 } else if (tRelevantConnections.size() > 1) {
                     mLogger.warn("Ambiguous connections found for kiosk " + iEvent.getId() + ", it'll remain unconfigured");
                 } else {
-                    String tId = tRelevantConnections.keySet().iterator().next();
-                    pushConnection(tId, mRepository.getConnection(tId));
+                    Map.Entry<String, Connection> tEntry = tRelevantConnections.entrySet().iterator().next();
+                    pushConnection(tEntry.getKey(), tEntry.getValue());
                 }
                 
                 break;
