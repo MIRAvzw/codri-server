@@ -23,4 +23,13 @@ public class NetworkKioskEvent extends NetworkEvent {
     public NetworkKioskEvent(Object iSource, NetworkEvent.NetworkEventType iType, UUID iId, Kiosk iKiosk, Kiosk iOldKiosk) {
         super(iSource, iType, iId, iKiosk, iOldKiosk);
     }
+    
+    
+    //
+    // Basic I/O
+    //
+    
+    public Kiosk getKiosk() {
+        return (Kiosk) getEntity();
+    }
 }

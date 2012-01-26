@@ -7,7 +7,6 @@ package be.mira.adastra3.server.business;
 import be.mira.adastra3.spring.Logger;
 import be.mira.adastra3.server.events.*;
 import be.mira.adastra3.server.exceptions.DeviceException;
-import be.mira.adastra3.server.network.NetworkEntity;
 import be.mira.adastra3.server.network.Kiosk;
 import be.mira.adastra3.server.repository.configuration.Configuration;
 import be.mira.adastra3.server.repository.connection.Connection;
@@ -24,7 +23,7 @@ import org.springframework.context.ApplicationListener;
 *
 * @author tim
 */
-public class Coordinator implements ApplicationListener {
+public class Coordinator implements ApplicationListener<ApplicationEvent> {
     //
     // Data members
     //
@@ -52,8 +51,20 @@ public class Coordinator implements ApplicationListener {
     
     @Override
     public void onApplicationEvent(ApplicationEvent iEvent) {
-        // TODO
-        // TODO: filter for non-Spring events?.
+        // TODO: this is ugly
+        if (iEvent instanceof NetworkEvent) {
+            if (iEvent instanceof NetworkKioskEvent) {
+                onNetworkKioskEvent((NetworkKioskEvent) iEvent);
+            }
+        } else if (iEvent instanceof RepositoryEvent) {
+            if (iEvent instanceof RepositoryPresentationEvent) {
+                onRepositoryPresentationEvent((RepositoryPresentationEvent) iEvent);
+            } else if (iEvent instanceof RepositoryConfigurationEvent) {
+                onRepositoryConfigurationEvent((RepositoryConfigurationEvent) iEvent);
+            } else if (iEvent instanceof RepositoryConnectionEvent) {
+                onRepositoryConnectionEvent((RepositoryConnectionEvent) iEvent);
+            }
+        }
     }
     
     
@@ -62,11 +73,11 @@ public class Coordinator implements ApplicationListener {
     //
     
     public void onNetworkKioskEvent(NetworkKioskEvent iEvent) {
-        NetworkEntity tEntity = iEvent.getEntity();
+        Kiosk tKiosk = iEvent.getKiosk();
         
         switch (iEvent.getType()) {
             case ADDED: {
-                mLogger.info("MIRA network entity added: " + iEvent.getId());
+                mLogger.info("Kiosk added: " + iEvent.getId());
 
                 // Find the connections this device is a part of
                 Map<String, Connection> tRelevantConnections = new HashMap<String, Connection>();
@@ -79,9 +90,9 @@ public class Coordinator implements ApplicationListener {
 
                 // Check the connections
                 if (tRelevantConnections.isEmpty()) {
-                    mLogger.warn("Couldn't find any configuration for device " + iEvent.getId() + ", it'll remain unconfigured");
+                    mLogger.warn("Couldn't find any configuration for kiosk " + iEvent.getId() + ", it'll remain unconfigured");
                 } else if (tRelevantConnections.size() > 1) {
-                    mLogger.warn("Ambiguous connections found for device " + iEvent.getId() + ", it'll remain unconfigured");
+                    mLogger.warn("Ambiguous connections found for kiosk " + iEvent.getId() + ", it'll remain unconfigured");
                 } else {
                     String tId = tRelevantConnections.keySet().iterator().next();
                     pushConnection(tId, mRepository.getConnection(tId));
@@ -91,7 +102,7 @@ public class Coordinator implements ApplicationListener {
             }
                 
             case REMOVED: {
-                mLogger.info("MIRA network entity removed: " + iEvent.getId());                
+                mLogger.info("Kiosk removed: " + iEvent.getId());                
             }
                 
         }
@@ -146,18 +157,15 @@ public class Coordinator implements ApplicationListener {
         
         // Push to the devices
         for (Connection tConnection: tRelevantConnections) {
-            NetworkEntity tDevice = mNetwork.getKiosk(tConnection.getKiosk());
+            Kiosk tKiosk = mNetwork.getKiosk(tConnection.getKiosk());
             // No need to display too many errors here, this should already have
             // have happened when the connection was initially added to the
             // repository
-            if (tDevice != null) {
-                if (tDevice instanceof Kiosk) {
-                    Kiosk tKiosk = (Kiosk) tDevice;
-                    try {
-                        tKiosk.setPresentation(iPresentation);
-                    } catch (DeviceException tException) {
-                        mLogger.error("Could not push presentation " + tConnection.getPresentation() + " to target device '" + tConnection.getKiosk() + "'", tException);
-                    }
+            if (tKiosk != null) {
+                try {
+                    tKiosk.setPresentation(iPresentation);
+                } catch (DeviceException tException) {
+                    mLogger.error("Could not push presentation " + tConnection.getPresentation() + " to target device '" + tConnection.getKiosk() + "'", tException);
                 }
             }
         }
@@ -209,18 +217,15 @@ public class Coordinator implements ApplicationListener {
         
         // Push to the devices
         for (Connection tConnection: tRelevantConnections) {
-            NetworkEntity tDevice = mNetwork.getKiosk(tConnection.getKiosk());
+            Kiosk tKiosk = mNetwork.getKiosk(tConnection.getKiosk());
             // No need to display too many errors here, this should already have
             // have happened when the connection was initially added to the
             // repository
-            if (tDevice != null) {
-                if (tDevice instanceof Kiosk) {
-                    Kiosk tKiosk = (Kiosk) tDevice;
-                    try {
-                        tKiosk.setConfiguration(iConfiguration);
-                    } catch (DeviceException tException) {
-                        mLogger.error("Could not push configuration " + tConnection.getConfiguration() + " to target device '" + tConnection.getKiosk()  + "'", tException);
-                    }
+            if (tKiosk != null) {
+                try {
+                    tKiosk.setConfiguration(iConfiguration);
+                } catch (DeviceException tException) {
+                    mLogger.error("Could not push configuration " + tConnection.getConfiguration() + " to target device '" + tConnection.getKiosk()  + "'", tException);
                 }
             }
         }
@@ -262,41 +267,34 @@ public class Coordinator implements ApplicationListener {
     
     private void pushConnection(final String iId, final Connection iConnection) {
         // Check if there is a valid target device
-        NetworkEntity tDevice = mNetwork.getKiosk(iConnection.getKiosk());
-        if (tDevice == null) {
+        Kiosk tKiosk = mNetwork.getKiosk(iConnection.getKiosk());
+        if (tKiosk == null) {
             mLogger.warn("Connection " + iId + " does not point to a valid device");
             return;
         }
         
-        // Process all types of devices
-        if (tDevice instanceof Kiosk) {
-            Kiosk tKiosk = (Kiosk) tDevice;
-            
-            // Push the configuration
-            Configuration tConfiguration = mRepository.getConfiguration(iConnection.getConfiguration());
-            if (tConfiguration != null) {
-                try {
-                    tKiosk.setConfiguration(tConfiguration);
-                } catch (DeviceException tException) {
-                    mLogger.error("Could not upload configuration " + iId, tException);
-                }
-            } else {
-                mLogger.warn("Connection " + iId + " does not point to a valid configuration");
-            }
-            
-            // Push the presentation
-            Presentation tPresentation = mRepository.getPresentation(iConnection.getPresentation());
-            if (tPresentation != null) {
-                try {
-                    tKiosk.setPresentation(tPresentation);
-                } catch (DeviceException tException) {
-                    mLogger.error("Could not upload presentation " + iId, tException);
-                }
-            } else {
-                mLogger.warn("Connection " + iId + " does not point to a valid presentation");
+        // Push the configuration
+        Configuration tConfiguration = mRepository.getConfiguration(iConnection.getConfiguration());
+        if (tConfiguration != null) {
+            try {
+                tKiosk.setConfiguration(tConfiguration);
+            } catch (DeviceException tException) {
+                mLogger.error("Could not upload configuration " + iId, tException);
             }
         } else {
-            mLogger.error("Cannot handle a " + tDevice.getClass().getSimpleName() + " entity");
+            mLogger.warn("Connection " + iId + " does not point to a valid configuration");
+        }
+
+        // Push the presentation
+        Presentation tPresentation = mRepository.getPresentation(iConnection.getPresentation());
+        if (tPresentation != null) {
+            try {
+                tKiosk.setPresentation(tPresentation);
+            } catch (DeviceException tException) {
+                mLogger.error("Could not upload presentation " + iId, tException);
+            }
+        } else {
+            mLogger.warn("Connection " + iId + " does not point to a valid presentation");
         }
     }
 }
