@@ -72,9 +72,7 @@ public class Coordinator implements ApplicationListener<ApplicationEvent> {
     // NetworkEvent handler
     //
     
-    public final void onNetworkKioskEvent(final NetworkKioskEvent iEvent) {
-        Kiosk tKiosk = iEvent.getKiosk();
-        
+    public final void onNetworkKioskEvent(final NetworkKioskEvent iEvent) {        
         switch (iEvent.getType()) {
             case ADDED:
                 mLogger.info("Kiosk added: " + iEvent.getId());
