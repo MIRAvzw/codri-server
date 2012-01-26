@@ -5,10 +5,11 @@
 package be.mira.adastra3.server.business;
 
 import be.mira.adastra3.server.exceptions.NetworkException;
-import be.mira.adastra3.server.network.NetworkEntity;
 import be.mira.adastra3.spring.Logger;
 import be.mira.adastra3.server.events.NetworkEvent;
 import be.mira.adastra3.server.events.NetworkEvent.NetworkEventType;
+import be.mira.adastra3.server.events.NetworkKioskEvent;
+import be.mira.adastra3.server.network.Kiosk;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -36,7 +37,7 @@ public final class Network implements ApplicationEventPublisherAware {
     
     private ApplicationEventPublisher mPublisher;
     
-    private Map<UUID, NetworkEntity> mDevices;
+    private Map<UUID, Kiosk> mKiosks;
 
 
     //
@@ -44,7 +45,7 @@ public final class Network implements ApplicationEventPublisherAware {
     //
 
     public Network() {
-        mDevices = new HashMap<UUID, NetworkEntity>();
+        mKiosks = new HashMap<UUID, Kiosk>();
     }
     
     @Override
@@ -59,7 +60,7 @@ public final class Network implements ApplicationEventPublisherAware {
     
     @PreDestroy
     public void destroy() {
-        mDevices.clear();
+        mKiosks.clear();
     }
 
 
@@ -69,31 +70,31 @@ public final class Network implements ApplicationEventPublisherAware {
     
     @XmlElementWrapper(name="devices")
     @XmlElement(name="device")
-    public synchronized Map<UUID, NetworkEntity> getDevices() {
-        return mDevices;
+    public synchronized Map<UUID, Kiosk> getKiosks() {
+        return mKiosks;
     }
     
-    public synchronized NetworkEntity getDevice(final UUID iUuid) {
-        return mDevices.get(iUuid);
+    public synchronized Kiosk getKiosk(final UUID iUuid) {
+        return mKiosks.get(iUuid);
     }
     
-    public synchronized void addDevice(final NetworkEntity iDevice) throws NetworkException{
-        if (mDevices.containsKey(iDevice.getUuid())) {
-            throw new NetworkException("device " + iDevice.getUuid() + " already present in network");
+    public synchronized void addKiosk(final UUID iId, final Kiosk iKiosk) throws NetworkException{
+        if (mKiosks.containsKey(iId)) {
+            throw new NetworkException("kiosk " + iId + " already present in network");
         }
-        mDevices.put(iDevice.getUuid(), iDevice);
+        mKiosks.put(iId, iKiosk);
         
-        NetworkEvent tEvent = new NetworkEvent(this, NetworkEventType.ADDED, iDevice);
+        NetworkEvent tEvent = new NetworkKioskEvent(this, NetworkEventType.ADDED, iId, iKiosk);
         mPublisher.publishEvent(tEvent);
     }
     
-    public synchronized void removeDevice(final NetworkEntity iDevice) throws NetworkException {
-        if (!mDevices.containsKey(iDevice.getUuid())) {
-            throw new NetworkException("device " + iDevice.getUuid() + " not present in network");
+    public synchronized void removeKiosk(final UUID iId, final Kiosk iKiosk) throws NetworkException {
+        if (!mKiosks.containsKey(iId)) {
+            throw new NetworkException("kiosk " + iId + " not present in network");
         }
-        mDevices.remove(iDevice.getUuid());
+        mKiosks.remove(iId);
         
-        NetworkEvent tEvent = new NetworkEvent(this, NetworkEventType.REMOVED, iDevice);
+        NetworkEvent tEvent = new NetworkKioskEvent(this, NetworkEventType.REMOVED, iId, iKiosk);
         mPublisher.publishEvent(tEvent);
     }
 }

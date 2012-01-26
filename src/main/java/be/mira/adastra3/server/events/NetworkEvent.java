@@ -5,13 +5,14 @@
 package be.mira.adastra3.server.events;
 
 import be.mira.adastra3.server.network.NetworkEntity;
+import java.util.UUID;
 import org.springframework.context.ApplicationEvent;
 
 /**
  *
  * @author tim
  */
-public class NetworkEvent extends ApplicationEvent {
+public abstract class NetworkEvent extends ApplicationEvent {
     //
     // Public types
     //
@@ -27,17 +28,24 @@ public class NetworkEvent extends ApplicationEvent {
     //
     
     private final NetworkEventType mType;
-    private final NetworkEntity mDevice;
+    private final UUID mId;
+    private final NetworkEntity mEntity, mOldEntity;
     
     
     //
     // Construction and destruction
     //
     
-    public NetworkEvent(Object iSource, NetworkEventType iType, NetworkEntity iDevice) {
+    public NetworkEvent(Object iSource, NetworkEventType iType, UUID iId, NetworkEntity iEntity) {
+        this(iSource, iType, iId, iEntity, null);
+    }
+    
+    public NetworkEvent(Object iSource, NetworkEventType iType, UUID iId, NetworkEntity iEntity, NetworkEntity iOldEntity) {
         super(iSource);
         mType = iType;
-        mDevice = iDevice;
+        mId = iId;
+        mEntity = iEntity;
+        mOldEntity = iOldEntity;
     }
     
     
@@ -45,12 +53,20 @@ public class NetworkEvent extends ApplicationEvent {
     // Basic I/O
     //
     
+    public final UUID getId() {
+        return mId;
+    }
+    
     public final NetworkEventType getType() {
         return mType;
     }
     
-    public final NetworkEntity getDevice() {
-        return mDevice;
+    public final NetworkEntity getEntity() {
+        return mEntity;
+    }
+    
+    public final NetworkEntity getOldEntity() {
+        return mOldEntity;
     }
     
 }

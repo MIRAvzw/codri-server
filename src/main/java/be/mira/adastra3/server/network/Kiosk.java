@@ -23,8 +23,8 @@ public class Kiosk extends NetworkEntity {
     // Construction and destruction
     //
     
-    public Kiosk(final UUID iUuid) {
-        super(iUuid);
+    public Kiosk() {
+        super();
     }
     
     

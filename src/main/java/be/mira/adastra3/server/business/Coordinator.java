@@ -50,11 +50,10 @@ public class Coordinator implements ApplicationListener {
     // ApplicationEvent handler
     //
     
-    // TODO: filter to MiraEvent?
-    
     @Override
     public void onApplicationEvent(ApplicationEvent iEvent) {
-        
+        // TODO
+        // TODO: filter for non-Spring events?.
     }
     
     
@@ -62,27 +61,27 @@ public class Coordinator implements ApplicationListener {
     // NetworkEvent handler
     //
     
-    public void onNetworkEvent(NetworkEvent iEvent) {
-        NetworkEntity tDevice = iEvent.getDevice();
+    public void onNetworkKioskEvent(NetworkKioskEvent iEvent) {
+        NetworkEntity tEntity = iEvent.getEntity();
         
         switch (iEvent.getType()) {
             case ADDED: {
-                mLogger.info("MIRA network entity added: " + tDevice.getUuid());
+                mLogger.info("MIRA network entity added: " + iEvent.getId());
 
                 // Find the connections this device is a part of
                 Map<String, Connection> tRelevantConnections = new HashMap<String, Connection>();
                 for (String tId : mRepository.getConnections().keySet()) {
                     Connection tConnection = mRepository.getConnection(tId);
-                    if (tConnection.getKiosk().equals(tDevice.getUuid())) {
+                    if (tConnection.getKiosk().equals(iEvent.getId())) {
                         tRelevantConnections.put(tId, tConnection);
                     }
                 }
 
                 // Check the connections
                 if (tRelevantConnections.isEmpty()) {
-                    mLogger.warn("Couldn't find any configuration for device " + tDevice.getUuid() + ", it'll remain unconfigured");
+                    mLogger.warn("Couldn't find any configuration for device " + iEvent.getId() + ", it'll remain unconfigured");
                 } else if (tRelevantConnections.size() > 1) {
-                    mLogger.warn("Ambiguous connections found for device " + tDevice.getUuid() + ", it'll remain unconfigured");
+                    mLogger.warn("Ambiguous connections found for device " + iEvent.getId() + ", it'll remain unconfigured");
                 } else {
                     String tId = tRelevantConnections.keySet().iterator().next();
                     pushConnection(tId, mRepository.getConnection(tId));
@@ -92,7 +91,7 @@ public class Coordinator implements ApplicationListener {
             }
                 
             case REMOVED: {
-                mLogger.info("MIRA network entity removed: " + tDevice.getUuid());                
+                mLogger.info("MIRA network entity removed: " + iEvent.getId());                
             }
                 
         }
@@ -147,7 +146,7 @@ public class Coordinator implements ApplicationListener {
         
         // Push to the devices
         for (Connection tConnection: tRelevantConnections) {
-            NetworkEntity tDevice = mNetwork.getDevice(tConnection.getKiosk());
+            NetworkEntity tDevice = mNetwork.getKiosk(tConnection.getKiosk());
             // No need to display too many errors here, this should already have
             // have happened when the connection was initially added to the
             // repository
@@ -157,7 +156,7 @@ public class Coordinator implements ApplicationListener {
                     try {
                         tKiosk.setPresentation(iPresentation);
                     } catch (DeviceException tException) {
-                        mLogger.error("Could not push presentation " + iId + " to target device '" + tDevice.getUuid() + "'", tException);
+                        mLogger.error("Could not push presentation " + tConnection.getPresentation() + " to target device '" + tConnection.getKiosk() + "'", tException);
                     }
                 }
             }
@@ -210,7 +209,7 @@ public class Coordinator implements ApplicationListener {
         
         // Push to the devices
         for (Connection tConnection: tRelevantConnections) {
-            NetworkEntity tDevice = mNetwork.getDevice(tConnection.getKiosk());
+            NetworkEntity tDevice = mNetwork.getKiosk(tConnection.getKiosk());
             // No need to display too many errors here, this should already have
             // have happened when the connection was initially added to the
             // repository
@@ -220,7 +219,7 @@ public class Coordinator implements ApplicationListener {
                     try {
                         tKiosk.setConfiguration(iConfiguration);
                     } catch (DeviceException tException) {
-                        mLogger.error("Could not push configuration " + iId + " to target device '" + tDevice.getUuid() + "'", tException);
+                        mLogger.error("Could not push configuration " + tConnection.getConfiguration() + " to target device '" + tConnection.getKiosk() + "'", tException);
                     }
                 }
             }
@@ -263,7 +262,7 @@ public class Coordinator implements ApplicationListener {
     
     private void pushConnection(final String iId, final Connection iConnection) {
         // Check if there is a valid target device
-        NetworkEntity tDevice = mNetwork.getDevice(iConnection.getKiosk());
+        NetworkEntity tDevice = mNetwork.getKiosk(iConnection.getKiosk());
         if (tDevice == null) {
             mLogger.warn("Connection " + iId + " does not point to a valid device");
             return;

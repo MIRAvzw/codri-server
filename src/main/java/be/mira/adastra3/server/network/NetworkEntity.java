@@ -16,7 +16,6 @@ abstract public class NetworkEntity {
     // Member data
     //
     
-    private UUID mUuid;
     private String mName;
     private Date mMark;
     
@@ -25,8 +24,7 @@ abstract public class NetworkEntity {
     // Construction and destruction
     //
     
-    public NetworkEntity(final UUID iUuid) {
-        mUuid = iUuid;
+    public NetworkEntity() {
         setMark();
     }
     
@@ -34,10 +32,6 @@ abstract public class NetworkEntity {
     //
     // Getters and setters
     //
-    
-    public final UUID getUuid() {
-        return mUuid;
-    }
     
     public final String getName() {
         return mName;
