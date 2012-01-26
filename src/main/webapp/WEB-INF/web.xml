@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (C) 2012 Tim Besard <tim.besard@gmail.com>
+
+    All rights reserved.
+
+-->
 <web-app>
 	<display-name>Ad-Astra III - Content server</display-name>
 

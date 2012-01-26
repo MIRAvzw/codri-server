@@ -1,4 +1,11 @@
 <?xml version="1.0"?>
+<!--
+
+    Copyright (C) 2012 Tim Besard <tim.besard@gmail.com>
+
+    All rights reserved.
+
+-->
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             targetNamespace="http://www.mira.be"
             xmlns="http://www.mira.be"

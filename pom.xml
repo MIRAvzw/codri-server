@@ -59,19 +59,23 @@
   -->
   
     <repositories>
-        <repository>
-            <id>teleal.org-repo</id>
-            <url>http://teleal.org/m2</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    
+        <!-- Local repository -->
         <repository>
             <id>local-repository</id>
             <url>file://${basedir}/lib</url>
-        </repository>    
+        </repository>
     </repositories>
+
+    <pluginRepositories>
+        <!-- maven-license-plugin -->
+        <pluginRepository>
+            <id>mc-release</id>
+            <url>http://mc-repo.googlecode.com/svn/maven2/releases</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
   
   
   <!--
@@ -193,7 +197,27 @@
   -->
   
     <build>
-        <plugins>            
+        <plugins>
+            <!-- Source file headers -->
+            <plugin>
+                <groupId>com.mycila.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+                <configuration>
+                    <header>src/etc/header.txt</header>
+                    <includes>
+                        <include>src/**</include>
+                    </includes>
+                    <skipExistingHeaders>true</skipExistingHeaders>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
             <!-- Compiler -->
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -225,13 +249,31 @@
                 <configuration>
                     <reportPlugins>
                         <!-- General project information -->
-                        <plugin>
+                        <plugin>>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-project-info-reports-plugin</artifactId>
                         </plugin>
 
-                        <!-- Report about violations of coding standards -->
+                        <!-- Cross-reference of sources -->
                         <plugin>
+                          <groupId>org.apache.maven.plugins</groupId>
+                          <artifactId>maven-jxr-plugin</artifactId>
+                          <version>2.1</version>
+                          <configuration>
+                            <aggregate>true</aggregate>
+                          </configuration>
+                        </plugin>
+
+                        <!-- Javadoc -->
+                        <plugin>
+                          <groupId>org.apache.maven.plugins</groupId>
+                          <artifactId>maven-javadoc-plugin</artifactId>
+                          <version>2.7</version>
+                        </plugin>
+
+                        <!-- CheckStyle: report about violations of coding standards -->
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-checkstyle-plugin</artifactId>
                             <configuration>
                                 <configLocation>checkstyle.xml</configLocation>
@@ -250,13 +292,7 @@
                             </configuration>
                         </plugin>
 
-                        <!-- Generate "JDepend" report -->
-                        <plugin>
-                            <groupId>org.codehaus.mojo</groupId>
-                            <artifactId>jdepend-maven-plugin</artifactId>
-                        </plugin>
-
-                        <!-- Generate "FindBugs Report" report -->
+                        <!-- FindBugs: detect some common issues -->
                         <plugin>
                             <groupId>org.codehaus.mojo</groupId>
                             <artifactId>findbugs-maven-plugin</artifactId>
@@ -264,12 +300,6 @@
                                 <threshold>Normal</threshold>
                                 <effort>Default</effort>
                             </configuration>
-                        </plugin>
-
-                        <!-- Generate "JavaNCSS Report" report -->
-                        <plugin>
-                            <groupId>org.codehaus.mojo</groupId>
-                            <artifactId>javancss-maven-plugin</artifactId>
                         </plugin>
                     </reportPlugins>
                 </configuration>
