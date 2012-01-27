@@ -12,7 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import javax.xml.stream.*;
-import javax.xml.transform.stream.StreamSource;
+import javax.xml.transform.stax.StAXSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
@@ -35,23 +35,7 @@ public abstract class Processor {
     // Construction and destruction
     //
     
-    public Processor(final File iFile, final String iValidationFilename) throws RepositoryException {        
-        // Validate the file
-        // TODO: do this within the pull parser
-        if (iValidationFilename != null) {
-            try {
-                String tSchemaLanguage = "http://www.w3.org/2001/XMLSchema";
-                SchemaFactory tSchemaFactory = SchemaFactory.newInstance(tSchemaLanguage);
-                Schema tSchema = tSchemaFactory.newSchema(this.getClass().getClassLoader().getResource(iValidationFilename));
-                Validator tValidator = tSchema.newValidator();
-                tValidator.validate(new StreamSource(iFile));
-            } catch (SAXException tException) {
-                throw new RepositoryException("could not validate file", tException);
-            } catch (IOException tException) {
-                throw new RepositoryException("could not open schema", tException);
-            }
-        }
-        
+    public Processor(final File iFile, final String iValidationFilename) throws RepositoryException {           
         // Setup the parser factory
         try {
             if (PARSER_FACTORY == null) {
@@ -71,6 +55,22 @@ public abstract class Processor {
             throw new RepositoryException("could not parse XML file", tException);
         } catch (FileNotFoundException tException) {
             throw new RepositoryException("could not open XML file", tException);
+        }  
+        
+        // Validate the file
+        // TODO: do this within the stream parser (use Stax2, http://stackoverflow.com/questions/5793087/stax-xml-validation)
+        if (iValidationFilename != null) {
+            try {
+                String tSchemaLanguage = "http://www.w3.org/2001/XMLSchema";
+                SchemaFactory tSchemaFactory = SchemaFactory.newInstance(tSchemaLanguage);
+                Schema tSchema = tSchemaFactory.newSchema(this.getClass().getClassLoader().getResource(iValidationFilename));
+                Validator tValidator = tSchema.newValidator();
+                tValidator.validate(new StAXSource(mParser));
+            } catch (SAXException tException) {
+                throw new RepositoryException("could not validate file", tException);
+            } catch (IOException tException) {
+                throw new RepositoryException("could not open schema", tException);
+            }
         }
     }
     
