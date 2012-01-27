@@ -40,7 +40,7 @@ import org.tigris.subversion.javahl.SVNClient;
  *
  * @author tim
  */
-public class RepositoryMonitor {
+public abstract class RepositoryMonitor {
     //
     // Data members
     //
@@ -289,7 +289,7 @@ public class RepositoryMonitor {
             
             // Process the contents
             String tRepositoryPath = "/configurations/" + tFilename;
-            ConfigurationProcessor tReader = new ConfigurationProcessor(tRevision, tRepositoryPath, mSVNLocation, tFile);
+            ConfigurationProcessor tReader = createConfigurationProcessor(tRevision, tRepositoryPath, mSVNLocation, tFile);
             tReader.process();
             Configuration tConfiguration = tReader.getConfiguration();
             if (tConfiguration == null) {
@@ -374,7 +374,7 @@ public class RepositoryMonitor {
             
             // Process the contents
             String tRepositoryPath = "/connections/" + tFilename;
-            ConnectionProcessor tReader = new ConnectionProcessor(tRevision, tRepositoryPath, mSVNLocation, tFile);
+            ConnectionProcessor tReader = createConnectionProcessor(tRevision, tRepositoryPath, mSVNLocation, tFile);
             tReader.process();
             Connection tConnection = tReader.getConnection();
             if (tConnection == null) {
@@ -570,4 +570,12 @@ public class RepositoryMonitor {
             return mUpdates;
         }
     }
+    
+    
+    //
+    // Abstract method injectors
+    //
+    
+    protected abstract ConnectionProcessor createConnectionProcessor(final long iRevision, final String iRepositoryPath, final String iRepositoryLocation, final File iFile);
+    protected abstract ConfigurationProcessor createConfigurationProcessor(final long iRevision, final String iRepositoryPath, final String iRepositoryLocation, final File iFile);
 }

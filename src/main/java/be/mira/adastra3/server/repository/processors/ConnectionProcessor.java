@@ -9,9 +9,11 @@ package be.mira.adastra3.server.repository.processors;
 import be.mira.adastra3.server.exceptions.InvalidStateException;
 import be.mira.adastra3.server.exceptions.RepositoryException;
 import be.mira.adastra3.server.repository.connection.Connection;
+import be.mira.adastra3.spring.Slf4jLogger;
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
+import org.slf4j.Logger;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -23,6 +25,9 @@ public class ConnectionProcessor extends Processor {
     //
     // Member data
     //
+    
+    @Slf4jLogger
+    private Logger mLogger;
     
     private Connection mConnection;
     private final long mRevision;
@@ -51,26 +56,26 @@ public class ConnectionProcessor extends Processor {
     public final void process() throws RepositoryException {
         try {
             // Setup parsing
-            if (mParser.getEventType() != XmlPullParser.START_DOCUMENT) {
+            if (getParser().getEventType() != XmlPullParser.START_DOCUMENT) {
                 throw new RepositoryException("not at start of document");
             }
             
             // Process tags
-            mParser.next();
-            loop: while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
-                switch (mParser.getEventType()) {
+            getParser().next();
+            loop: while (getParser().getEventType() != XmlPullParser.END_DOCUMENT) {
+                switch (getParser().getEventType()) {
                     case (XmlPullParser.END_TAG):
-                        mParser.next();
+                        getParser().next();
                         break loop;
                     case (XmlPullParser.START_TAG):
-                        if (mParser.getName().equals("connection")) {
+                        if (getParser().getName().equals("connection")) {
                             mConnection = parseConnection();
                         } else {
                             throw new InvalidStateException("inconsistency detected between validator and processor (unknown tag)");
                         }
                         break;
                     default:                        
-                        mParser.next();
+                        getParser().next();
                 }
             }
         } catch (XmlPullParserException tException) {
@@ -94,25 +99,25 @@ public class ConnectionProcessor extends Processor {
         UUID tKiosk = null;
         String tConfiguration = null;
         String tPresentation = null;
-        mParser.next();
-        loop: while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
-            switch (mParser.getEventType()) {
+        getParser().next();
+        loop: while (getParser().getEventType() != XmlPullParser.END_DOCUMENT) {
+            switch (getParser().getEventType()) {
                 case (XmlPullParser.END_TAG):
-                    mParser.next();
+                    getParser().next();
                     break loop;
                 case (XmlPullParser.START_TAG):
-                    if (mParser.getName().equals("kiosk")) {
+                    if (getParser().getName().equals("kiosk")) {
                         tKiosk = UUID.fromString(parseTextElement());
-                    } else if (mParser.getName().equals("configuration")) {
+                    } else if (getParser().getName().equals("configuration")) {
                         tConfiguration = parseTextElement();
-                    } else if (mParser.getName().equals("presentation")) {
+                    } else if (getParser().getName().equals("presentation")) {
                         tPresentation = parseTextElement();
                     } else {
                         throw new InvalidStateException("inconsistency detected between validator and processor (unknown tag)");
                     }
                     break;
                 default:
-                    mParser.next();
+                    getParser().next();
             }
         }
         

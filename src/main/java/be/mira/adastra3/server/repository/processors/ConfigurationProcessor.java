@@ -10,8 +10,10 @@ import be.mira.adastra3.server.exceptions.InvalidStateException;
 import be.mira.adastra3.server.exceptions.RepositoryException;
 import be.mira.adastra3.server.repository.configuration.Configuration;
 import be.mira.adastra3.server.repository.configuration.SoundConfiguration;
+import be.mira.adastra3.spring.Slf4jLogger;
 import java.io.File;
 import java.io.IOException;
+import org.slf4j.Logger;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -23,6 +25,9 @@ public class ConfigurationProcessor extends Processor {
     //
     // Member data
     //
+    
+    @Slf4jLogger
+    private Logger mLogger;
     
     private Configuration mConfiguration;
     private final long mRevision;
@@ -49,26 +54,26 @@ public class ConfigurationProcessor extends Processor {
     public final void process() throws RepositoryException {
         try {
             // Setup parsing
-            if (mParser.getEventType() != XmlPullParser.START_DOCUMENT) {
+            if (getParser().getEventType() != XmlPullParser.START_DOCUMENT) {
                 throw new RepositoryException("not at start of document");
             }
             
             // Process tags
-            mParser.next();
-            loop: while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
-                switch (mParser.getEventType()) {
+            getParser().next();
+            loop: while (getParser().getEventType() != XmlPullParser.END_DOCUMENT) {
+                switch (getParser().getEventType()) {
                     case (XmlPullParser.END_TAG):
-                        mParser.next();
+                        getParser().next();
                         break loop;
                     case (XmlPullParser.START_TAG):
-                        if (mParser.getName().equals("configuration")) {
+                        if (getParser().getName().equals("configuration")) {
                             mConfiguration = parseConfiguration();
                         } else {
                             throw new InvalidStateException("inconsistency detected between validator and processor (unknown tag)");
                         }
                         break;
                     default:                        
-                        mParser.next();
+                        getParser().next();
                 }
             }
         } catch (XmlPullParserException tException) {
@@ -90,21 +95,21 @@ public class ConfigurationProcessor extends Processor {
     private Configuration parseConfiguration() throws RepositoryException, XmlPullParserException, IOException {        
         // Process the tags
         SoundConfiguration tSoundConfiguration = null;
-        mParser.next();
-        loop: while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
-            switch (mParser.getEventType()) {
+        getParser().next();
+        loop: while (getParser().getEventType() != XmlPullParser.END_DOCUMENT) {
+            switch (getParser().getEventType()) {
                 case (XmlPullParser.END_TAG):
-                    mParser.next();
+                    getParser().next();
                     break loop;
                 case (XmlPullParser.START_TAG):
-                    if (mParser.getName().equals("sound")) {
+                    if (getParser().getName().equals("sound")) {
                         tSoundConfiguration = parseSoundConfiguration();
                     } else {
                         throw new InvalidStateException("inconsistency detected between validator and processor (unknown tag)");
                     }
                     break;
                 default:
-                    mParser.next();
+                    getParser().next();
             }
         }
         
@@ -121,21 +126,21 @@ public class ConfigurationProcessor extends Processor {
     private SoundConfiguration parseSoundConfiguration() throws RepositoryException, XmlPullParserException, IOException {
         // Process the tags
         Integer tVolume = null;
-        mParser.next();
-        loop: while (mParser.getEventType() != XmlPullParser.END_DOCUMENT) {
-            switch (mParser.getEventType()) {
+        getParser().next();
+        loop: while (getParser().getEventType() != XmlPullParser.END_DOCUMENT) {
+            switch (getParser().getEventType()) {
                 case (XmlPullParser.END_TAG):
-                    mParser.next();
+                    getParser().next();
                     break loop;
                 case (XmlPullParser.START_TAG):
-                    if (mParser.getName().equals("volume")) {
+                    if (getParser().getName().equals("volume")) {
                         tVolume = Integer.parseInt(parseTextElement());
                     } else {
                         throw new InvalidStateException("inconsistency detected between validator and processor (unknown tag)");
                     }
                     break;
                 default:
-                    mParser.next();
+                    getParser().next();
             }
         }
         

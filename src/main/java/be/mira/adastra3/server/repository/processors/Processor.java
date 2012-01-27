@@ -19,8 +19,6 @@ import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -31,20 +29,15 @@ public class Processor {
     // Member data
     //
     
-    private Logger mLogger;
-    
-    protected static XmlPullParserFactory PARSER_FACTORY;
-    protected XmlPullParser mParser;
+    private static XmlPullParserFactory PARSER_FACTORY;
+    private final XmlPullParser mParser;
             
             
     //
     // Construction and destruction
     //
     
-    public Processor(final File iFile, final String iValidationFilename) throws RepositoryException { 
-        // FIXME: acquire a configured logger properly. Bean?
-        mLogger = LoggerFactory.getLogger(this.getClass());
-        
+    public Processor(final File iFile, final String iValidationFilename) throws RepositoryException {        
         // Validate the file
         // TODO: do this within the pull parser
         if (iValidationFilename != null) {
@@ -82,6 +75,15 @@ public class Processor {
         } catch (FileNotFoundException tException) {
             throw new RepositoryException("could not open configuration file", tException);
         }
+    }
+    
+    
+    //
+    // Basic I/O
+    //
+    
+    protected final XmlPullParser getParser() {
+        return mParser;
     }
     
     

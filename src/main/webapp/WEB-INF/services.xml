@@ -83,11 +83,13 @@
         <constructor-arg ref="network"/>
     </bean>
 
-    <!--
+    <bean id="connectionProcessor" class="be.mira.adastra3.server.repository.processors.ConnectionProcessor" scope="prototype" />
+    <bean id="configurationProcessor" class="be.mira.adastra3.server.repository.processors.ConfigurationProcessor" scope="prototype" />
     <bean class="be.mira.adastra3.server.business.RepositoryMonitor" id="repositoryMonitor">
         <constructor-arg ref="repository"/>
+        <lookup-method name="createConnectionProcessor" bean="connectionProcessor"/>
+        <lookup-method name="createConfigurationProcessor" bean="configurationProcessor"/>
     </bean>
-    -->
 
 
     <!--
