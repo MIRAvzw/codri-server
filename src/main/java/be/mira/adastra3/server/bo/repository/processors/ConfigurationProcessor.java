@@ -13,9 +13,9 @@ import be.mira.adastra3.server.bo.repository.configuration.SoundConfiguration;
 import be.mira.adastra3.spring.Slf4jLogger;
 import java.io.File;
 import java.io.IOException;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
 import org.slf4j.Logger;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
 
 /**
  *
@@ -52,18 +52,18 @@ public class ConfigurationProcessor extends Processor {
     public final void process() throws RepositoryException {
         try {
             // Setup parsing
-            if (getParser().getEventType() != XmlPullParser.START_DOCUMENT) {
+            if (getParser().getEventType() != XMLStreamConstants.START_DOCUMENT) {
                 throw new RepositoryException("not at start of document");
             }
             
             // Process tags
             getParser().next();
-            loop: while (getParser().getEventType() != XmlPullParser.END_DOCUMENT) {
+            loop: while (getParser().getEventType() != XMLStreamConstants.END_DOCUMENT) {
                 switch (getParser().getEventType()) {
-                    case (XmlPullParser.END_TAG):
+                    case (XMLStreamConstants.END_ELEMENT):
                         getParser().next();
                         break loop;
-                    case (XmlPullParser.START_TAG):
+                    case (XMLStreamConstants.START_ELEMENT):
                         if (getParser().getName().equals("configuration")) {
                             mConfiguration = parseConfiguration();
                         } else {
@@ -74,7 +74,7 @@ public class ConfigurationProcessor extends Processor {
                         getParser().next();
                 }
             }
-        } catch (XmlPullParserException tException) {
+        } catch (XMLStreamException tException) {
             throw new RepositoryException(tException);
         } catch (IOException tException) {
             throw new RepositoryException(tException);
@@ -90,16 +90,16 @@ public class ConfigurationProcessor extends Processor {
     // Parsing helpers
     //
     
-    private Configuration parseConfiguration() throws RepositoryException, XmlPullParserException, IOException {        
+    private Configuration parseConfiguration() throws RepositoryException, XMLStreamException, IOException {        
         // Process the tags
         SoundConfiguration tSoundConfiguration = null;
         getParser().next();
-        loop: while (getParser().getEventType() != XmlPullParser.END_DOCUMENT) {
+        loop: while (getParser().getEventType() != XMLStreamConstants.END_DOCUMENT) {
             switch (getParser().getEventType()) {
-                case (XmlPullParser.END_TAG):
+                case (XMLStreamConstants.END_ELEMENT):
                     getParser().next();
                     break loop;
-                case (XmlPullParser.START_TAG):
+                case (XMLStreamConstants.START_ELEMENT):
                     if (getParser().getName().equals("sound")) {
                         tSoundConfiguration = parseSoundConfiguration();
                     } else {
@@ -120,16 +120,16 @@ public class ConfigurationProcessor extends Processor {
         return tConfiguration;
     }
     
-    private SoundConfiguration parseSoundConfiguration() throws RepositoryException, XmlPullParserException, IOException {
+    private SoundConfiguration parseSoundConfiguration() throws RepositoryException, XMLStreamException, IOException {
         // Process the tags
         Integer tVolume = null;
         getParser().next();
-        loop: while (getParser().getEventType() != XmlPullParser.END_DOCUMENT) {
+        loop: while (getParser().getEventType() != XMLStreamConstants.END_DOCUMENT) {
             switch (getParser().getEventType()) {
-                case (XmlPullParser.END_TAG):
+                case (XMLStreamConstants.END_ELEMENT):
                     getParser().next();
                     break loop;
-                case (XmlPullParser.START_TAG):
+                case (XMLStreamConstants.START_ELEMENT):
                     if (getParser().getName().equals("volume")) {
                         tVolume = Integer.parseInt(parseTextElement());
                     } else {

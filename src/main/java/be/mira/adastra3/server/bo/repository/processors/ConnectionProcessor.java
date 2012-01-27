@@ -13,9 +13,9 @@ import be.mira.adastra3.spring.Slf4jLogger;
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
 import org.slf4j.Logger;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
 
 /**
  *
@@ -54,18 +54,18 @@ public class ConnectionProcessor extends Processor {
     public final void process() throws RepositoryException {
         try {
             // Setup parsing
-            if (getParser().getEventType() != XmlPullParser.START_DOCUMENT) {
+            if (getParser().getEventType() != XMLStreamConstants.START_DOCUMENT) {
                 throw new RepositoryException("not at start of document");
             }
             
             // Process tags
             getParser().next();
-            loop: while (getParser().getEventType() != XmlPullParser.END_DOCUMENT) {
+            loop: while (getParser().getEventType() != XMLStreamConstants.END_DOCUMENT) {
                 switch (getParser().getEventType()) {
-                    case (XmlPullParser.END_TAG):
+                    case (XMLStreamConstants.END_ELEMENT):
                         getParser().next();
                         break loop;
-                    case (XmlPullParser.START_TAG):
+                    case (XMLStreamConstants.START_ELEMENT):
                         if (getParser().getName().equals("connection")) {
                             mConnection = parseConnection();
                         } else {
@@ -76,7 +76,7 @@ public class ConnectionProcessor extends Processor {
                         getParser().next();
                 }
             }
-        } catch (XmlPullParserException tException) {
+        } catch (XMLStreamException tException) {
             throw new RepositoryException(tException);
         } catch (IOException tException) {
             throw new RepositoryException(tException);
@@ -92,18 +92,18 @@ public class ConnectionProcessor extends Processor {
     // Parsing helpers
     //
     
-    private Connection parseConnection() throws RepositoryException, XmlPullParserException, IOException {       
+    private Connection parseConnection() throws RepositoryException, XMLStreamException, IOException {       
         // Process the tags
         UUID tKiosk = null;
         String tConfiguration = null;
         String tPresentation = null;
         getParser().next();
-        loop: while (getParser().getEventType() != XmlPullParser.END_DOCUMENT) {
+        loop: while (getParser().getEventType() != XMLStreamConstants.END_DOCUMENT) {
             switch (getParser().getEventType()) {
-                case (XmlPullParser.END_TAG):
+                case (XMLStreamConstants.END_ELEMENT):
                     getParser().next();
                     break loop;
-                case (XmlPullParser.START_TAG):
+                case (XMLStreamConstants.START_ELEMENT):
                     if (getParser().getName().equals("kiosk")) {
                         tKiosk = UUID.fromString(parseTextElement());
                     } else if (getParser().getName().equals("configuration")) {

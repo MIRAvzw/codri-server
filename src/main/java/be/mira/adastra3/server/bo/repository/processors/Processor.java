@@ -11,26 +11,24 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import javax.xml.stream.*;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import org.xml.sax.SAXException;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
 
 /**
  *
  * @author tim
  */
-public class Processor {
+public abstract class Processor {
     //
     // Member data
     //
     
-    private static XmlPullParserFactory PARSER_FACTORY;
-    private final XmlPullParser mParser;
+    private static XMLInputFactory PARSER_FACTORY;
+    private final XMLStreamReader mParser;
             
             
     //
@@ -57,23 +55,22 @@ public class Processor {
         // Setup the parser factory
         try {
             if (PARSER_FACTORY == null) {
-                PARSER_FACTORY = XmlPullParserFactory.newInstance();     
+                PARSER_FACTORY = XMLInputFactory.newInstance();   
 
-                PARSER_FACTORY.setNamespaceAware(true);
-                PARSER_FACTORY.setValidating(false);       
+                //PARSER_FACTORY.setNamespaceAware(true);
+                //PARSER_FACTORY.setValidating(false);       
             }
-        } catch (XmlPullParserException tException) {
-            throw new RepositoryException("could not set-up the pull parser", tException);
+        } catch (FactoryConfigurationError tException) {
+            throw new RepositoryException("could not set-up the XML parser", tException);
         }
         
         // Parse the file
         try {    
-            mParser = PARSER_FACTORY.newPullParser();
-            mParser.setInput(new FileInputStream(iFile), null);
-        } catch (XmlPullParserException tException) {
-            throw new RepositoryException("could not parse configuration file", tException);
+            mParser = PARSER_FACTORY.createXMLStreamReader(new FileInputStream(iFile));
+        } catch (XMLStreamException tException) {
+            throw new RepositoryException("could not parse XML file", tException);
         } catch (FileNotFoundException tException) {
-            throw new RepositoryException("could not open configuration file", tException);
+            throw new RepositoryException("could not open XML file", tException);
         }
     }
     
@@ -82,7 +79,7 @@ public class Processor {
     // Basic I/O
     //
     
-    protected final XmlPullParser getParser() {
+    protected final XMLStreamReader getParser() {
         return mParser;
     }
     
@@ -91,17 +88,17 @@ public class Processor {
     // Parsing methods
     //    
     
-    protected final String parseTextElement()  throws RepositoryException, XmlPullParserException, IOException {   
+    protected final String parseTextElement()  throws RepositoryException, XMLStreamException, IOException {   
         // Parse the contents
         mParser.next();
-        if (mParser.getEventType() != XmlPullParser.TEXT) {
-            throw new XmlPullParserException("asked to parse text where there is no text");
+        if (mParser.getEventType() != XMLStreamConstants.CHARACTERS) {
+            throw new XMLStreamException("asked to parse text where there is no text");
         }
         String tText = mParser.getText();
         
         // If there is an end tag after the text, skip it
         mParser.next();
-        if (mParser.getEventType() == XmlPullParser.END_TAG) {
+        if (mParser.getEventType() == XMLStreamConstants.END_ELEMENT) {
             mParser.next();
         }
         
