@@ -93,7 +93,7 @@ public class RepositoryMonitor {
         if (mSVNMonitorInterval <= 0) {
             throw new Exception("Update interval out of valid range");
         }
-        mLogger.debug("Scheduling SVN monitor with interval of " + mSVNMonitorInterval + " seconds");
+        mLogger.debug("Scheduling SVN monitor with interval of {}s", mSVNMonitorInterval);
         mSVNMonitor = new Timer();
         
         // TODO: does this has to happen in the init()? Move to timer?
@@ -148,7 +148,7 @@ public class RepositoryMonitor {
                 mLogger.debug("Checking the connections");
                 long tConnectionsRevision = checkConnections();
                 if (mConnectionsRevision != tConnectionsRevision) {
-                    mLogger.info("Connections changed to revision " + tConnectionsRevision);
+                    mLogger.info("Connections changed to revision {}", tConnectionsRevision);
                     mConnectionsRevision = tConnectionsRevision;
                     getConnections();
                     processConnections();
@@ -162,7 +162,7 @@ public class RepositoryMonitor {
                 mLogger.debug("Checking the configurations");
                 long tConfigurationsRevision = checkConfigurations();
                 if (mConfigurationsRevision != tConfigurationsRevision) {
-                    mLogger.info("Configurations changed to revision " + tConfigurationsRevision);
+                    mLogger.info("Configurations changed to revision {}", tConfigurationsRevision);
                     mConfigurationsRevision = tConfigurationsRevision;
                     getConfigurations();
                     processConfigurations();
@@ -176,7 +176,7 @@ public class RepositoryMonitor {
                 mLogger.debug("Checking the presentations");
                 long tPresentationRevision = checkPresentations();
                 if (mPresentationsRevision != tPresentationRevision) {
-                    mLogger.info("Presentations changed to revision " + tPresentationRevision);
+                    mLogger.info("Presentations changed to revision {}", tPresentationRevision);
                     mPresentationsRevision = tPresentationRevision;
                     processPresentations();
                 }
@@ -282,7 +282,7 @@ public class RepositoryMonitor {
         for (File tFile: tDirectory.listFiles(new XMLFilter())) {
             // Generate an identifier
             String tFilename = tFile.getName();
-            mLogger.trace("Processing '" + tFilename + "'");
+            mLogger.trace("Processing '{}'", tFilename);
             int tDotPosition = tFilename.lastIndexOf('.');
             String tId = tFilename.substring(0, tDotPosition);
             final long tRevision = getRevision(tFile);
@@ -367,7 +367,7 @@ public class RepositoryMonitor {
         for (File tFile: tDirectory.listFiles(new XMLFilter())) {
             // Generate an identifier
             String tFilename = tFile.getName();
-            mLogger.trace("Processing '" + tFilename + "'");
+            mLogger.trace("Processing '{}'", tFilename);
             int tDotPosition = tFilename.lastIndexOf('.');
             String tId = tFilename.substring(0, tDotPosition);
             final long tRevision = getRevision(tFile);

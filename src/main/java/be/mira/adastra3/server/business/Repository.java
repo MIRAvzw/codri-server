@@ -85,15 +85,13 @@ public final class Repository implements ApplicationEventPublisherAware {
     
     @XmlElement(nillable=true)
     public String getServer() {
-        synchronized (mServer) {
-            return mServer;
-        }
+        return mServer;
     }
     
     public void setServer(final String iServer) {
-        synchronized (mServer) {
-            mServer = iServer;
-        }
+        mLogger.info("Setting the repository server to {}", iServer);
+        
+        mServer = iServer;
     }
      
     @XmlElementWrapper(name="presentations")
@@ -111,6 +109,8 @@ public final class Repository implements ApplicationEventPublisherAware {
     }
 
     public void addPresentation(final String iId, final Presentation iPresentation) throws RepositoryException {
+        mLogger.info("Adding presentation {}", iId);
+        
         synchronized (mPresentations) {
             if (mPresentations.containsKey(iId)) {
                 throw new RepositoryException("presentation " + iId + " already present in repository");
@@ -123,6 +123,8 @@ public final class Repository implements ApplicationEventPublisherAware {
     }
     
     public void updatePresentation(final String iId, final Presentation iPresentation) throws RepositoryException {
+        mLogger.info("Updating presentation {}", iId);
+        
         Presentation tOldPresentation;
         synchronized (mPresentations) {
             if (! mPresentations.containsKey(iId)) {
@@ -136,6 +138,8 @@ public final class Repository implements ApplicationEventPublisherAware {
     }
 
     public void removePresentation(final String iId, final Presentation iPresentation) throws RepositoryException {
+        mLogger.info("Removing presentation {}", iId);
+        
         synchronized (mPresentations) {
             if (! mPresentations.containsKey(iId)) {
                 throw new RepositoryException("presentation " + iId + " not present in repository");
@@ -162,6 +166,8 @@ public final class Repository implements ApplicationEventPublisherAware {
     }
 
     public void addConfiguration(final String iId, final Configuration iConfiguration) throws RepositoryException {
+        mLogger.info("Adding configuration {}", iId);
+        
         synchronized (mConfigurations) {
             if (mConfigurations.containsKey(iId)) {
                 throw new RepositoryException("configuration " + iId + " already present in repository");
@@ -174,6 +180,8 @@ public final class Repository implements ApplicationEventPublisherAware {
     }
     
     public void updateConfiguration(final String iId, final Configuration iConfiguration) throws RepositoryException {
+        mLogger.info("Updating configuration {}", iId);
+        
         Configuration tOldConfiguration;
         synchronized (mConfigurations) {
             if (! mConfigurations.containsKey(iId)) {
@@ -187,6 +195,8 @@ public final class Repository implements ApplicationEventPublisherAware {
     }
 
     public void removeConfiguration(final String iId, final Configuration iConfiguration) throws RepositoryException {
+        mLogger.info("Removing configuration {}", iId);
+        
         synchronized (mConfigurations) {
             if (! mConfigurations.containsKey(iId)) {
                 throw new RepositoryException("configuration " + iId + " not present in repository");
@@ -213,6 +223,8 @@ public final class Repository implements ApplicationEventPublisherAware {
     }
 
     public void addConnection(final String iId, final Connection iConnection) throws RepositoryException {
+        mLogger.info("Adding connection {}", iId);
+        
         synchronized (mConnections) {
             if (mConnections.containsKey(iId)) {
                 throw new RepositoryException("connection " + iId + " already present in repository");
@@ -225,6 +237,8 @@ public final class Repository implements ApplicationEventPublisherAware {
     }
     
     public void updateConnection(final String iId, final Connection iConnection) throws RepositoryException {
+        mLogger.info("Updating connection {}", iId);
+        
         Connection tOldConnection;
         synchronized (mConnections) {
             if (! mConnections.containsKey(iId)) {
@@ -238,6 +252,8 @@ public final class Repository implements ApplicationEventPublisherAware {
     }
 
     public void removeConnection(final String iId, final Connection iConnection) throws RepositoryException {
+        mLogger.info("Removing connection {}", iId);
+        
         synchronized (mConnections) {
             if (! mConnections.containsKey(iId)) {
                 throw new RepositoryException("connection " + iId + " not present in repository");

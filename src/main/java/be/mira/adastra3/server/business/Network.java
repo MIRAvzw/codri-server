@@ -83,9 +83,11 @@ public final class Network implements ApplicationEventPublisherAware {
     }
     
     public void addKiosk(final UUID iId, final Kiosk iKiosk) throws NetworkException {
+        mLogger.info("Adding kiosk {}", iId);
+        
         synchronized (mKiosks) {
             if (mKiosks.containsKey(iId)) {
-                throw new NetworkException("kiosk " + iId + " already present in network");
+                throw new NetworkException("kiosk " + iId + " already is present in network");
             }
             mKiosks.put(iId, iKiosk);            
         }
@@ -95,9 +97,11 @@ public final class Network implements ApplicationEventPublisherAware {
     }
     
     public void removeKiosk(final UUID iId, final Kiosk iKiosk) throws NetworkException {
+        mLogger.info("Removing kiosk {}", iId);
+        
         synchronized (mKiosks) {
             if (!mKiosks.containsKey(iId)) {
-                throw new NetworkException("kiosk " + iId + " not present in network");
+                throw new NetworkException("kiosk " + iId + " is not present in network");
             }
             mKiosks.remove(iId);
         }
