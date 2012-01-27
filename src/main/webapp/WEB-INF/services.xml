@@ -6,18 +6,22 @@
     All rights reserved.
 
 -->
+
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:mvc="http://www.springframework.org/schema/mvc"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:context="http://www.springframework.org/schema/context"       
+       xmlns:aop="http://www.springframework.org/schema/aop"
        xmlns:util="http://www.springframework.org/schema/util"
        xmlns:p="http://www.springframework.org/schema/p"
        xsi:schemaLocation="
-        http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.1.xsd
-        http://www.springframework.org/schema/mvc 
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+        http://www.springframework.org/schema/mvc
         http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
         http://www.springframework.org/schema/util
         http://www.springframework.org/schema/util/spring-util-3.1.xsd">
@@ -26,13 +30,19 @@
       Framework configuration
       -->
 
+    <!-- Use annotations -->
     <context:annotation-config />
-
+    
+    <!-- Load the service properties -->
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <value>classpath:services.properties</value>
         </property>
     </bean>
+    
+    <!-- Aspects -->
+    <aop:aspectj-autoproxy/>
+    <bean id="timingAspect" class="org.perf4j.slf4j.aop.TimingAspect"/>
 
     <!-- Bean postprocessors -->
     <bean class="be.mira.adastra3.spring.LoggerPostProcessor" />
@@ -85,11 +95,11 @@
 
     <bean id="connectionProcessor" class="be.mira.adastra3.server.bo.repository.processors.ConnectionProcessor" scope="prototype" />
     <bean id="configurationProcessor" class="be.mira.adastra3.server.bo.repository.processors.ConfigurationProcessor" scope="prototype" />
-    <bean class="be.mira.adastra3.server.bo.RepositoryMonitor" id="repositoryMonitor">
+    <!--<bean class="be.mira.adastra3.server.bo.RepositoryMonitor" id="repositoryMonitor">
         <constructor-arg ref="repository"/>
         <lookup-method name="createConnectionProcessor" bean="connectionProcessor"/>
         <lookup-method name="createConfigurationProcessor" bean="configurationProcessor"/>
-    </bean>
+    </bean>-->
 
 
     <!--
@@ -97,10 +107,10 @@
       -->
     
     <bean class="be.mira.adastra3.server.web.RepositoryController" id="repositoryController">
-        <constructor-arg ref="repository"/>
+        <property name="repository" ref="repository"/>
     </bean>
     
     <bean class="be.mira.adastra3.server.web.NetworkController" id="networkController">
-        <constructor-arg ref="network"/>
+        <property name="network" ref="network"/>
     </bean>
 </beans>

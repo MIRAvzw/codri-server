@@ -70,8 +70,8 @@ public final class Network implements ApplicationEventPublisherAware {
     // Basic I/O
     //
     
-    @XmlElementWrapper(name="devices")
-    @XmlElement(name="device")
+    @XmlElementWrapper(name="kiosks")
+    @XmlElement(name="kiosk")
     public Map<UUID, Kiosk> getKiosks() {
         return mKiosks;
     }

@@ -8,7 +8,9 @@ package be.mira.adastra3.server.web;
 
 import be.mira.adastra3.server.bo.Repository;
 import be.mira.adastra3.spring.Slf4jLogger;
+import org.perf4j.aop.Profiled;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -28,6 +30,7 @@ public class RepositoryController {
     @Slf4jLogger
     private Logger mLogger;
     
+    // TODO: can we make this final, despite the property injection?
     private Repository mRepository;
     
     
@@ -35,7 +38,8 @@ public class RepositoryController {
     // Construction and destruction
     //
     
-    public RepositoryController(final Repository iRepository) {
+    @Required
+    public void setRepository(final Repository iRepository) {
         mRepository = iRepository;
     }
     
@@ -44,9 +48,10 @@ public class RepositoryController {
     // REST endpoints
     //
     
+    @Profiled(tag="GET api/repository")
     @RequestMapping(method = RequestMethod.GET)
-    public final @ResponseBody
-    Repository getRepository() {        
+    @ResponseBody
+    public Repository getRepository() {        
         return mRepository;
     }
 }

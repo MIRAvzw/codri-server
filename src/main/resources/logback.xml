@@ -8,16 +8,44 @@
 -->
 
 <configuration>
+    
+    <property name="LOG_FOLDER" value="/tmp" />
+    
+    
+    <!--
+      Appenders
+    -->
 
-  <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
-    <layout class="ch.qos.logback.classic.PatternLayout">
-      <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
-    </layout>
-  </appender>
+    <appender name="logfile"
+              class="ch.qos.logback.core.FileAppender">
+        <file>${LOG_FOLDER}/server.log</file>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <!-- TODO: provide something parseable -->
+            <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
+        </layout>
+    </appender>
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <filter level="warn" />
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
+        </layout>
+    </appender>
+    
+    
+    <!--
+      Class configurations
+    -->
   
-  <logger name="org.springframework" level="info"/>
+    <logger name="org.springframework" level="info"/>
+    
+    
+    <!--
+      Actual output
+    -->
 
-  <root level="warn">
-    <appender-ref ref="console" />
-  </root>
+    <root level="debug">
+        <appender-ref ref="console" />
+        <appender-ref ref="logfile" />
+    </root>
 </configuration>
