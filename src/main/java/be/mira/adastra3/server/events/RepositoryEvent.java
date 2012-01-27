@@ -6,7 +6,7 @@
 
 package be.mira.adastra3.server.events;
 
-import be.mira.adastra3.server.repository.RepositoryEntity;
+import be.mira.adastra3.server.bo.repository.RepositoryEntity;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.util.Assert;
 

@@ -4,12 +4,12 @@
  * All rights reserved.
  */
 
-package be.mira.adastra3.server.business;
+package be.mira.adastra3.server.bo;
 
 import be.mira.adastra3.server.exceptions.RepositoryException;
-import be.mira.adastra3.server.repository.configuration.Configuration;
-import be.mira.adastra3.server.repository.connection.Connection;
-import be.mira.adastra3.server.repository.presentation.Presentation;
+import be.mira.adastra3.server.bo.repository.configuration.Configuration;
+import be.mira.adastra3.server.bo.repository.connection.Connection;
+import be.mira.adastra3.server.bo.repository.presentation.Presentation;
 import be.mira.adastra3.server.events.RepositoryConfigurationEvent;
 import be.mira.adastra3.server.events.RepositoryConnectionEvent;
 import be.mira.adastra3.server.events.RepositoryEvent;

@@ -4,9 +4,9 @@
  * All rights reserved.
  */
 
-package be.mira.adastra3.server.repository.presentation;
+package be.mira.adastra3.server.bo.repository.presentation;
 
-import be.mira.adastra3.server.repository.RepositoryEntity;
+import be.mira.adastra3.server.bo.repository.RepositoryEntity;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**

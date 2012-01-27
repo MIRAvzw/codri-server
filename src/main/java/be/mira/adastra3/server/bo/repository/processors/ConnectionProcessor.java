@@ -4,11 +4,11 @@
  * All rights reserved.
  */
 
-package be.mira.adastra3.server.repository.processors;
+package be.mira.adastra3.server.bo.repository.processors;
 
 import be.mira.adastra3.server.exceptions.InvalidStateException;
 import be.mira.adastra3.server.exceptions.RepositoryException;
-import be.mira.adastra3.server.repository.connection.Connection;
+import be.mira.adastra3.server.bo.repository.connection.Connection;
 import be.mira.adastra3.spring.Slf4jLogger;
 import java.io.File;
 import java.io.IOException;

@@ -6,7 +6,7 @@
 
 package be.mira.adastra3.server.events;
 
-import be.mira.adastra3.server.network.Kiosk;
+import be.mira.adastra3.server.bo.network.Kiosk;
 import java.util.UUID;
 
 /**

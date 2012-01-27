@@ -4,12 +4,12 @@
  * All rights reserved.
  */
 
-package be.mira.adastra3.server.repository.processors;
+package be.mira.adastra3.server.bo.repository.processors;
 
 import be.mira.adastra3.server.exceptions.InvalidStateException;
 import be.mira.adastra3.server.exceptions.RepositoryException;
-import be.mira.adastra3.server.repository.configuration.Configuration;
-import be.mira.adastra3.server.repository.configuration.SoundConfiguration;
+import be.mira.adastra3.server.bo.repository.configuration.Configuration;
+import be.mira.adastra3.server.bo.repository.configuration.SoundConfiguration;
 import be.mira.adastra3.spring.Slf4jLogger;
 import java.io.File;
 import java.io.IOException;

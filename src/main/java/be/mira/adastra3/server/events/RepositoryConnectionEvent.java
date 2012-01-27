@@ -6,7 +6,7 @@
 
 package be.mira.adastra3.server.events;
 
-import be.mira.adastra3.server.repository.connection.Connection;
+import be.mira.adastra3.server.bo.repository.connection.Connection;
 
 /**
  *

@@ -4,7 +4,7 @@
  * All rights reserved.
  */
 
-package be.mira.adastra3.server.repository.processors;
+package be.mira.adastra3.server.bo.repository.processors;
 
 import be.mira.adastra3.server.exceptions.RepositoryException;
 import java.io.File;

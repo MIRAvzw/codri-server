@@ -4,9 +4,9 @@
  * All rights reserved.
  */
 
-package be.mira.adastra3.server.repository.connection;
+package be.mira.adastra3.server.bo.repository.connection;
 
-import be.mira.adastra3.server.repository.RepositoryEntity;
+import be.mira.adastra3.server.bo.repository.RepositoryEntity;
 import java.util.UUID;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;

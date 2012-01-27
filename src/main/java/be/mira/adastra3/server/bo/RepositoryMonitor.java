@@ -4,15 +4,15 @@
  * All rights reserved.
  */
 
-package be.mira.adastra3.server.business;
+package be.mira.adastra3.server.bo;
 
-import be.mira.adastra3.server.repository.processors.ConfigurationProcessor;
+import be.mira.adastra3.server.bo.repository.processors.ConfigurationProcessor;
 import be.mira.adastra3.server.exceptions.RepositoryException;
-import be.mira.adastra3.server.repository.RepositoryEntity;
-import be.mira.adastra3.server.repository.configuration.Configuration;
-import be.mira.adastra3.server.repository.connection.Connection;
-import be.mira.adastra3.server.repository.presentation.Presentation;
-import be.mira.adastra3.server.repository.processors.ConnectionProcessor;
+import be.mira.adastra3.server.bo.repository.RepositoryEntity;
+import be.mira.adastra3.server.bo.repository.configuration.Configuration;
+import be.mira.adastra3.server.bo.repository.connection.Connection;
+import be.mira.adastra3.server.bo.repository.presentation.Presentation;
+import be.mira.adastra3.server.bo.repository.processors.ConnectionProcessor;
 import be.mira.adastra3.spring.Slf4jLogger;
 import java.io.File;
 import java.io.FilenameFilter;

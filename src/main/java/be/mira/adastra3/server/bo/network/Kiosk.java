@@ -4,11 +4,11 @@
  * All rights reserved.
  */
 
-package be.mira.adastra3.server.network;
+package be.mira.adastra3.server.bo.network;
 
 import be.mira.adastra3.server.exceptions.DeviceException;
-import be.mira.adastra3.server.repository.configuration.Configuration;
-import be.mira.adastra3.server.repository.presentation.Presentation;
+import be.mira.adastra3.server.bo.repository.configuration.Configuration;
+import be.mira.adastra3.server.bo.repository.presentation.Presentation;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 

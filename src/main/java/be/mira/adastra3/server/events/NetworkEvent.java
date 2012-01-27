@@ -6,7 +6,7 @@
 
 package be.mira.adastra3.server.events;
 
-import be.mira.adastra3.server.network.NetworkEntity;
+import be.mira.adastra3.server.bo.network.NetworkEntity;
 import java.util.UUID;
 import org.springframework.context.ApplicationEvent;
 

@@ -4,13 +4,13 @@
  * All rights reserved.
  */
 
-package be.mira.adastra3.server.business;
+package be.mira.adastra3.server.bo;
 
 import be.mira.adastra3.server.exceptions.NetworkException;
 import be.mira.adastra3.server.events.NetworkEvent;
 import be.mira.adastra3.server.events.NetworkEvent.NetworkEventType;
 import be.mira.adastra3.server.events.NetworkKioskEvent;
-import be.mira.adastra3.server.network.Kiosk;
+import be.mira.adastra3.server.bo.network.Kiosk;
 import be.mira.adastra3.spring.Slf4jLogger;
 import java.util.HashMap;
 import java.util.Map;

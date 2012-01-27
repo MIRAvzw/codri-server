@@ -4,14 +4,14 @@
  * All rights reserved.
  */
 
-package be.mira.adastra3.server.business;
+package be.mira.adastra3.server.bo;
 
 import be.mira.adastra3.server.events.*;
 import be.mira.adastra3.server.exceptions.DeviceException;
-import be.mira.adastra3.server.network.Kiosk;
-import be.mira.adastra3.server.repository.configuration.Configuration;
-import be.mira.adastra3.server.repository.connection.Connection;
-import be.mira.adastra3.server.repository.presentation.Presentation;
+import be.mira.adastra3.server.bo.network.Kiosk;
+import be.mira.adastra3.server.bo.repository.configuration.Configuration;
+import be.mira.adastra3.server.bo.repository.connection.Connection;
+import be.mira.adastra3.server.bo.repository.presentation.Presentation;
 import be.mira.adastra3.spring.Slf4jLogger;
 import java.util.ArrayList;
 import java.util.HashMap;

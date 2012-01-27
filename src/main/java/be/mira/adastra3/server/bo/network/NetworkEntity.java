@@ -4,7 +4,7 @@
  * All rights reserved.
  */
 
-package be.mira.adastra3.server.network;
+package be.mira.adastra3.server.bo.network;
 
 import java.util.Date;
 

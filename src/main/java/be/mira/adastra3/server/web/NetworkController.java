@@ -6,9 +6,9 @@
 
 package be.mira.adastra3.server.web;
 
-import be.mira.adastra3.server.business.Network;
+import be.mira.adastra3.server.bo.Network;
 import be.mira.adastra3.server.exceptions.NetworkException;
-import be.mira.adastra3.server.network.Kiosk;
+import be.mira.adastra3.server.bo.network.Kiosk;
 import be.mira.adastra3.spring.Slf4jLogger;
 import java.io.IOException;
 import java.util.UUID;

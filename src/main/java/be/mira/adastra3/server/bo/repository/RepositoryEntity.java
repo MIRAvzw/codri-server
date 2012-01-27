@@ -4,7 +4,7 @@
  * All rights reserved.
  */
 
-package be.mira.adastra3.server.repository;
+package be.mira.adastra3.server.bo.repository;
 
 /**
  *
