@@ -71,9 +71,6 @@
         <pluginRepository>
             <id>mc-release</id>
             <url>http://mc-repo.googlecode.com/svn/maven2/releases</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
         </pluginRepository>
     </pluginRepositories>
   
@@ -207,12 +204,14 @@
             <plugin>
                 <groupId>com.mycila.maven-license-plugin</groupId>
                 <artifactId>maven-license-plugin</artifactId>
+                <version>1.9.0</version>
                 <configuration>
                     <header>src/etc/header.txt</header>
                     <includes>
                         <include>src/**</include>
                     </includes>
                     <skipExistingHeaders>true</skipExistingHeaders>
+                    <strictCheck>true</strictCheck>
                 </configuration>
                 <executions>
                     <execution>
