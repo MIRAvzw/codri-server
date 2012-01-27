@@ -6,6 +6,8 @@
 
 package be.mira.adastra3.server.bo.repository;
 
+import javax.xml.bind.annotation.XmlElement;
+
 /**
  *
  * @author tim
@@ -17,17 +19,15 @@ public abstract class RepositoryEntity {
     
     private final Long mRevision;
     private final String mPath;
-    private final String mServer; // FIXME: duplicate information
     
     
     //
     // Construction and destruction
     //
     
-    public RepositoryEntity(final Long iRevision, final String iPath, final String iServer) {
+    public RepositoryEntity(final Long iRevision, final String iPath) {
         mRevision = iRevision;
         mPath = iPath;
-        mServer = iServer;
     }
     
     
@@ -35,15 +35,13 @@ public abstract class RepositoryEntity {
     // Getters & setters
     //
     
+    @XmlElement
     public final long getRevision() {
         return mRevision;
     }
     
+    @XmlElement
     public final String getPath() {
         return mPath;
     }
-    
-    public final String getLocation() {
-        return mServer + getPath();
-    }    
 }

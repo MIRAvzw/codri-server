@@ -9,6 +9,7 @@ package be.mira.adastra3.server.bo.network;
 import be.mira.adastra3.server.exceptions.DeviceException;
 import be.mira.adastra3.server.bo.repository.configuration.Configuration;
 import be.mira.adastra3.server.bo.repository.presentation.Presentation;
+import javax.xml.bind.annotation.XmlRootElement;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 
@@ -16,6 +17,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
  *
  * @author tim
  */
+@XmlRootElement(name="kiosk")
 public class Kiosk extends NetworkEntity {
     //
     // Member data

@@ -7,6 +7,7 @@
 package be.mira.adastra3.server.bo.network;
 
 import java.util.Date;
+import javax.xml.bind.annotation.XmlElement;
 
 /**
  *
@@ -37,14 +38,17 @@ public abstract class NetworkEntity {
     // Getters and setters
     //
     
+    @XmlElement
     public final String getVendor() {
         return mVendor;
     }
     
+    @XmlElement
     public final String getModel() {
         return mModel;
     }
     
+    @XmlElement
     public final String getAddress() {
         return mAddress;
     }
@@ -53,6 +57,7 @@ public abstract class NetworkEntity {
         mAddress = iAddress;
     }
     
+    @XmlElement
     public final Date getHeartbeat() {
         return mHeartbeat;
     }
@@ -61,6 +66,7 @@ public abstract class NetworkEntity {
         mHeartbeat = new Date();
     }
     
+    @XmlElement
     public final long getHeartbeatDelta() {
         return (new Date().getTime()) - mHeartbeat.getTime();
     }

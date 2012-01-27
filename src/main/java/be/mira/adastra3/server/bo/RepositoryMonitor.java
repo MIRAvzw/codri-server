@@ -212,7 +212,7 @@ public abstract class RepositoryMonitor {
         Map<String, Long> tPathEntries = getChildrenRevisions(mSVNLocation + "/presentations");
         for (Map.Entry<String, Long> tEntry: tPathEntries.entrySet()) {
             String tPath = "/presentations/" + tEntry.getKey();
-            Presentation tMedia = new Presentation(tEntry.getValue(), tPath, mSVNLocation);
+            Presentation tMedia = new Presentation(tEntry.getValue(), tPath);
             tNewPresentations.put(tEntry.getKey(), tMedia);
         }
         
@@ -289,7 +289,7 @@ public abstract class RepositoryMonitor {
             
             // Process the contents
             String tRepositoryPath = "/configurations/" + tFilename;
-            ConfigurationProcessor tReader = createConfigurationProcessor(tRevision, tRepositoryPath, mSVNLocation, tFile);
+            ConfigurationProcessor tReader = createConfigurationProcessor(tRevision, tRepositoryPath, tFile);
             tReader.process();
             Configuration tConfiguration = tReader.getConfiguration();
             if (tConfiguration == null) {
@@ -374,7 +374,7 @@ public abstract class RepositoryMonitor {
             
             // Process the contents
             String tRepositoryPath = "/connections/" + tFilename;
-            ConnectionProcessor tReader = createConnectionProcessor(tRevision, tRepositoryPath, mSVNLocation, tFile);
+            ConnectionProcessor tReader = createConnectionProcessor(tRevision, tRepositoryPath, tFile);
             tReader.process();
             Connection tConnection = tReader.getConnection();
             if (tConnection == null) {
@@ -576,6 +576,6 @@ public abstract class RepositoryMonitor {
     // Abstract method injectors
     //
     
-    protected abstract ConnectionProcessor createConnectionProcessor(final long iRevision, final String iRepositoryPath, final String iRepositoryLocation, final File iFile);
-    protected abstract ConfigurationProcessor createConfigurationProcessor(final long iRevision, final String iRepositoryPath, final String iRepositoryLocation, final File iFile);
+    protected abstract ConnectionProcessor createConnectionProcessor(final long iRevision, final String iPath, final File iFile);
+    protected abstract ConfigurationProcessor createConfigurationProcessor(final long iRevision, final String iPath, final File iFile);
 }
