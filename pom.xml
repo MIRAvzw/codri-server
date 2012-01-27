@@ -88,12 +88,6 @@
            <groupId>org.springframework</groupId>
            <artifactId>spring-context</artifactId>
            <version>3.1.0.RELEASE</version>
-           <exclusions>
-              <exclusion>
-                 <groupId>commons-logging</groupId>
-                 <artifactId>commons-logging</artifactId>
-              </exclusion>
-           </exclusions>
         </dependency>
         <dependency>
             <groupId>cglib</groupId>
@@ -158,17 +152,28 @@
            <artifactId>slf4j-api</artifactId>
            <version>1.6.4</version>
         </dependency>
-        <dependency> <!-- Redirect commons-logging to SLF4J -->
+        <dependency> <!-- We don't want the JCL provider -->
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+          <version>1.1.1</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency> <!-- Redirect commons-logging -->
            <groupId>org.slf4j</groupId>
            <artifactId>jcl-over-slf4j</artifactId>
            <version>1.6.4</version>
            <scope>runtime</scope>
         </dependency>
-        <dependency> <!-- Redirect log4j to SLF4J -->
+        <dependency> <!-- Redirect log4j -->
           <groupId>org.slf4j</groupId>
           <artifactId>log4j-over-slf4j</artifactId>
           <version>1.6.4</version>
           <scope>runtime</scope>
+        </dependency>
+        <dependency> <!-- Redirect JUL -->
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+            <version>1.6.4</version>
         </dependency>
         <dependency> <!-- Actual logging implementation -->
            <groupId>ch.qos.logback</groupId>
