@@ -7,8 +7,8 @@
 package be.mira.adastra3.server.web;
 
 import be.mira.adastra3.server.business.Repository;
-import be.mira.adastra3.spring.Logger;
-import org.apache.commons.logging.Log;
+import be.mira.adastra3.spring.Slf4jLogger;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,8 +25,8 @@ public class RepositoryController {
     // Member data
     //
     
-    @Logger
-    private Log mLogger;
+    @Slf4jLogger
+    private Logger mLogger;
     
     private Repository mRepository;
     

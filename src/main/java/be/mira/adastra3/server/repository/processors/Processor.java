@@ -19,8 +19,8 @@ import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -31,7 +31,7 @@ public class Processor {
     // Member data
     //
     
-    private Log mLogger;
+    private Logger mLogger;
     
     protected static XmlPullParserFactory PARSER_FACTORY;
     protected XmlPullParser mParser;
@@ -43,7 +43,7 @@ public class Processor {
     
     public Processor(final File iFile, final String iValidationFilename) throws RepositoryException { 
         // FIXME: acquire a configured logger properly. Bean?
-        mLogger = LogFactory.getLog(this.getClass());
+        mLogger = LoggerFactory.getLogger(this.getClass());
         
         // Validate the file
         // TODO: do this within the pull parser

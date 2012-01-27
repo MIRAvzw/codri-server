@@ -10,12 +10,12 @@ import be.mira.adastra3.server.exceptions.RepositoryException;
 import be.mira.adastra3.server.repository.configuration.Configuration;
 import be.mira.adastra3.server.repository.connection.Connection;
 import be.mira.adastra3.server.repository.presentation.Presentation;
-import be.mira.adastra3.spring.Logger;
 import be.mira.adastra3.server.events.RepositoryConfigurationEvent;
 import be.mira.adastra3.server.events.RepositoryConnectionEvent;
 import be.mira.adastra3.server.events.RepositoryEvent;
 import be.mira.adastra3.server.events.RepositoryEvent.RepositoryEventType;
 import be.mira.adastra3.server.events.RepositoryPresentationEvent;
+import be.mira.adastra3.spring.Slf4jLogger;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.PostConstruct;
@@ -23,7 +23,7 @@ import javax.annotation.PreDestroy;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 
@@ -37,8 +37,8 @@ public final class Repository implements ApplicationEventPublisherAware {
     // Member data
     //
     
-    @Logger
-    private Log mLogger;
+    @Slf4jLogger
+    private Logger mLogger;
     
     private ApplicationEventPublisher mPublisher;
     

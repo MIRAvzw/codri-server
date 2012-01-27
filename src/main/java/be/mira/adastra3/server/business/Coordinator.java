@@ -7,17 +7,17 @@
 package be.mira.adastra3.server.business;
 
 import be.mira.adastra3.server.events.*;
-import be.mira.adastra3.spring.Logger;
 import be.mira.adastra3.server.exceptions.DeviceException;
 import be.mira.adastra3.server.network.Kiosk;
 import be.mira.adastra3.server.repository.configuration.Configuration;
 import be.mira.adastra3.server.repository.connection.Connection;
 import be.mira.adastra3.server.repository.presentation.Presentation;
+import be.mira.adastra3.spring.Slf4jLogger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 
@@ -30,8 +30,8 @@ public class Coordinator implements ApplicationListener<ApplicationEvent> {
     // Data members
     //
     
-    @Logger
-    private Log mLogger;
+    @Slf4jLogger
+    private Logger mLogger;
     
     private Network mNetwork;
     private Repository mRepository;

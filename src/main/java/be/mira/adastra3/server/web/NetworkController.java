@@ -9,12 +9,12 @@ package be.mira.adastra3.server.web;
 import be.mira.adastra3.server.business.Network;
 import be.mira.adastra3.server.exceptions.NetworkException;
 import be.mira.adastra3.server.network.Kiosk;
-import be.mira.adastra3.spring.Logger;
+import be.mira.adastra3.spring.Slf4jLogger;
 import java.io.IOException;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -30,8 +30,8 @@ public class NetworkController {
     // Member data
     //
     
-    @Logger
-    private Log mLogger;
+    @Slf4jLogger
+    private Logger mLogger;
     
     private Network mNetwork;
     

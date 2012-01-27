@@ -22,5 +22,5 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 @Target(FIELD)
 @Documented
-public @interface Logger {
+public @interface Slf4jLogger {
 }

@@ -14,9 +14,8 @@ package be.mira.adastra3.spring;
  */
 import java.lang.reflect.Field;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.BeansException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.util.ReflectionUtils;
 
@@ -39,8 +38,8 @@ public class LoggerPostProcessor implements BeanPostProcessor {
             public final void doWith(final Field iField) throws IllegalAccessException {
                 // Make the field accessible if defined private  
                 ReflectionUtils.makeAccessible(iField);
-                if (iField.getAnnotation(Logger.class) != null) {
-                    Log tLog = LogFactory.getLog(iBean.getClass());
+                if (iField.getAnnotation(Slf4jLogger.class) != null) {
+                    Logger tLog = LoggerFactory.getLogger(iBean.getClass());
                     iField.set(iBean, tLog);
                 }
             }

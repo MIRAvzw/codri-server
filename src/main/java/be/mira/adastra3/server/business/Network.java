@@ -7,11 +7,11 @@
 package be.mira.adastra3.server.business;
 
 import be.mira.adastra3.server.exceptions.NetworkException;
-import be.mira.adastra3.spring.Logger;
 import be.mira.adastra3.server.events.NetworkEvent;
 import be.mira.adastra3.server.events.NetworkEvent.NetworkEventType;
 import be.mira.adastra3.server.events.NetworkKioskEvent;
 import be.mira.adastra3.server.network.Kiosk;
+import be.mira.adastra3.spring.Slf4jLogger;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -20,7 +20,7 @@ import javax.annotation.PreDestroy;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 
@@ -34,8 +34,8 @@ public final class Network implements ApplicationEventPublisherAware {
     // Member data
     //
     
-    @Logger
-    private Log mLogger;
+    @Slf4jLogger
+    private Logger mLogger;
     
     private ApplicationEventPublisher mPublisher;
     

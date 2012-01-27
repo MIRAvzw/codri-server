@@ -13,7 +13,7 @@ import be.mira.adastra3.server.repository.configuration.Configuration;
 import be.mira.adastra3.server.repository.connection.Connection;
 import be.mira.adastra3.server.repository.presentation.Presentation;
 import be.mira.adastra3.server.repository.processors.ConnectionProcessor;
-import be.mira.adastra3.spring.Logger;
+import be.mira.adastra3.spring.Slf4jLogger;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -27,7 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.logging.Log;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.Depth;
@@ -45,8 +45,8 @@ public class RepositoryMonitor {
     // Data members
     //
     
-    @Logger
-    private Log mLogger;
+    @Slf4jLogger
+    private Logger mLogger;
     
     private Repository mRepository;
 
