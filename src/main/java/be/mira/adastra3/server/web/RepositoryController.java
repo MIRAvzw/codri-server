@@ -10,6 +10,7 @@ import be.mira.adastra3.server.bo.Repository;
 import be.mira.adastra3.spring.Slf4jLogger;
 import org.perf4j.aop.Profiled;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,6 +40,7 @@ public class RepositoryController {
     //
     
     @Required
+    @Autowired
     public void setRepository(final Repository iRepository) {
         mRepository = iRepository;
     }

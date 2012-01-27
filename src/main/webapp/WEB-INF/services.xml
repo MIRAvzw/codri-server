@@ -88,15 +88,11 @@
     <bean class="be.mira.adastra3.server.bo.Repository" id="repository" />
     <bean class="be.mira.adastra3.server.bo.Network" id="network" />
 
-    <bean class="be.mira.adastra3.server.bo.Coordinator">
-        <constructor-arg ref="repository"/>
-        <constructor-arg ref="network"/>
-    </bean>
+    <bean class="be.mira.adastra3.server.bo.Coordinator" />
 
     <bean id="connectionProcessor" class="be.mira.adastra3.server.bo.repository.processors.ConnectionProcessor" scope="prototype" />
     <bean id="configurationProcessor" class="be.mira.adastra3.server.bo.repository.processors.ConfigurationProcessor" scope="prototype" />
-    <!--<bean class="be.mira.adastra3.server.bo.RepositoryMonitor" id="repositoryMonitor">
-        <constructor-arg ref="repository"/>
+    <!--<bean class="be.mira.adastra3.server.bo.RepositoryMonitor" id="repositoryMonitor" />
         <lookup-method name="createConnectionProcessor" bean="connectionProcessor"/>
         <lookup-method name="createConfigurationProcessor" bean="configurationProcessor"/>
     </bean>-->
@@ -106,11 +102,7 @@
       Web
       -->
     
-    <bean class="be.mira.adastra3.server.web.RepositoryController" id="repositoryController">
-        <property name="repository" ref="repository"/>
-    </bean>
+    <bean class="be.mira.adastra3.server.web.RepositoryController" id="repositoryController" />
     
-    <bean class="be.mira.adastra3.server.web.NetworkController" id="networkController">
-        <property name="network" ref="network"/>
-    </bean>
+    <bean class="be.mira.adastra3.server.web.NetworkController" id="networkController" />
 </beans>

@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 
@@ -39,10 +41,17 @@ public class Coordinator implements ApplicationListener<ApplicationEvent> {
     
     //
     // Construction and destruction
-    //
+    //    
     
-    public Coordinator(final Network iNetwork, final Repository iRepository) {
+    @Required
+    @Autowired
+    public void setNetwork(Network iNetwork) {
         mNetwork = iNetwork;
+    }
+    
+    @Required
+    @Autowired
+    public void setRepository(Repository iRepository) {
         mRepository = iRepository;
     }
     

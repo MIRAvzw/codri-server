@@ -28,6 +28,8 @@ import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.beans.factory.annotation.Value;
 import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.Depth;
@@ -65,8 +67,10 @@ public abstract class RepositoryMonitor {
     //
     // Construction and destruction
     //
-
-    public RepositoryMonitor(final Repository iRepository) {
+    
+    @Required
+    @Autowired
+    public void setRepository(Repository iRepository) {
         mRepository = iRepository;
     }
 

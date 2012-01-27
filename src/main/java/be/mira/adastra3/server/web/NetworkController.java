@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.perf4j.aop.Profiled;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -44,6 +45,7 @@ public class NetworkController {
     //
     
     @Required
+    @Autowired
     public void setNetwork(final Network iNetwork) {
         mNetwork = iNetwork;
     }
