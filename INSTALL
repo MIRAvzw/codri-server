@@ -1,0 +1,15 @@
+Subversion JavaHL
+-----------------
+
+Codri makes use of the native JavaHL bindings Subversion provides. This means that
+you need to install these libraries, and make sure they can be accessed properly.
+
+a) install the bindings
+Debian: aptitude install libsvn-java
+
+b) add the native library path to java.properties.path
+Debian: nothing to do, /usr/lib/jni already in java.properties.path
+
+c) add the java library to Tomcat's classpath
+Debian: ln -s /usr/share/java/svn-javahl.jar /var/lib/tomcat6/shared/svn-javahl.jar
+        (assuming shared.loader contains /var/lib/tomcat6/shared/*.jar)
