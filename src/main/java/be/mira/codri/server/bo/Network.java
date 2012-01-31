@@ -55,11 +55,6 @@ public final class Network implements ApplicationEventPublisherAware {
         mPublisher = iPublisher;
     }
     
-    @PostConstruct
-    public void init() {
-        
-    }
-    
     @PreDestroy
     public void destroy() {
         mKiosks.clear();

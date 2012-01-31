@@ -7,7 +7,7 @@
 
 -->
 <web-app id="codri-server" version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
-    <display-name>Codri - Backend server</display-name>
+    <display-name>Codri backend server</display-name>
     
     <servlet>
         <servlet-name>springDispatcher</servlet-name>

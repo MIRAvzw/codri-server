@@ -286,14 +286,14 @@ public abstract class RepositoryMonitor {
         for (File tFile: tDirectory.listFiles(new XMLFilter())) {
             // Generate an identifier
             String tFilename = tFile.getName();
-            mLogger.trace("Processing '{}'", tFilename);
+            mLogger.trace("Processing '{}'", tFile.getAbsoluteFile());
             int tDotPosition = tFilename.lastIndexOf('.');
             String tId = tFilename.substring(0, tDotPosition);
             final long tRevision = getRevision(tFile);
             
             // Process the contents
             String tRepositoryPath = "/configurations/" + tFilename;
-            ConfigurationProcessor tReader = createConfigurationProcessor(tRevision, tRepositoryPath, tFile);
+            ConfigurationProcessor tReader = createConfigurationProcessorWrapper(tRevision, tRepositoryPath, tFile);
             tReader.process();
             Configuration tConfiguration = tReader.getConfiguration();
             if (tConfiguration == null) {
@@ -371,14 +371,14 @@ public abstract class RepositoryMonitor {
         for (File tFile: tDirectory.listFiles(new XMLFilter())) {
             // Generate an identifier
             String tFilename = tFile.getName();
-            mLogger.trace("Processing '{}'", tFilename);
+            mLogger.trace("Processing '{}'", tFile.getAbsoluteFile());
             int tDotPosition = tFilename.lastIndexOf('.');
             String tId = tFilename.substring(0, tDotPosition);
             final long tRevision = getRevision(tFile);
             
             // Process the contents
             String tRepositoryPath = "/connections/" + tFilename;
-            ConnectionProcessor tReader = createConnectionProcessor(tRevision, tRepositoryPath, tFile);
+            ConnectionProcessor tReader = createConnectionProcessorWrapper(tRevision, tRepositoryPath, tFile);
             tReader.process();
             Connection tConnection = tReader.getConnection();
             if (tConnection == null) {
@@ -577,9 +577,28 @@ public abstract class RepositoryMonitor {
     
     
     //
-    // Abstract method injectors
+    // Prototype bean injectors
     //
     
-    protected abstract ConnectionProcessor createConnectionProcessor(final long iRevision, final String iPath, final File iFile);
-    protected abstract ConfigurationProcessor createConfigurationProcessor(final long iRevision, final String iPath, final File iFile);
+    // TODO: remove these method injection wrappers
+    
+    private ConnectionProcessor createConnectionProcessorWrapper(final long iRevision, final String iPath, final File iFile) throws RepositoryException {
+        ConnectionProcessor tBean = createConnectionProcessor();
+        tBean.setRevision(iRevision);
+        tBean.setPath(iPath);
+        tBean.setFile(iFile);
+        tBean.init();
+        return tBean;
+    }
+    private ConfigurationProcessor createConfigurationProcessorWrapper(final long iRevision, final String iPath, final File iFile) throws RepositoryException {
+        ConfigurationProcessor tBean = createConfigurationProcessor();
+        tBean.setRevision(iRevision);
+        tBean.setPath(iPath);
+        tBean.setFile(iFile);
+        tBean.init();
+        return tBean;
+    }
+    
+    protected abstract ConnectionProcessor createConnectionProcessor();
+    protected abstract ConfigurationProcessor createConfigurationProcessor();
 }

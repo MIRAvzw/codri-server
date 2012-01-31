@@ -10,7 +10,6 @@ import be.mira.codri.server.exceptions.InvalidStateException;
 import be.mira.codri.server.exceptions.RepositoryException;
 import be.mira.codri.server.bo.repository.connection.Connection;
 import be.mira.codri.server.spring.Slf4jLogger;
-import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 import javax.xml.stream.XMLStreamConstants;
@@ -29,9 +28,10 @@ public class ConnectionProcessor extends Processor {
     @Slf4jLogger
     private Logger mLogger;
     
+    private long mRevision;
+    private String mPath;
+    
     private Connection mConnection;
-    private final long mRevision;
-    private final String mPath;
     
     
     
@@ -40,10 +40,23 @@ public class ConnectionProcessor extends Processor {
     // Construction and destruction
     //
     
-    public ConnectionProcessor(final long iRevision, final String iPath, final File iFile) throws RepositoryException {
-        super(iFile, "connection.xsd");
+    // TODO: use typical bean construction
+    
+    //@Required
+    public void setRevision(final long iRevision) {
         mRevision = iRevision;
+    }
+    
+    //@Required
+    public void setPath(final String iPath) {
         mPath = iPath;
+    }
+    
+    //@PostConstruct
+    @Override
+    public void init() throws RepositoryException {
+        setValidationFilename("connection.xsd");
+        super.init();
     }
     
     
@@ -54,8 +67,9 @@ public class ConnectionProcessor extends Processor {
     public final void process() throws RepositoryException {
         try {
             // Setup parsing
-            if (getParser().getEventType() != XMLStreamConstants.START_DOCUMENT) {
-                throw new RepositoryException("not at start of document");
+            if (getParser().getEventType() != XMLStreamConstants.START_DOCUMENT
+                    && getParser().getEventType() != XMLStreamConstants.START_ELEMENT) {
+                throw new RepositoryException("not at start of document or element");
             }
             
             // Process tags

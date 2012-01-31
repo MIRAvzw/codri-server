@@ -11,12 +11,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import javax.xml.stream.*;
-import javax.xml.transform.stax.StAXSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
-import org.xml.sax.SAXException;
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import org.codehaus.stax2.XMLInputFactory2;
+import org.codehaus.stax2.XMLStreamReader2;
+import org.codehaus.stax2.validation.XMLValidationSchema;
+import org.codehaus.stax2.validation.XMLValidationSchemaFactory;
 
 /**
  *
@@ -27,50 +28,64 @@ public abstract class Processor {
     // Member data
     //
     
-    private static XMLInputFactory PARSER_FACTORY;
-    private final XMLStreamReader mParser;
+    private File mFile;
+    private String mValidationFilename;
+    
+    private static XMLInputFactory2 PARSER_FACTORY;
+    private XMLStreamReader2 mParser;
+    private static XMLValidationSchemaFactory VALIDATOR_FACTORY;
+    private XMLValidationSchema mValidator;
             
             
     //
     // Construction and destruction
     //
     
-    public Processor(final File iFile, final String iValidationFilename) throws RepositoryException {           
-        // Setup the parser factory
-        try {
-            if (PARSER_FACTORY == null) {
-                PARSER_FACTORY = XMLInputFactory.newInstance();   
-
-                //PARSER_FACTORY.setNamespaceAware(true);
-                //PARSER_FACTORY.setValidating(false);       
+    // TODO: use typical bean construction
+    
+    //@Required
+    public void setFile(final File iFile) {
+        mFile = iFile;
+    }
+    
+    //@Required
+    public void setValidationFilename(final String iValidationFilename) {
+        mValidationFilename = iValidationFilename;
+    }
+    
+    //@PostConstruct
+    public void init() throws RepositoryException {        
+        // Create a validator
+        try {           
+            // Create the validator factory
+            if (VALIDATOR_FACTORY == null) {
+                VALIDATOR_FACTORY = XMLValidationSchemaFactory.newInstance(XMLValidationSchema.SCHEMA_ID_W3C_SCHEMA);
             }
+            
+            // Create a schema instance
+            mValidator = VALIDATOR_FACTORY.createSchema(this.getClass().getClassLoader().getResource(mValidationFilename));
         } catch (FactoryConfigurationError tException) {
-            throw new RepositoryException("could not set-up the XML parser", tException);
+            throw new RepositoryException("could not acquire schema validator factory", tException);
+        } catch (XMLStreamException tException) {
+            throw new RepositoryException("could not create schema validator", tException);
         }
         
         // Parse the file
-        try {    
-            mParser = PARSER_FACTORY.createXMLStreamReader(new FileInputStream(iFile));
+        try {
+            // Create the parser factory
+            if (PARSER_FACTORY == null) {
+                PARSER_FACTORY = (XMLInputFactory2) XMLInputFactory2.newInstance(); 
+            }
+            
+            // Create the parser
+            mParser = (XMLStreamReader2) PARSER_FACTORY.createXMLStreamReader(new FileInputStream(mFile));
+            mParser.validateAgainst(mValidator);
+        } catch(FactoryConfigurationError tException) {
+            throw new RepositoryException("could not acquire XML parser factory", tException);
         } catch (XMLStreamException tException) {
-            throw new RepositoryException("could not parse XML file", tException);
+            throw new RepositoryException("could not create XML parser", tException);
         } catch (FileNotFoundException tException) {
             throw new RepositoryException("could not open XML file", tException);
-        }  
-        
-        // Validate the file
-        // TODO: do this within the stream parser (use Stax2, http://stackoverflow.com/questions/5793087/stax-xml-validation)
-        if (iValidationFilename != null) {
-            try {
-                String tSchemaLanguage = "http://www.w3.org/2001/XMLSchema";
-                SchemaFactory tSchemaFactory = SchemaFactory.newInstance(tSchemaLanguage);
-                Schema tSchema = tSchemaFactory.newSchema(this.getClass().getClassLoader().getResource(iValidationFilename));
-                Validator tValidator = tSchema.newValidator();
-                tValidator.validate(new StAXSource(mParser));
-            } catch (SAXException tException) {
-                throw new RepositoryException("could not validate file", tException);
-            } catch (IOException tException) {
-                throw new RepositoryException("could not open schema", tException);
-            }
         }
     }
     
@@ -79,7 +94,7 @@ public abstract class Processor {
     // Basic I/O
     //
     
-    protected final XMLStreamReader getParser() {
+    protected final XMLStreamReader2 getParser() {
         return mParser;
     }
     

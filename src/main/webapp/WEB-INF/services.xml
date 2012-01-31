@@ -41,7 +41,7 @@
         <property name="locations">
             <list>
                 <value>classpath:defaults.properties</value>
-                <value>file:/etc/cobri/server.properties</value>
+                <value>file:/etc/codri/server.properties</value>
             </list>
         </property>
     </bean>
