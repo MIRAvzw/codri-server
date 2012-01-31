@@ -4,7 +4,7 @@
  * All rights reserved.
  */
 
-package be.mira.codri.spring;
+package be.mira.codri.server.spring;
 
 /**
  * Auto injects the underlying implementation of logger into the bean with field

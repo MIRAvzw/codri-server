@@ -7,7 +7,7 @@
 package be.mira.codri.server.web;
 
 import be.mira.codri.server.bo.Repository;
-import be.mira.codri.spring.Slf4jLogger;
+import be.mira.codri.server.spring.Slf4jLogger;
 import org.perf4j.aop.Profiled;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

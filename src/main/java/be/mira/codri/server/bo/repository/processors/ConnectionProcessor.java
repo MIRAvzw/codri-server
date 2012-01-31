@@ -9,7 +9,7 @@ package be.mira.codri.server.bo.repository.processors;
 import be.mira.codri.server.exceptions.InvalidStateException;
 import be.mira.codri.server.exceptions.RepositoryException;
 import be.mira.codri.server.bo.repository.connection.Connection;
-import be.mira.codri.spring.Slf4jLogger;
+import be.mira.codri.server.spring.Slf4jLogger;
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;

@@ -36,7 +36,10 @@
     <!-- Load the service properties -->
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
-            <value>classpath:services.properties</value>
+            <list>
+                <value>classpath:defaults.properties</value>
+                <value>file:/etc/cobri/server.properties</value>
+            </list>
         </property>
     </bean>
     
@@ -45,10 +48,10 @@
     <bean id="timingAspect" class="org.perf4j.slf4j.aop.TimingAspect"/>
 
     <!-- Bean postprocessors -->
-    <bean class="be.mira.codri.spring.LoggerPostProcessor" />
+    <bean class="be.mira.codri.server.spring.LoggerPostProcessor" />
 
     <!-- Field converters -->
-    <bean class="be.mira.codri.spring.UUIDConverter" />
+    <bean class="be.mira.codri.server.spring.UUIDConverter" />
 
 
     <!--

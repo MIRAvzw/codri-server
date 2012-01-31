@@ -15,7 +15,7 @@ import be.mira.codri.server.events.RepositoryConnectionEvent;
 import be.mira.codri.server.events.RepositoryEvent;
 import be.mira.codri.server.events.RepositoryEvent.RepositoryEventType;
 import be.mira.codri.server.events.RepositoryPresentationEvent;
-import be.mira.codri.spring.Slf4jLogger;
+import be.mira.codri.server.spring.Slf4jLogger;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.PostConstruct;

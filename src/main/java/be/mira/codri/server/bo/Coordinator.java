@@ -17,7 +17,7 @@ import be.mira.codri.server.bo.network.Kiosk;
 import be.mira.codri.server.bo.repository.configuration.Configuration;
 import be.mira.codri.server.bo.repository.connection.Connection;
 import be.mira.codri.server.bo.repository.presentation.Presentation;
-import be.mira.codri.spring.Slf4jLogger;
+import be.mira.codri.server.spring.Slf4jLogger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

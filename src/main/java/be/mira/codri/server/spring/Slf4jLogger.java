@@ -4,7 +4,7 @@
  * All rights reserved.
  */
 
-package be.mira.codri.spring;
+package be.mira.codri.server.spring;
 
 /**
  * Indicates Logger of appropriate type to be supplied at runtime to the

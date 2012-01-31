@@ -13,7 +13,7 @@ import be.mira.codri.server.bo.repository.configuration.Configuration;
 import be.mira.codri.server.bo.repository.connection.Connection;
 import be.mira.codri.server.bo.repository.presentation.Presentation;
 import be.mira.codri.server.bo.repository.processors.ConnectionProcessor;
-import be.mira.codri.spring.Slf4jLogger;
+import be.mira.codri.server.spring.Slf4jLogger;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;

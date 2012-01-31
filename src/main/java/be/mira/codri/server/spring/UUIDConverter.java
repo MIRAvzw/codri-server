@@ -4,7 +4,7 @@
  * All rights reserved.
  */
 
-package be.mira.codri.spring;
+package be.mira.codri.server.spring;
 
 import java.util.UUID;
 import org.springframework.core.convert.converter.Converter;
