@@ -45,10 +45,10 @@
     <bean id="timingAspect" class="org.perf4j.slf4j.aop.TimingAspect"/>
 
     <!-- Bean postprocessors -->
-    <bean class="be.mira.adastra3.spring.LoggerPostProcessor" />
+    <bean class="be.mira.codri.spring.LoggerPostProcessor" />
 
     <!-- Field converters -->
-    <bean class="be.mira.adastra3.spring.UUIDConverter" />
+    <bean class="be.mira.codri.spring.UUIDConverter" />
 
 
     <!--
@@ -85,14 +85,14 @@
       Business objects
       -->
     
-    <bean class="be.mira.adastra3.server.bo.Repository" id="repository" />
-    <bean class="be.mira.adastra3.server.bo.Network" id="network" />
+    <bean class="be.mira.codri.server.bo.Repository" id="repository" />
+    <bean class="be.mira.codri.server.bo.Network" id="network" />
 
-    <bean class="be.mira.adastra3.server.bo.Coordinator" />
+    <bean class="be.mira.codri.server.bo.Coordinator" />
 
-    <bean id="connectionProcessor" class="be.mira.adastra3.server.bo.repository.processors.ConnectionProcessor" scope="prototype" />
-    <bean id="configurationProcessor" class="be.mira.adastra3.server.bo.repository.processors.ConfigurationProcessor" scope="prototype" />
-    <!--<bean class="be.mira.adastra3.server.bo.RepositoryMonitor" id="repositoryMonitor" />
+    <bean id="connectionProcessor" class="be.mira.codri.server.bo.repository.processors.ConnectionProcessor" scope="prototype" />
+    <bean id="configurationProcessor" class="be.mira.codri.server.bo.repository.processors.ConfigurationProcessor" scope="prototype" />
+    <!--<bean class="be.mira.codri.server.bo.RepositoryMonitor" id="repositoryMonitor" />
         <lookup-method name="createConnectionProcessor" bean="connectionProcessor"/>
         <lookup-method name="createConfigurationProcessor" bean="configurationProcessor"/>
     </bean>-->
@@ -102,9 +102,9 @@
       Web
       -->
     
-    <bean class="be.mira.adastra3.server.web.RootController" />
+    <bean class="be.mira.codri.server.web.RootController" />
     
-    <bean class="be.mira.adastra3.server.web.RepositoryController" />
+    <bean class="be.mira.codri.server.web.RepositoryController" />
     
-    <bean class="be.mira.adastra3.server.web.NetworkController" />
+    <bean class="be.mira.codri.server.web.NetworkController" />
 </beans>
