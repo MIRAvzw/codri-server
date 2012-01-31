@@ -35,6 +35,9 @@
     
     <!-- Load the service properties -->
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="ignoreResourceNotFound">
+            <value>true</value>
+        </property>
         <property name="locations">
             <list>
                 <value>classpath:defaults.properties</value>
@@ -95,10 +98,10 @@
 
     <bean id="connectionProcessor" class="be.mira.codri.server.bo.repository.processors.ConnectionProcessor" scope="prototype" />
     <bean id="configurationProcessor" class="be.mira.codri.server.bo.repository.processors.ConfigurationProcessor" scope="prototype" />
-    <!--<bean class="be.mira.codri.server.bo.RepositoryMonitor" id="repositoryMonitor" />
+    <bean class="be.mira.codri.server.bo.RepositoryMonitor" id="repositoryMonitor">
         <lookup-method name="createConnectionProcessor" bean="connectionProcessor"/>
         <lookup-method name="createConfigurationProcessor" bean="configurationProcessor"/>
-    </bean>-->
+    </bean>
 
 
     <!--

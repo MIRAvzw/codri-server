@@ -183,7 +183,8 @@
         <dependency>
             <groupId>org.tigris</groupId>
             <artifactId>subversion</artifactId>
-            <version>1.7</version>
+            <version>1.6</version>
+            <scope>provided</scope>
         </dependency>
     
         <!-- Streaming XML parser (Stax) -->
