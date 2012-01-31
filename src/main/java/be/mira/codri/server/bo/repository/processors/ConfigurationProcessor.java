@@ -78,10 +78,10 @@ public class ConfigurationProcessor extends Processor {
                         getParser().next();
                         break loop;
                     case (XMLStreamConstants.START_ELEMENT):
-                        if (getParser().getName().equals("configuration")) {
+                        if (getTag().equals("configuration")) {
                             mConfiguration = parseConfiguration();
                         } else {
-                            throw new InvalidStateException("inconsistency detected between validator and processor (unknown tag)");
+                            throw new InvalidStateException("inconsistency detected between validator and processor (unknown tag '" + getParser().getName() + "')");
                         }
                         break;
                     default:                        
@@ -114,10 +114,10 @@ public class ConfigurationProcessor extends Processor {
                     getParser().next();
                     break loop;
                 case (XMLStreamConstants.START_ELEMENT):
-                    if (getParser().getName().equals("sound")) {
+                    if (getTag().equals("sound")) {
                         tSoundConfiguration = parseSoundConfiguration();
                     } else {
-                        throw new InvalidStateException("inconsistency detected between validator and processor (unknown tag)");
+                            throw new InvalidStateException("inconsistency detected between validator and processor (unknown tag '" + getParser().getName() + "')");
                     }
                     break;
                 default:
@@ -144,10 +144,10 @@ public class ConfigurationProcessor extends Processor {
                     getParser().next();
                     break loop;
                 case (XMLStreamConstants.START_ELEMENT):
-                    if (getParser().getName().equals("volume")) {
+                    if (getTag().equals("volume")) {
                         tVolume = Integer.parseInt(parseTextElement());
                     } else {
-                        throw new InvalidStateException("inconsistency detected between validator and processor (unknown tag)");
+                            throw new InvalidStateException("inconsistency detected between validator and processor (unknown tag '" + getParser().getName() + "')");
                     }
                     break;
                 default:

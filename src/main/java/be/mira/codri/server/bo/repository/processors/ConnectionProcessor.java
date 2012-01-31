@@ -80,10 +80,10 @@ public class ConnectionProcessor extends Processor {
                         getParser().next();
                         break loop;
                     case (XMLStreamConstants.START_ELEMENT):
-                        if (getParser().getName().equals("connection")) {
+                        if (getTag().equals("connection")) {
                             mConnection = parseConnection();
                         } else {
-                            throw new InvalidStateException("inconsistency detected between validator and processor (unknown tag)");
+                            throw new InvalidStateException("inconsistency detected between validator and processor (unknown tag '" + getParser().getName() + "')");
                         }
                         break;
                     default:                        
@@ -118,14 +118,14 @@ public class ConnectionProcessor extends Processor {
                     getParser().next();
                     break loop;
                 case (XMLStreamConstants.START_ELEMENT):
-                    if (getParser().getName().equals("kiosk")) {
+                    if (getTag().equals("kiosk")) {
                         tKiosk = UUID.fromString(parseTextElement());
-                    } else if (getParser().getName().equals("configuration")) {
+                    } else if (getTag().equals("configuration")) {
                         tConfiguration = parseTextElement();
-                    } else if (getParser().getName().equals("presentation")) {
+                    } else if (getTag().equals("presentation")) {
                         tPresentation = parseTextElement();
                     } else {
-                        throw new InvalidStateException("inconsistency detected between validator and processor (unknown tag)");
+                            throw new InvalidStateException("inconsistency detected between validator and processor (unknown tag '" + getParser().getName() + "')");
                     }
                     break;
                 default:

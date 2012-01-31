@@ -120,4 +120,13 @@ public abstract class Processor {
         return tText;
     }
     
+    
+    //
+    // Auxiliary
+    //
+    
+    public String getTag() {
+        return getParser().getName().getLocalPart();
+    }
+    
 }
