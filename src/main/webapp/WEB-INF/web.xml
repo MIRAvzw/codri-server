@@ -11,9 +11,9 @@
          xmlns="http://java.sun.com/xml/ns/javaee"
          xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-         id="contentranger-server" version="2.5">
+         id="codri-server" version="2.5">
      
-    <display-name>Content Ranger - Backend server</display-name>
+    <display-name>Codri - Backend server</display-name>
 
     <servlet>
         <servlet-name>springDispatcher</servlet-name>
@@ -29,8 +29,4 @@
         <servlet-name>springDispatcher</servlet-name>
         <url-pattern>/</url-pattern>
     </servlet-mapping>
-
-    <welcome-file-list>
-        <welcome-file>index.html</welcome-file>
-    </welcome-file-list>
 </web-app>

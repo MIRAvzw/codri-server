@@ -7,14 +7,14 @@
   
     <!-- Basics -->
     <modelVersion>4.0.0</modelVersion>
-    <groupId>be.mira.contentranger</groupId>
-    <artifactId>contentranger-server</artifactId>
+    <groupId>be.mira.codri</groupId>
+    <artifactId>codri-server</artifactId>
     <packaging>war</packaging>
 
     <!-- Project information -->
     <version>0.2-SNAPSHOT</version>
-    <name>Content Ranger server</name>
-    <description>Backend server for the Content Ranger media management platform.</description>
+    <name>Codri server</name>
+    <description>Backend server for the Codri platform.</description>
     <url>https://sites.google.com/site/miraadastraiii/</url>
     <inceptionYear>2011</inceptionYear>
     <organization>
@@ -104,13 +104,24 @@
            <version>3.1.0.RELEASE</version>
         </dependency>
 
-        <!-- Servlet API -->
+        <!-- Servlet APIs (some of which are provided by Tomcat) -->
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
-            <scope>provided</scope>
-         </dependency>
+           <groupId>javax.servlet</groupId>
+           <artifactId>servlet-api</artifactId>
+           <version>2.5</version>
+           <scope>provided</scope>
+        </dependency>
+        <dependency>
+           <groupId>javax.servlet.jsp</groupId>
+           <artifactId>jsp-api</artifactId>
+           <version>2.1</version>
+           <scope>provided</scope>
+        </dependency>
+        <dependency>
+           <groupId>javax.servlet</groupId>
+           <artifactId>jstl</artifactId>
+           <version>1.2</version>
+        </dependency>
 
         <!-- JSON output (with JAXB annotation support) -->
         <dependency>
@@ -280,7 +291,7 @@
               <configuration>
                 <server>nemesis</server>
                 <url>http://nemesis:8080/manager</url>
-                <path>/contentranger</path>
+                <path>/codri</path>
                 <update>true</update>
               </configuration>
             </plugin>

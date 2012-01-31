@@ -102,7 +102,9 @@
       Web
       -->
     
-    <bean class="be.mira.adastra3.server.web.RepositoryController" id="repositoryController" />
+    <bean class="be.mira.adastra3.server.web.RootController" />
     
-    <bean class="be.mira.adastra3.server.web.NetworkController" id="networkController" />
+    <bean class="be.mira.adastra3.server.web.RepositoryController" />
+    
+    <bean class="be.mira.adastra3.server.web.NetworkController" />
 </beans>
