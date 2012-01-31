@@ -1,7 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Copyright (C) 2012 Tim Besard <tim.besard@gmail.com>
+ *
+ * All rights reserved.
  */
+
 package be.mira.codri.server.web;
 
 import java.net.UnknownHostException;
