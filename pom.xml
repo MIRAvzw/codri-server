@@ -7,14 +7,14 @@
   
     <!-- Basics -->
     <modelVersion>4.0.0</modelVersion>
-    <groupId>be.mira.adastra3</groupId>
-    <artifactId>aa3server</artifactId>
+    <groupId>be.mira.contentranger</groupId>
+    <artifactId>contentranger-server</artifactId>
     <packaging>war</packaging>
 
     <!-- Project information -->
     <version>0.2-SNAPSHOT</version>
-    <name>Ad-Astra 3 Server</name>
-    <description>Backend server for the MIRA Ad-Astra III content management system.</description>
+    <name>Content Ranger server</name>
+    <description>Backend server for the Content Ranger media management platform.</description>
     <url>https://sites.google.com/site/miraadastraiii/</url>
     <inceptionYear>2011</inceptionYear>
     <organization>
@@ -32,7 +32,7 @@
                 <role>architect</role>
                 <role>developer</role>
             </roles>
-            <timezone>+2</timezone>
+            <timezone>+1</timezone>
         </developer>
     </developers>
 
@@ -274,9 +274,15 @@
 
             <!-- Development Tomcat -->
             <plugin>
-               <groupId>org.codehaus.mojo</groupId>
-               <artifactId>tomcat-maven-plugin</artifactId>
-               <version>1.1</version>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>tomcat-maven-plugin</artifactId>
+              <version>1.1</version>
+              <configuration>
+                <server>nemesis</server>
+                <url>http://nemesis:8080/manager</url>
+                <path>/contentranger</path>
+                <update>true</update>
+              </configuration>
             </plugin>
 
             <!-- WAR generation -->

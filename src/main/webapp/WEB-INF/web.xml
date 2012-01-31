@@ -11,9 +11,9 @@
          xmlns="http://java.sun.com/xml/ns/javaee"
          xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-         id="aa3server" version="2.5">
+         id="contentranger-server" version="2.5">
      
-    <display-name>Ad-Astra III - Content server</display-name>
+    <display-name>Content Ranger - Backend server</display-name>
 
     <servlet>
         <servlet-name>springDispatcher</servlet-name>
@@ -27,7 +27,7 @@
 	    
     <servlet-mapping>
         <servlet-name>springDispatcher</servlet-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/</url-pattern>
     </servlet-mapping>
 
     <welcome-file-list>

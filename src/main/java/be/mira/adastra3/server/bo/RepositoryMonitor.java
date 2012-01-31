@@ -100,7 +100,7 @@ public abstract class RepositoryMonitor {
         mLogger.debug("Scheduling SVN monitor with interval of {}s", mSVNMonitorInterval);
         mSVNMonitor = new Timer();
         
-        // TODO: does this has to happen in the init()? Move to timer?
+        // TODO: reduce to get() and mRevision = -1, no processing
         
         // Get the connections
         try {

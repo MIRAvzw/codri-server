@@ -9,7 +9,7 @@
 
 <configuration>
     
-    <property name="LOG_FOLDER" value="/tmp" />
+    <property name="LOG_FOLDER" value="/var/log/contentranger" />
     
     
     <!--
