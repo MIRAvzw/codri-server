@@ -20,6 +20,7 @@ public abstract class NetworkEntity {
     
     private final String mVendor, mModel;
     private String mAddress;
+    private int mPort;
     private Date mHeartbeat;
     
     
@@ -55,6 +56,15 @@ public abstract class NetworkEntity {
     
     public final void setAddress(final String iAddress) {
         mAddress = iAddress;
+    }
+    
+    @XmlElement
+    public final int getPort() {
+        return mPort;
+    }
+    
+    public final void setPort(final int iPort) {
+        mPort = iPort;
     }
     
     @XmlElement
