@@ -12,6 +12,7 @@ import be.mira.codri.server.bo.repository.entities.Connection;
 import be.mira.codri.server.spring.Slf4jLogger;
 import java.io.IOException;
 import java.util.UUID;
+import javax.annotation.PostConstruct;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import org.slf4j.Logger;
@@ -20,18 +21,13 @@ import org.slf4j.Logger;
  *
  * @author tim
  */
-public class ConnectionProcessor extends Processor {
+public class ConnectionProcessor extends Processor<Connection> {
     //
     // Member data
     //
     
     @Slf4jLogger
     private Logger mLogger;
-    
-    private long mRevision;
-    private String mPath;
-    
-    private Connection mConnection;
     
     
     
@@ -40,32 +36,21 @@ public class ConnectionProcessor extends Processor {
     // Construction and destruction
     //
     
-    // TODO: use typical bean construction
-    
-    //@Required
-    public void setRevision(final long iRevision) {
-        mRevision = iRevision;
-    }
-    
-    //@Required
-    public void setPath(final String iPath) {
-        mPath = iPath;
-    }
-    
-    //@PostConstruct
-    @Override
+    @PostConstruct
     public void init() throws RepositoryException {
         setValidationFilename("connection.xsd");
-        super.init();
     }
     
     
     //
-    // Public API
+    // Parsing functionality
     //
     
-    public final void process() throws RepositoryException {
-        try {
+    @Override
+    protected final Connection parseDocument(final long iRevision, final String iPath) throws RepositoryException {
+        try {    
+            Connection tConnection = null;
+            
             // Setup parsing
             if (getParser().getEventType() != XMLStreamConstants.START_DOCUMENT
                     && getParser().getEventType() != XMLStreamConstants.START_ELEMENT) {
@@ -81,7 +66,7 @@ public class ConnectionProcessor extends Processor {
                         break loop;
                     case (XMLStreamConstants.START_ELEMENT):
                         if (getTag().equals("connection")) {
-                            mConnection = parseConnection();
+                            tConnection = parseConnection(iRevision, iPath);
                         } else {
                             throw new InvalidStateException("inconsistency detected between validator and processor (unknown tag '" + getParser().getName() + "')");
                         }
@@ -90,6 +75,8 @@ public class ConnectionProcessor extends Processor {
                         getParser().next();
                 }
             }
+            
+            return tConnection;
         } catch (XMLStreamException tException) {
             throw new RepositoryException(tException);
         } catch (IOException tException) {
@@ -97,16 +84,7 @@ public class ConnectionProcessor extends Processor {
         }
     }
     
-    public final Connection getConnection() {
-        return mConnection;
-    }
-    
-    
-    //
-    // Parsing helpers
-    //
-    
-    private Connection parseConnection() throws RepositoryException, XMLStreamException, IOException {       
+    private Connection parseConnection(final long iRevision, final String iPath) throws RepositoryException, XMLStreamException, IOException {       
         // Process the tags
         UUID tKiosk = null;
         String tConfiguration = null;
@@ -135,8 +113,8 @@ public class ConnectionProcessor extends Processor {
         
         // Create the object
         Connection tConnection = new Connection(
-                mRevision,
-                mPath,
+                iRevision,
+                iPath,
                 tKiosk,
                 tConfiguration,
                 tPresentation);

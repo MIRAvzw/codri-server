@@ -23,12 +23,11 @@ import org.codehaus.stax2.validation.XMLValidationSchemaFactory;
  *
  * @author tim
  */
-public abstract class Processor {
+public abstract class Processor<T> {
     //
     // Member data
     //
     
-    private File mFile;
     private String mValidationFilename;
     
     private static XMLInputFactory2 PARSER_FACTORY;
@@ -44,20 +43,19 @@ public abstract class Processor {
     // TODO: use typical bean construction
     
     //@Required
-    public void setFile(final File iFile) {
-        mFile = iFile;
-    }
-    
-    //@Required
     public void setValidationFilename(final String iValidationFilename) {
         mValidationFilename = iValidationFilename;
     }
     
-    //@PostConstruct
-    public void init() throws RepositoryException {        
+    
+    //
+    // Public API
+    //
+    
+    public final T process(final File iFile, final long iRevision, final String iPath) throws RepositoryException {
         // Create a validator
         try {           
-            // Create the validator factory
+            // Acquire the validator factory
             if (VALIDATOR_FACTORY == null) {
                 VALIDATOR_FACTORY = XMLValidationSchemaFactory.newInstance(XMLValidationSchema.SCHEMA_ID_W3C_SCHEMA);
             }
@@ -70,15 +68,15 @@ public abstract class Processor {
             throw new RepositoryException("could not create schema validator", tException);
         }
         
-        // Parse the file
+        // Create a parser
         try {
-            // Create the parser factory
+            // Acquire the parser factory
             if (PARSER_FACTORY == null) {
                 PARSER_FACTORY = (XMLInputFactory2) XMLInputFactory2.newInstance(); 
             }
             
-            // Create the parser
-            mParser = (XMLStreamReader2) PARSER_FACTORY.createXMLStreamReader(new FileInputStream(mFile));
+            // Create a parser
+            mParser = (XMLStreamReader2) PARSER_FACTORY.createXMLStreamReader(new FileInputStream(iFile));
             mParser.validateAgainst(mValidator);
         } catch(FactoryConfigurationError tException) {
             throw new RepositoryException("could not acquire XML parser factory", tException);
@@ -87,7 +85,11 @@ public abstract class Processor {
         } catch (FileNotFoundException tException) {
             throw new RepositoryException("could not open XML file", tException);
         }
+        
+        return parseDocument(iRevision, iPath);
     }
+    
+    protected abstract T parseDocument(final long iRevision, final String iPath) throws RepositoryException;
     
     
     //

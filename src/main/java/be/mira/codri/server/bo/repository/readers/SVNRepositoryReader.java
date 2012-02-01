@@ -251,9 +251,8 @@ public abstract class SVNRepositoryReader extends RepositoryReader {
             
             // Process the contents
             String tRepositoryPath = "/configurations/" + tFilename;
-            ConfigurationProcessor tReader = createConfigurationProcessorWrapper(tRevision, tRepositoryPath, tFile);
-            tReader.process();
-            Configuration tConfiguration = tReader.getConfiguration();
+            ConfigurationProcessor tReader = createConfigurationProcessor();
+            Configuration tConfiguration = tReader.process(tFile, tRevision, tRepositoryPath);
             if (tConfiguration == null) {
                 throw new RepositoryException("found empty configuration file");
             }
@@ -336,9 +335,8 @@ public abstract class SVNRepositoryReader extends RepositoryReader {
             
             // Process the contents
             String tRepositoryPath = "/connections/" + tFilename;
-            ConnectionProcessor tReader = createConnectionProcessorWrapper(tRevision, tRepositoryPath, tFile);
-            tReader.process();
-            Connection tConnection = tReader.getConnection();
+            ConnectionProcessor tReader = createConnectionProcessor();
+            Connection tConnection = tReader.process(tFile, tRevision, tRepositoryPath);
             if (tConnection == null) {
                 throw new RepositoryException("found empty connection file");
             }
@@ -537,25 +535,6 @@ public abstract class SVNRepositoryReader extends RepositoryReader {
     //
     // Prototype bean injectors
     //
-    
-    // TODO: remove these method injection wrappers
-    
-    private ConnectionProcessor createConnectionProcessorWrapper(final long iRevision, final String iPath, final File iFile) throws RepositoryException {
-        ConnectionProcessor tBean = createConnectionProcessor();
-        tBean.setRevision(iRevision);
-        tBean.setPath(iPath);
-        tBean.setFile(iFile);
-        tBean.init();
-        return tBean;
-    }
-    private ConfigurationProcessor createConfigurationProcessorWrapper(final long iRevision, final String iPath, final File iFile) throws RepositoryException {
-        ConfigurationProcessor tBean = createConfigurationProcessor();
-        tBean.setRevision(iRevision);
-        tBean.setPath(iPath);
-        tBean.setFile(iFile);
-        tBean.init();
-        return tBean;
-    }
     
     protected abstract ConnectionProcessor createConnectionProcessor();
     protected abstract ConfigurationProcessor createConfigurationProcessor();

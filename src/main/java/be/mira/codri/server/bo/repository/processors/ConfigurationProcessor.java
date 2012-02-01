@@ -12,6 +12,7 @@ import be.mira.codri.server.bo.repository.entities.Configuration;
 import be.mira.codri.server.bo.repository.entities.SoundConfiguration;
 import be.mira.codri.server.spring.Slf4jLogger;
 import java.io.IOException;
+import javax.annotation.PostConstruct;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import org.slf4j.Logger;
@@ -20,7 +21,7 @@ import org.slf4j.Logger;
  *
  * @author tim
  */
-public class ConfigurationProcessor extends Processor {
+public class ConfigurationProcessor extends Processor<Configuration> {
     //
     // Member data
     //
@@ -28,42 +29,26 @@ public class ConfigurationProcessor extends Processor {
     @Slf4jLogger
     private Logger mLogger;
     
-    private long mRevision;
-    private String mPath;
-    
-    private Configuration mConfiguration;
-    
     
     //
     // Construction and destruction
     //
     
-    // TODO: use typical bean construction
-    
-    //@Required
-    public void setRevision(final long iRevision) {
-        mRevision = iRevision;
-    }
-    
-    //@Required
-    public void setPath(final String iPath) {
-        mPath = iPath;
-    }
-    
-    //@PostConstruct
-    @Override
+    @PostConstruct
     public void init() throws RepositoryException {
         setValidationFilename("configuration.xsd");
-        super.init();
     }
     
     
     //
-    // Public API
+    // Parsing functionality
     //
     
-    public final void process() throws RepositoryException {
+    @Override
+    public final Configuration parseDocument(final long iRevision, final String iPath) throws RepositoryException {
         try {
+            Configuration tConfiguration = null;
+            
             // Setup parsing
             if (getParser().getEventType() != XMLStreamConstants.START_DOCUMENT
                     && getParser().getEventType() != XMLStreamConstants.START_ELEMENT) {
@@ -79,7 +64,7 @@ public class ConfigurationProcessor extends Processor {
                         break loop;
                     case (XMLStreamConstants.START_ELEMENT):
                         if (getTag().equals("configuration")) {
-                            mConfiguration = parseConfiguration();
+                            tConfiguration = parseConfiguration(iRevision, iPath);
                         } else {
                             throw new InvalidStateException("inconsistency detected between validator and processor (unknown tag '" + getParser().getName() + "')");
                         }
@@ -88,6 +73,8 @@ public class ConfigurationProcessor extends Processor {
                         getParser().next();
                 }
             }
+            
+            return tConfiguration;
         } catch (XMLStreamException tException) {
             throw new RepositoryException(tException);
         } catch (IOException tException) {
@@ -95,16 +82,7 @@ public class ConfigurationProcessor extends Processor {
         }
     }
     
-    public final Configuration getConfiguration() {
-        return mConfiguration;
-    }
-    
-    
-    //
-    // Parsing helpers
-    //
-    
-    private Configuration parseConfiguration() throws RepositoryException, XMLStreamException, IOException {        
+    private Configuration parseConfiguration(final long iRevision, final String iPath) throws RepositoryException, XMLStreamException, IOException {        
         // Process the tags
         SoundConfiguration tSoundConfiguration = null;
         getParser().next();
@@ -128,8 +106,8 @@ public class ConfigurationProcessor extends Processor {
         // Create the object
         // TODO: null check of soundconfiguration? can it be missing?
         Configuration tConfiguration = new Configuration(
-                mRevision,
-                mPath,
+                iRevision,
+                iPath,
                 tSoundConfiguration);
         return tConfiguration;
     }
