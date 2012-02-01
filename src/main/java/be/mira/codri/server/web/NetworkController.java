@@ -55,14 +55,14 @@ public class NetworkController {
     // REST endpoints
     //
     
-    @Profiled(tag="GET api/network")
+    @Profiled(tag="api/network.GET")
     @RequestMapping(method=RequestMethod.GET)
     @ResponseBody
     public Network getNetwork() {        
         return mNetwork;
     }
     
-    @Profiled(tag="GET api/network/kiosks/$id")
+    @Profiled(tag="api/network/kiosks/$id.GET")
     @RequestMapping(value="/kiosks/{id}", method=RequestMethod.GET)
     @ResponseBody
     public Kiosk getKiosk(final @PathVariable("id") UUID iId, final HttpServletResponse iResponse) throws IOException {
@@ -73,7 +73,7 @@ public class NetworkController {
         return tKiosk;
     }
     
-    @Profiled(tag="PUT api/network/kiosks/$id")
+    @Profiled(tag="api/network/kiosks/$id.PUT")
     @RequestMapping(value="/kiosks/{id}", method=RequestMethod.PUT)
     public void updateKiosk(final @PathVariable("id") UUID iId, final HttpServletRequest iRequest, final HttpServletResponse iResponse) throws IOException {
         Kiosk tKiosk = mNetwork.getKiosk(iId);
@@ -84,7 +84,7 @@ public class NetworkController {
         }
     }
     
-    @Profiled(tag="POST api/network/kiosks/$id")
+    @Profiled(tag="api/network/kiosks/$id.POST")
     @RequestMapping(value="/kiosks/{id}", method=RequestMethod.POST)
     public void addKiosk(final @RequestBody Kiosk iKiosk, final @PathVariable("id") UUID iId, final HttpServletRequest iRequest, final HttpServletResponse iResponse) throws IOException {
         try {

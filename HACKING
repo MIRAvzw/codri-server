@@ -1,0 +1,7 @@
+Perf4J
+------
+
+All REST endpoints, as well as other critical invocations, are annotated with
+Perf4J profiling instructions. This results in timing statistics being written
+to the server log, which can be analyzed using:
+  $ java -jar /location/to/perf4j-a.b.c.jar /var/log/codri/server.log

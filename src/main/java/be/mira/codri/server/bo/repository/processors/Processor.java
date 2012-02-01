@@ -40,8 +40,7 @@ public abstract class Processor<T> {
     // Construction and destruction
     //
     
-    // TODO: use typical bean construction
-    
+    // TODO: use typical bean construction    
     //@Required
     public void setValidationFilename(final String iValidationFilename) {
         mValidationFilename = iValidationFilename;

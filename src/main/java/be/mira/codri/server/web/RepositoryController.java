@@ -60,14 +60,14 @@ public class RepositoryController {
     // REST endpoints
     //
     
-    @Profiled(tag="GET api/repository")
+    @Profiled(tag="api/repository.GET")
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
     public Repository getRepository() {        
         return mRepository;
     }
     
-    @Profiled(tag="PUT api/repository")
+    @Profiled(tag="api/repository.PUT")
     @RequestMapping(method = RequestMethod.PUT)
     @ResponseBody
     public void updateRepository() throws RepositoryException {        
