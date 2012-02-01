@@ -4,14 +4,17 @@
  * All rights reserved.
  */
 
-package be.mira.codri.server.bo;
+package be.mira.codri.server.bo.repository.readers;
 
+import be.mira.codri.server.bo.Repository;
 import be.mira.codri.server.bo.repository.processors.ConfigurationProcessor;
 import be.mira.codri.server.exceptions.RepositoryException;
 import be.mira.codri.server.bo.repository.RepositoryEntity;
-import be.mira.codri.server.bo.repository.configuration.Configuration;
-import be.mira.codri.server.bo.repository.connection.Connection;
-import be.mira.codri.server.bo.repository.presentation.Presentation;
+import be.mira.codri.server.bo.repository.RepositoryEntity;
+import be.mira.codri.server.bo.repository.RepositoryReader;
+import be.mira.codri.server.bo.repository.entities.Configuration;
+import be.mira.codri.server.bo.repository.entities.Connection;
+import be.mira.codri.server.bo.repository.entities.Presentation;
 import be.mira.codri.server.bo.repository.processors.ConnectionProcessor;
 import be.mira.codri.server.spring.Slf4jLogger;
 import java.io.File;

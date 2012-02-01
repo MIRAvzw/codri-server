@@ -98,7 +98,7 @@
 
     <bean id="connectionProcessor" class="be.mira.codri.server.bo.repository.processors.ConnectionProcessor" scope="prototype" />
     <bean id="configurationProcessor" class="be.mira.codri.server.bo.repository.processors.ConfigurationProcessor" scope="prototype" />
-    <bean class="be.mira.codri.server.bo.SVNRepositoryReader" id="repositoryReader">
+    <bean class="be.mira.codri.server.bo.repository.readers.SVNRepositoryReader" id="repositoryReader">
         <lookup-method name="createConnectionProcessor" bean="connectionProcessor"/>
         <lookup-method name="createConfigurationProcessor" bean="configurationProcessor"/>
     </bean>

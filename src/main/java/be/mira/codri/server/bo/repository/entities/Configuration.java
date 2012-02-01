@@ -4,7 +4,7 @@
  * All rights reserved.
  */
 
-package be.mira.codri.server.bo.repository.configuration;
+package be.mira.codri.server.bo.repository.entities;
 
 import be.mira.codri.server.bo.repository.RepositoryEntity;
 import javax.xml.bind.annotation.XmlElement;

@@ -7,8 +7,8 @@
 package be.mira.codri.server.bo.network;
 
 import be.mira.codri.server.exceptions.DeviceException;
-import be.mira.codri.server.bo.repository.configuration.Configuration;
-import be.mira.codri.server.bo.repository.presentation.Presentation;
+import be.mira.codri.server.bo.repository.entities.Configuration;
+import be.mira.codri.server.bo.repository.entities.Presentation;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;

@@ -6,7 +6,7 @@
 
 package be.mira.codri.server.events;
 
-import be.mira.codri.server.bo.repository.configuration.Configuration;
+import be.mira.codri.server.bo.repository.entities.Configuration;
 
 /**
  *

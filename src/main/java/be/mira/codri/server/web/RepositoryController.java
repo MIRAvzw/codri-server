@@ -7,7 +7,7 @@
 package be.mira.codri.server.web;
 
 import be.mira.codri.server.bo.Repository;
-import be.mira.codri.server.bo.RepositoryReader;
+import be.mira.codri.server.bo.repository.RepositoryReader;
 import be.mira.codri.server.exceptions.RepositoryException;
 import be.mira.codri.server.spring.Slf4jLogger;
 import org.perf4j.aop.Profiled;

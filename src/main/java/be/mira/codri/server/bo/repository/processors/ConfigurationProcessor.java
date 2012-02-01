@@ -8,8 +8,8 @@ package be.mira.codri.server.bo.repository.processors;
 
 import be.mira.codri.server.exceptions.InvalidStateException;
 import be.mira.codri.server.exceptions.RepositoryException;
-import be.mira.codri.server.bo.repository.configuration.Configuration;
-import be.mira.codri.server.bo.repository.configuration.SoundConfiguration;
+import be.mira.codri.server.bo.repository.entities.Configuration;
+import be.mira.codri.server.bo.repository.entities.SoundConfiguration;
 import be.mira.codri.server.spring.Slf4jLogger;
 import java.io.IOException;
 import javax.xml.stream.XMLStreamConstants;
