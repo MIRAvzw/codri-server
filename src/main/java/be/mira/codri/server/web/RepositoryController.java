@@ -7,10 +7,13 @@
 package be.mira.codri.server.web;
 
 import be.mira.codri.server.bo.Repository;
+import be.mira.codri.server.bo.RepositoryReader;
+import be.mira.codri.server.exceptions.RepositoryException;
 import be.mira.codri.server.spring.Slf4jLogger;
 import org.perf4j.aop.Profiled;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +36,7 @@ public class RepositoryController {
     
     // TODO: can we make this final, despite the property injection?
     private Repository mRepository;
+    private RepositoryReader mRepositoryReader;
     
     
     //
@@ -45,6 +49,12 @@ public class RepositoryController {
         mRepository = iRepository;
     }
     
+    @Required
+    @Autowired
+    public void setRepositoryReader(final RepositoryReader iRepositoryReader) {
+        mRepositoryReader = iRepositoryReader;
+    }
+    
     
     //
     // REST endpoints
@@ -55,5 +65,12 @@ public class RepositoryController {
     @ResponseBody
     public Repository getRepository() {        
         return mRepository;
+    }
+    
+    @Profiled(tag="PUT api/repository")
+    @RequestMapping(method = RequestMethod.PUT)
+    @ResponseBody
+    public void updateRepository() throws RepositoryException {        
+        mRepositoryReader.update();
     }
 }
