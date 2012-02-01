@@ -28,9 +28,10 @@ public abstract class NetworkEntity {
     // Construction and destruction
     //
     
-    public NetworkEntity(final String iVendor, final String iModel) {
+    public NetworkEntity(final String iVendor, final String iModel, final int iPort) {
         mVendor = iVendor;
         mModel = iModel;
+        mPort = iPort;
         updateHeartbeat();
     }
     
@@ -61,10 +62,6 @@ public abstract class NetworkEntity {
     @XmlElement
     public final int getPort() {
         return mPort;
-    }
-    
-    public final void setPort(final int iPort) {
-        mPort = iPort;
     }
     
     @XmlElement

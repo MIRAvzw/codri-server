@@ -29,8 +29,8 @@ public class Kiosk extends NetworkEntity {
     //
     
     @JsonCreator
-    public Kiosk(final @JsonProperty("vendor") String iVendor, final @JsonProperty("model") String iModel) {
-        super(iVendor, iModel);
+    public Kiosk(final @JsonProperty("vendor") String iVendor, final @JsonProperty("model") String iModel, final @JsonProperty("port") int iPort) {
+        super(iVendor, iModel, iPort);
     }
     
     
