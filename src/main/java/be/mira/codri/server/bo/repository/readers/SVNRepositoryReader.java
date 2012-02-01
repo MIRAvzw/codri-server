@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
-import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
@@ -42,22 +41,18 @@ import org.tigris.subversion.javahl.SVNClient;
  *
  * @author tim
  */
-public abstract class RepositoryMonitor {
+public abstract class SVNRepositoryReader extends RepositoryReader {
     //
     // Data members
     //
     
     @Slf4jLogger
     private Logger mLogger;
-    
-    private Repository mRepository;
 
     private @Value("${repository.location}") String mSVNLocation;
     private @Value("${repository.checkout}") File mSVNCheckoutRoot;
-    private @Value("${repository.interval}") int mSVNMonitorInterval;
     
     private SVNClient mSVNClient;
-    private Timer mSVNMonitor;
     
     private long mConnectionsRevision;
     private long mConfigurationsRevision;
@@ -67,12 +62,6 @@ public abstract class RepositoryMonitor {
     //
     // Construction and destruction
     //
-    
-    @Required
-    @Autowired
-    public void setRepository(Repository iRepository) {
-        mRepository = iRepository;
-    }
 
     @PostConstruct
     public final void init() throws Exception {
@@ -92,49 +81,9 @@ public abstract class RepositoryMonitor {
         }
         mRepository.setServer(mSVNLocation);
         mSVNClient = new SVNClient();
-
-        // Monitor timer
-        if (mSVNMonitorInterval <= 0) {
-            throw new Exception("Update interval out of valid range");
-        }
-        mLogger.debug("Scheduling SVN monitor with interval of {}s", mSVNMonitorInterval);
-        mSVNMonitor = new Timer();
         
-        // TODO: reduce to get() and mRevision = -1, no processing
-        
-        // Get the connections
-        try {
-            mLogger.debug("Checking out and processing the connections");
-            mConnectionsRevision = getConnections();
-            processConnections();
-        } catch (RepositoryException tException) {
-            throw new Exception("could not fetch the connections", tException);
-        }
-        
-        // Get the configurations
-        try {
-            mLogger.debug("Checking out and processing the configurations");
-            mConfigurationsRevision = getConfigurations();
-            processConfigurations();
-        } catch (RepositoryException tException) {
-            throw new Exception("could not fetch the configurations", tException);
-        }
-        
-        // Get the media
-        try {
-            mLogger.debug("Processing the media");
-            mConfigurationsRevision = checkPresentations();
-            processPresentations();
-        } catch (RepositoryException tException) {
-            throw new Exception("could not fetch the media", tException);
-        }
-
-        // Schedule the monitor
-        mSVNMonitor.schedule(
-                new Monitor(),
-                mSVNMonitorInterval * 1000, // Initial delay
-                mSVNMonitorInterval * 1000  // Period
-            );
+        // TODO: remove
+        checkout();
     }
 
 
@@ -142,54 +91,6 @@ public abstract class RepositoryMonitor {
     // Auxiliary classes
     //
 
-    private class Monitor extends TimerTask {
-        @Override
-        public void run() {
-            // TODO: squash these three cases in something using the 
-            //       RepositoryEntity interface
-            // Check the connections
-            try {
-                mLogger.debug("Checking the connections");
-                long tConnectionsRevision = checkConnections();
-                if (mConnectionsRevision != tConnectionsRevision) {
-                    mLogger.info("Connections changed to revision {}", tConnectionsRevision);
-                    mConnectionsRevision = tConnectionsRevision;
-                    getConnections();
-                    processConnections();
-                }
-            } catch (RepositoryException tException) {
-                mLogger.error("could not update the connections", tException);
-            }
-            
-            // Check the configurations
-            try {
-                mLogger.debug("Checking the configurations");
-                long tConfigurationsRevision = checkConfigurations();
-                if (mConfigurationsRevision != tConfigurationsRevision) {
-                    mLogger.info("Configurations changed to revision {}", tConfigurationsRevision);
-                    mConfigurationsRevision = tConfigurationsRevision;
-                    getConfigurations();
-                    processConfigurations();
-                }
-            } catch (RepositoryException tException) {
-                mLogger.error("could not update the configurations", tException);
-            }
-            
-            // Check the presentations
-            try {
-                mLogger.debug("Checking the presentations");
-                long tPresentationRevision = checkPresentations();
-                if (mPresentationsRevision != tPresentationRevision) {
-                    mLogger.info("Presentations changed to revision {}", tPresentationRevision);
-                    mPresentationsRevision = tPresentationRevision;
-                    processPresentations();
-                }
-            } catch (RepositoryException tException) {
-                mLogger.error("could not update the presentations", tException);
-            }
-        }
-        
-    }
     
     private class XMLFilter implements FilenameFilter {
       private Pattern mPattern = Pattern.compile("\\.xml$", Pattern.CASE_INSENSITIVE);
@@ -204,6 +105,60 @@ public abstract class RepositoryMonitor {
     //
     // Presentation helpers
     //
+    
+    @Override
+    public void checkout() throws RepositoryException {        
+        // TODO: reduce to get() and mRevision = -1, no processing
+        
+        // Get the connections
+        mLogger.debug("Checking out and processing the connections");
+        mConnectionsRevision = getConnections();
+        processConnections();
+        
+        // Get the configurations
+        mLogger.debug("Checking out and processing the configurations");
+        mConfigurationsRevision = getConfigurations();
+        processConfigurations();
+        
+        // Get the media
+        mLogger.debug("Processing the presentations");
+        mPresentationsRevision = checkPresentations();
+        processPresentations();  
+    }
+    
+    @Override
+    public void update() throws RepositoryException {
+        // TODO: squash these three cases in something using the 
+        //       RepositoryEntity interface
+        // Check the connections
+        mLogger.debug("Checking the connections");
+        long tConnectionsRevision = checkConnections();
+        if (mConnectionsRevision != tConnectionsRevision) {
+            mLogger.info("Connections changed to revision {}", tConnectionsRevision);
+            mConnectionsRevision = tConnectionsRevision;
+            getConnections();
+            processConnections();
+        }
+
+        // Check the configurations
+        mLogger.debug("Checking the configurations");
+        long tConfigurationsRevision = checkConfigurations();
+        if (mConfigurationsRevision != tConfigurationsRevision) {
+            mLogger.info("Configurations changed to revision {}", tConfigurationsRevision);
+            mConfigurationsRevision = tConfigurationsRevision;
+            getConfigurations();
+            processConfigurations();
+        }
+
+        // Check the presentations
+        mLogger.debug("Checking the presentations");
+        long tPresentationRevision = checkPresentations();
+        if (mPresentationsRevision != tPresentationRevision) {
+            mLogger.info("Presentations changed to revision {}", tPresentationRevision);
+            mPresentationsRevision = tPresentationRevision;
+            processPresentations();
+        }
+    }
     
     private long checkPresentations() throws RepositoryException {
         return getRevision(mSVNLocation + "/presentations");

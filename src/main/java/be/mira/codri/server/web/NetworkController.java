@@ -75,7 +75,6 @@ public class NetworkController {
     
     @Profiled(tag="PUT api/network/kiosks/$id")
     @RequestMapping(value="/kiosks/{id}", method=RequestMethod.PUT)
-    @ResponseBody
     public void updateKiosk(final @PathVariable("id") UUID iId, final HttpServletRequest iRequest, final HttpServletResponse iResponse) throws IOException {
         Kiosk tKiosk = mNetwork.getKiosk(iId);
         if (tKiosk == null) {
@@ -87,7 +86,6 @@ public class NetworkController {
     
     @Profiled(tag="POST api/network/kiosks/$id")
     @RequestMapping(value="/kiosks/{id}", method=RequestMethod.POST)
-    @ResponseBody
     public void addKiosk(final @RequestBody Kiosk iKiosk, final @PathVariable("id") UUID iId, final HttpServletRequest iRequest, final HttpServletResponse iResponse) throws IOException {
         try {
             iKiosk.setAddress(iRequest.getRemoteAddr());

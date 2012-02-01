@@ -1,3 +1,37 @@
+Servlet container
+-----------------
+
+To run Codri, you need a servlet container like Tomcat or Jetty. Although it shouldn't
+matter exactly which container you use, it should at least support servler API v2.5
+(e.g. Tomcat 6 or higher).
+
+However, there tend to be slight differences between several containers. E.g. Tomcat
+doesn't provide a JSTL implementation, while other containers might. The default Maven
+build process is ready to use with Tomcat 6, so if you use any other container you
+might need to change some stuff in order to get it working.
+
+
+Content storage
+---------------
+
+Data and related directives are stored in a external repository, read out by Codri's
+RepositoryReaders. Currently, there is only one reader, using a external Subversion
+repository.
+
+a) setup
+
+Create a SVN repository (supported protocols: file://, http(s)://, svn://), and configure
+the repository.location in Codri's server configuration file.
+
+b) commit hook
+
+Codri does not monitor the repository, but expects you to notify in case of changes.
+To do that, create a post-commit hook sending a HTTP PUT request on the repository
+endpoint of the REST API:
+  $ cat post-commit
+  # curl --silent -X PUT http://localhost:8080/codri/repository
+
+
 Subversion JavaHL
 -----------------
 
