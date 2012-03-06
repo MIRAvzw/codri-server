@@ -90,7 +90,6 @@ public class NetworkController {
         try {
             iKiosk.setAddress(iRequest.getRemoteAddr());
             mNetwork.addKiosk(iId, iKiosk);
-            // TODO: this seems to get processed synchronously
             iResponse.setStatus(HttpStatus.CREATED.value());
             iResponse.setHeader("Location", String.format("/rest/customers/%s", iId));
 

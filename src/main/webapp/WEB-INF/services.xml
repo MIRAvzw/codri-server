@@ -64,6 +64,13 @@
             </list>
         </property>
     </bean>
+    
+    <!-- Asynchronous event processing -->
+    <bean id="applicationEventMulticaster" class="org.springframework.context.event.SimpleApplicationEventMulticaster">  
+        <property name="taskExecutor">  
+            <bean class="org.springframework.scheduling.timer.TimerTaskExecutor"/>  
+        </property>  
+    </bean>
 
 
     <!--
