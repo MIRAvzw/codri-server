@@ -10,6 +10,11 @@ doesn't provide a JSTL implementation, while other containers might. The default
 build process is ready to use with Tomcat 6, so if you use any other container you
 might need to change some stuff in order to get it working.
 
+Obviously, you'll need to have the proper rights to deploy the application to the Tomcat
+container. More specifically, the Maven deploy plugin will need the "manager-script" role.
+Create a user, grant him the "manager-script" role, and save the credentials in your Maven
+settings file (see http://mojo.codehaus.org/tomcat-maven-plugin/configuration.html).
+
 
 Content storage
 ---------------
