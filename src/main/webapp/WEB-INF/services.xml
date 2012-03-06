@@ -134,6 +134,10 @@
       Web
       -->
     
+    <bean id="exceptionResolver" class="be.mira.codri.server.spring.LoggingExceptionResolver" />
+    
+    <!-- Controllers -->
+    
     <bean class="be.mira.codri.server.web.RootController" />
     
     <bean class="be.mira.codri.server.web.RepositoryController" />

@@ -68,7 +68,7 @@ public class NetworkController {
     public Kiosk getKiosk(final @PathVariable("id") UUID iId, final HttpServletResponse iResponse) throws IOException {
         Kiosk tKiosk = mNetwork.getKiosk(iId);
         if (tKiosk == null) {
-            iResponse.sendError(HttpStatus.NOT_FOUND.value());
+            iResponse.sendError(HttpStatus.GONE.value());
         }
         return tKiosk;
     }
@@ -78,7 +78,7 @@ public class NetworkController {
     public void updateKiosk(final @PathVariable("id") UUID iId, final HttpServletRequest iRequest, final HttpServletResponse iResponse) throws IOException {
         Kiosk tKiosk = mNetwork.getKiosk(iId);
         if (tKiosk == null) {
-            iResponse.sendError(HttpStatus.NOT_FOUND.value());            
+            iResponse.sendError(HttpStatus.GONE.value());            
         } else {
             tKiosk.updateHeartbeat();
         }
@@ -90,6 +90,10 @@ public class NetworkController {
         try {
             iKiosk.setAddress(iRequest.getRemoteAddr());
             mNetwork.addKiosk(iId, iKiosk);
+            // TODO: this seems to get processed synchronously
+            iResponse.setStatus(HttpStatus.CREATED.value());
+            iResponse.setHeader("Location", String.format("/rest/customers/%s", iId));
+
         } catch (NetworkException tException) {
             iResponse.sendError(HttpStatus.CONFLICT.value(), tException.getLocalizedMessage());
         }

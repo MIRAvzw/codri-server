@@ -77,4 +77,18 @@ public abstract class NetworkEntity {
     public final long getHeartbeatDelta() {
         return (new Date().getTime()) - mHeartbeat.getTime();
     }
+    
+    
+    //
+    // Auxiliary
+    //
+    
+    protected final String getEndpoint(final String[] iResources) {
+        StringBuilder tEndpointBuilder = new StringBuilder("http://").append(getAddress());
+        tEndpointBuilder.append(":").append(getPort());
+        for (final String tResource: iResources) {
+            tEndpointBuilder.append("/").append(tResource);
+        }
+        return tEndpointBuilder.toString();
+    }
 }
