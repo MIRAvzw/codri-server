@@ -3,10 +3,7 @@
  *
  * All rights reserved.
  */
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package be.mira.codri.server.bo.repository;
 
 import be.mira.codri.server.bo.Repository;
