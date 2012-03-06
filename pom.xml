@@ -302,8 +302,8 @@
               <artifactId>tomcat-maven-plugin</artifactId>
               <version>1.1</version>
               <configuration>
-                <server>nemesis</server>
-                <url>http://nemesis:8080/manager</url>
+                <server>codri.local</server>
+                <url>http://codri.local:8080/manager</url>
                 <path>/codri</path>
                 <update>true</update>
               </configuration>
