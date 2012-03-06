@@ -92,7 +92,6 @@ public class NetworkController {
             mNetwork.addKiosk(iId, iKiosk);
             iResponse.setStatus(HttpStatus.CREATED.value());
             iResponse.setHeader("Location", String.format("/rest/customers/%s", iId));
-
         } catch (NetworkException tException) {
             iResponse.sendError(HttpStatus.CONFLICT.value(), tException.getLocalizedMessage());
         }
