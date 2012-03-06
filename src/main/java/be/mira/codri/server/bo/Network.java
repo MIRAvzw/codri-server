@@ -91,6 +91,20 @@ public final class Network implements ApplicationEventPublisherAware {
         mPublisher.publishEvent(tEvent);
     }
     
+    public void expireKiosk(final UUID iId, final Kiosk iKiosk) throws NetworkException {
+        mLogger.info("Expiring kiosk {}", iId);
+        
+        synchronized (mKiosks) {
+            if (!mKiosks.containsKey(iId)) {
+                throw new NetworkException("kiosk " + iId + " is not present in network");
+            }
+            mKiosks.remove(iId);
+        }
+        
+        NetworkEvent tEvent = new NetworkKioskEvent(this, NetworkEventType.EXPIRED, iId, iKiosk);
+        mPublisher.publishEvent(tEvent);
+    }
+    
     public void removeKiosk(final UUID iId, final Kiosk iKiosk) throws NetworkException {
         mLogger.info("Removing kiosk {}", iId);
         

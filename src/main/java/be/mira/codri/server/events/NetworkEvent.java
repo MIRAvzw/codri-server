@@ -21,6 +21,7 @@ public abstract class NetworkEvent extends ApplicationEvent {
     
     public enum NetworkEventType {
         ADDED,
+        EXPIRED,
         REMOVED
     }
     

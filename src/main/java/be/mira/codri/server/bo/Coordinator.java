@@ -115,8 +115,15 @@ public class Coordinator implements ApplicationListener<ApplicationEvent> {
                 
                 break;
                 
+            case EXPIRED:
+                mLogger.warn("Kiosk {} has been expired", iEvent.getId());
+                
+                break;
+                
             case REMOVED:
-                mLogger.info("Kiosk {} has been removed", iEvent.getId());                
+                mLogger.info("Kiosk {} has been removed", iEvent.getId());
+                
+                break;              
         }
     }
     

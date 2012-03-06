@@ -55,6 +55,15 @@
 
     <!-- Field converters -->
     <bean class="be.mira.codri.server.spring.UUIDConverter" />
+    
+    <!-- Timers -->
+    <bean class="org.springframework.scheduling.timer.TimerFactoryBean">
+        <property name="scheduledTimerTasks">
+            <list>
+                <ref bean="checkNetworkExpiries" />
+            </list>
+        </property>
+    </bean>
 
 
     <!--
@@ -91,17 +100,34 @@
       Business objects
       -->
     
+    <!-- Repository --> 
+    
     <bean class="be.mira.codri.server.bo.Repository" id="repository" />
-    <bean class="be.mira.codri.server.bo.Network" id="network" />
-
-    <bean class="be.mira.codri.server.bo.Coordinator" />
 
     <bean id="connectionProcessor" class="be.mira.codri.server.bo.repository.processors.ConnectionProcessor" scope="prototype" />
     <bean id="configurationProcessor" class="be.mira.codri.server.bo.repository.processors.ConfigurationProcessor" scope="prototype" />
+    
     <bean class="be.mira.codri.server.bo.repository.readers.SVNRepositoryReader" id="repositoryReader">
         <lookup-method name="createConnectionProcessor" bean="connectionProcessor"/>
         <lookup-method name="createConfigurationProcessor" bean="configurationProcessor"/>
     </bean>
+    
+    <!-- Network -->
+    
+    <bean class="be.mira.codri.server.bo.Network" id="network" />    
+    
+    <bean id="checkNetworkExpiries" class="org.springframework.scheduling.timer.ScheduledTimerTask">
+        <property name="delay" value="${network.expiry.delay}"/>
+        <property name="period" value="${network.expiry.period}"/>
+        <property name="timerTask">
+            <bean class="be.mira.codri.server.bo.network.ExpiryChecker" />
+        </property>
+    </bean>
+			
+    
+    <!-- Coordinator -->
+
+    <bean class="be.mira.codri.server.bo.Coordinator" />
 
 
     <!--
