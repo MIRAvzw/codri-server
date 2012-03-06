@@ -11,24 +11,12 @@
             xmlns="http://www.mira.be"
             elementFormDefault="qualified">
     <!--
-      The configuration object contains all configurable paramters.
+      The configuration object contains all configurable parameters.
       -->
     
     <xsd:element name="configuration" type="configurationType" />
     
     <xsd:complexType name="configurationType">
-        <xsd:sequence>
-            <xsd:element name="sound" type="soundType" minOccurs="0" />  
-        </xsd:sequence>
-    </xsd:complexType>
-    
-    
-    <!--
-      The sound elements configures all aspects of the device its sound playback
-      capabilities.
-      -->
-
-    <xsd:complexType name="soundType">
         <xsd:sequence>
             <xsd:element name="volume" type="volumeType" minOccurs="0" />
         </xsd:sequence>

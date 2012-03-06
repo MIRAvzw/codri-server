@@ -12,6 +12,7 @@ import be.mira.codri.server.bo.repository.entities.Presentation;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.springframework.web.client.RestTemplate;
 
 /**
  *
@@ -22,6 +23,8 @@ public class Kiosk extends NetworkEntity {
     //
     // Member data
     //
+    
+    RestTemplate mRestTemplate;
     
     
     //

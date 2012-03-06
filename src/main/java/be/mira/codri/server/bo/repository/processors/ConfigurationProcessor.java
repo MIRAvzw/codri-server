@@ -9,7 +9,6 @@ package be.mira.codri.server.bo.repository.processors;
 import be.mira.codri.server.exceptions.InvalidStateException;
 import be.mira.codri.server.exceptions.RepositoryException;
 import be.mira.codri.server.bo.repository.entities.Configuration;
-import be.mira.codri.server.bo.repository.entities.SoundConfiguration;
 import be.mira.codri.server.spring.Slf4jLogger;
 import java.io.IOException;
 import javax.annotation.PostConstruct;
@@ -84,36 +83,6 @@ public class ConfigurationProcessor extends Processor<Configuration> {
     
     private Configuration parseConfiguration(final long iRevision, final String iPath) throws RepositoryException, XMLStreamException, IOException {        
         // Process the tags
-        SoundConfiguration tSoundConfiguration = null;
-        getParser().next();
-        loop: while (getParser().getEventType() != XMLStreamConstants.END_DOCUMENT) {
-            switch (getParser().getEventType()) {
-                case (XMLStreamConstants.END_ELEMENT):
-                    getParser().next();
-                    break loop;
-                case (XMLStreamConstants.START_ELEMENT):
-                    if (getTag().equals("sound")) {
-                        tSoundConfiguration = parseSoundConfiguration();
-                    } else {
-                            throw new InvalidStateException("inconsistency detected between validator and processor (unknown tag '" + getParser().getName() + "')");
-                    }
-                    break;
-                default:
-                    getParser().next();
-            }
-        }
-        
-        // Create the object
-        // TODO: null check of soundconfiguration? can it be missing?
-        Configuration tConfiguration = new Configuration(
-                iRevision,
-                iPath,
-                tSoundConfiguration);
-        return tConfiguration;
-    }
-    
-    private SoundConfiguration parseSoundConfiguration() throws RepositoryException, XMLStreamException, IOException {
-        // Process the tags
         Integer tVolume = null;
         getParser().next();
         loop: while (getParser().getEventType() != XMLStreamConstants.END_DOCUMENT) {
@@ -134,8 +103,11 @@ public class ConfigurationProcessor extends Processor<Configuration> {
         }
         
         // Create the object
-        // TODO: null check? can volume be missing?
-        SoundConfiguration tSound = new SoundConfiguration(tVolume);
-        return tSound;
+        // TODO: null check of soundconfiguration? can it be missing?
+        Configuration tConfiguration = new Configuration(
+                iRevision,
+                iPath,
+                tVolume);
+        return tConfiguration;
     }
 }

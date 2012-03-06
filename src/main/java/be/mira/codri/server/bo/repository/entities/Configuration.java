@@ -20,15 +20,15 @@ public class Configuration extends RepositoryEntity {
     // Member data
     //
     
-    private SoundConfiguration mSoundConfiguration;
+    private Integer mVolume;
     
     //
     // Construction and destruction
     //
     
-    public Configuration(final Long iRevision, final String iPath, final SoundConfiguration iSoundConfiguration) {
+    public Configuration(final Long iRevision, final String iPath, final Integer iVolume) {
         super(iRevision, iPath);
-        mSoundConfiguration = iSoundConfiguration;
+        mVolume = iVolume;
     }
     
     
@@ -37,7 +37,7 @@ public class Configuration extends RepositoryEntity {
     //
     
     @XmlElement
-    public final SoundConfiguration getSoundConfiguration() {
-        return mSoundConfiguration;
+    public Integer getVolume() {
+        return mVolume;
     }
 }
