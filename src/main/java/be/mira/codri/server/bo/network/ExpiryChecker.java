@@ -59,7 +59,7 @@ public class ExpiryChecker extends TimerTask {
             if (tEntry.getValue().getHeartbeatDelta() > mExpiryThreshold) {
                 try {
                     mLogger.debug("Trying to expire kiosk {}", tEntry.getKey());
-                    mNetwork.expireKiosk(tEntry.getKey(), tEntry.getValue());
+                    mNetwork.expireKiosk(tEntry.getKey());
                 } catch (NetworkException tException) {
                     mLogger.error("Could not expire kiosk {}", tEntry.getKey(), tException);
                 }

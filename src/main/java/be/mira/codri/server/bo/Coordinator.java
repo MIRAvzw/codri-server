@@ -115,6 +115,11 @@ public class Coordinator implements ApplicationListener<ApplicationEvent> {
                 
                 break;
                 
+            case REFRESHED:
+                mLogger.debug("Received heartbeat from kiosk {}", iEvent.getId());
+                
+                break;
+                
             case EXPIRED:
                 mLogger.warn("Kiosk {} has been expired", iEvent.getId());
                 

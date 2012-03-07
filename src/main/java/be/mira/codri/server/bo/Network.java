@@ -91,31 +91,48 @@ public final class Network implements ApplicationEventPublisherAware {
         mPublisher.publishEvent(tEvent);
     }
     
-    public void expireKiosk(final UUID iId, final Kiosk iKiosk) throws NetworkException {
-        mLogger.info("Expiring kiosk {}", iId);
+    public void refreshKiosk(final UUID iId) throws NetworkException {
+        mLogger.info("Refreshing kiosk {}", iId);
         
+        Kiosk tKiosk = null;
         synchronized (mKiosks) {
             if (!mKiosks.containsKey(iId)) {
                 throw new NetworkException("kiosk " + iId + " is not present in network");
             }
-            mKiosks.remove(iId);
+            tKiosk = mKiosks.get(iId);
         }
         
-        NetworkEvent tEvent = new NetworkKioskEvent(this, NetworkEventType.EXPIRED, iId, iKiosk);
+        NetworkEvent tEvent = new NetworkKioskEvent(this, NetworkEventType.REFRESHED, iId, tKiosk);
+        mPublisher.publishEvent(tEvent);        
+    }
+    
+    public void expireKiosk(final UUID iId) throws NetworkException {
+        mLogger.info("Expiring kiosk {}", iId);
+        
+        Kiosk tKiosk = null;
+        synchronized (mKiosks) {
+            if (!mKiosks.containsKey(iId)) {
+                throw new NetworkException("kiosk " + iId + " is not present in network");
+            }
+            tKiosk = mKiosks.remove(iId);
+        }
+        
+        NetworkEvent tEvent = new NetworkKioskEvent(this, NetworkEventType.EXPIRED, iId, tKiosk);
         mPublisher.publishEvent(tEvent);
     }
     
-    public void removeKiosk(final UUID iId, final Kiosk iKiosk) throws NetworkException {
+    public void removeKiosk(final UUID iId) throws NetworkException {
         mLogger.info("Removing kiosk {}", iId);
         
+        Kiosk tKiosk = null;
         synchronized (mKiosks) {
             if (!mKiosks.containsKey(iId)) {
                 throw new NetworkException("kiosk " + iId + " is not present in network");
             }
-            mKiosks.remove(iId);
+            tKiosk = mKiosks.remove(iId);
         }
         
-        NetworkEvent tEvent = new NetworkKioskEvent(this, NetworkEventType.REMOVED, iId, iKiosk);
+        NetworkEvent tEvent = new NetworkKioskEvent(this, NetworkEventType.REMOVED, iId, tKiosk);
         mPublisher.publishEvent(tEvent);
     }
 }

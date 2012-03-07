@@ -73,14 +73,13 @@ public class NetworkController {
         return tKiosk;
     }
     
-    @Profiled(tag="api/network/kiosks/$id.PUT")
-    @RequestMapping(value="/kiosks/{id}", method=RequestMethod.PUT)
-    public void updateKiosk(final @PathVariable("id") UUID iId, final HttpServletRequest iRequest, final HttpServletResponse iResponse) throws IOException {
-        Kiosk tKiosk = mNetwork.getKiosk(iId);
-        if (tKiosk == null) {
-            iResponse.sendError(HttpStatus.GONE.value());            
-        } else {
-            tKiosk.updateHeartbeat();
+    @Profiled(tag="api/network/kiosks/$id/heartbeat.PUT")
+    @RequestMapping(value="/kiosks/{id}/heartbeat", method=RequestMethod.PUT)
+    public void refreshKiosk(final @PathVariable("id") UUID iId, final HttpServletRequest iRequest, final HttpServletResponse iResponse) throws IOException {
+        try {
+            mNetwork.refreshKiosk(iId);
+        } catch (NetworkException tException) {
+            iResponse.sendError(HttpStatus.GONE.value());
         }
     }
     
@@ -94,6 +93,17 @@ public class NetworkController {
             iResponse.setHeader("Location", String.format("/rest/customers/%s", iId));
         } catch (NetworkException tException) {
             iResponse.sendError(HttpStatus.CONFLICT.value(), tException.getLocalizedMessage());
+        }
+    }
+    
+    @Profiled(tag="api/network/kiosks/$id.DELETE")
+    @RequestMapping(value="/kiosks/{id}", method=RequestMethod.DELETE)
+    @ResponseBody
+    public void removeKiosk(final @PathVariable("id") UUID iId, final HttpServletResponse iResponse) throws IOException {
+        try {
+            mNetwork.removeKiosk(iId);
+        } catch (NetworkException tException) {
+            iResponse.sendError(HttpStatus.GONE.value());
         }
     }
 }
