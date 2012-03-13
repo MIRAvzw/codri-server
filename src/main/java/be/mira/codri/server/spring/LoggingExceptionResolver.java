@@ -1,3 +1,9 @@
+/**
+ * Copyright (C) 2012 Tim Besard <tim.besard@gmail.com>
+ *
+ * All rights reserved.
+ */
+
 package be.mira.codri.server.spring;
 
 import javax.servlet.http.HttpServletRequest;
