@@ -57,14 +57,6 @@
   <!--
     Repositories
   -->
-  
-    <repositories>
-        <!-- Local repository -->
-        <repository>
-            <id>local-repository</id>
-            <url>file://${basedir}/lib</url>
-        </repository>
-    </repositories>
 
     <pluginRepositories>
         <!-- maven-license-plugin -->
