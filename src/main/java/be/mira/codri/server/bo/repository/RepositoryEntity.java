@@ -7,7 +7,6 @@
 package be.mira.codri.server.bo.repository;
 
 import javax.xml.bind.annotation.XmlElement;
-import org.springframework.context.annotation.Scope;
 
 /**
  *
@@ -19,16 +18,16 @@ public abstract class RepositoryEntity {
     //
     
     private final Long mRevision;
-    private final String mPath;
+    private final String mLocation;
     
     
     //
     // Construction and destruction
     //
     
-    public RepositoryEntity(final Long iRevision, final String iPath) {
+    public RepositoryEntity(final Long iRevision, final String iLocation) {
         mRevision = iRevision;
-        mPath = iPath;
+        mLocation = iLocation;
     }
     
     
@@ -42,7 +41,7 @@ public abstract class RepositoryEntity {
     }
     
     @XmlElement
-    public final String getPath() {
-        return mPath;
+    public final String getLocation() {
+        return mLocation;
     }
 }

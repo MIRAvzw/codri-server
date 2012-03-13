@@ -105,7 +105,9 @@
     
     <!-- Repository --> 
     
-    <bean class="be.mira.codri.server.bo.Repository" id="repository" />
+    <bean class="be.mira.codri.server.bo.Repository" id="repository">
+        <property name="server" value="${repository.location}"/>
+    </bean>
     
     <bean id="configuration" class="be.mira.codri.server.bo.repository.entities.Configuration" scope="prototype" />
     <bean id="presentation" class="be.mira.codri.server.bo.repository.entities.Presentation" scope="prototype" />

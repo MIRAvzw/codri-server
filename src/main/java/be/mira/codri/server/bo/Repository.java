@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 
@@ -83,14 +84,13 @@ public final class Repository implements ApplicationEventPublisherAware {
     // TODO: Remove the quite identical Connection/Configuration/Presentation setters
     //       somehow make it using the RepositoryEntity interface
     
-    @XmlElement(nillable=true)
+    @XmlElement
     public String getServer() {
         return mServer;
     }
     
-    public void setServer(final String iServer) {
-        mLogger.info("Setting the repository server to {}", iServer);
-        
+    @Required
+    public void setServer(final String iServer) {        
         mServer = iServer;
     }
      

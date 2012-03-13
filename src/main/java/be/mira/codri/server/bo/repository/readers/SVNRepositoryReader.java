@@ -51,9 +51,8 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
     
     @Slf4jLogger
     private Logger mLogger;
-
-    private @Value("${repository.location}") String mSVNLocation;
-    private @Value("${repository.checkout}") File mSVNCheckoutRoot;
+    
+    private @Value("${svnrepositoryreader.checkout}") File mSVNCheckoutRoot;
     
     private SVNClient mSVNClient;
     
@@ -85,11 +84,10 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
         
         // Subversion location
         Pattern tLocationPattern = Pattern.compile("^(https?|file|svn)://");
-        Matcher tLocationMatcher = tLocationPattern.matcher(mSVNLocation);
+        Matcher tLocationMatcher = tLocationPattern.matcher(mRepository.getServer());
         if (!tLocationMatcher.find()) {
-            throw new Exception("repository location '" + mSVNLocation + "' is not a valid URL");
+            throw new Exception("repository location '" + mRepository.getServer() + "' is not a valid URL");
         }
-        mRepository.setServer(mSVNLocation);
         mSVNClient = new SVNClient();
         
         // TODO: remove
@@ -177,17 +175,19 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
     }
     
     private long checkPresentations() throws RepositoryException {
-        return getRevision(mSVNLocation + "/presentations");
+        return getRevision(mRepository.getServer() + "/presentations");
     }
     
     private void processPresentations() throws RepositoryException {        
         // List
         mLogger.debug("Listing presentations");
         Map<String, Presentation> tNewPresentations = new HashMap<String, Presentation>();
-        Map<String, Long> tPathEntries = getChildrenRevisions(mSVNLocation + "/presentations");
+        Map<String, Long> tPathEntries = getChildrenRevisions(mRepository.getServer() + "/presentations");
         for (Map.Entry<String, Long> tEntry: tPathEntries.entrySet()) {
-            String tPath = "/presentations/" + tEntry.getKey();
-            Presentation tPresentation = (Presentation) mApplicationContext.getBean("presentation", new Object[]{tEntry.getValue(), tPath});
+            String tLocation = mRepository.getServer() + "/presentations/" + tEntry.getKey();
+            Presentation tPresentation = (Presentation) mApplicationContext.getBean("presentation", new Object[]{
+                tEntry.getValue(),
+                tLocation});
             tNewPresentations.put(tEntry.getKey(), tPresentation);
         }
         
@@ -212,13 +212,13 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
     //
     
     private long checkConfigurations() throws RepositoryException {
-        return getRevision(mSVNLocation + "/configurations");
+        return getRevision(mRepository.getServer() + "/configurations");
     }
     
     private long getConfigurations() throws RepositoryException {
         // Get a local checkout and location
         final File tCheckout =  new File(mSVNCheckoutRoot, "configurations");
-        final String tLocation = mSVNLocation + "/configurations";
+        final String tLocation = mRepository.getServer() + "/configurations";
         
         // Check if the repository exists and is valid
         Long tConfigurationRevision = null;
@@ -263,9 +263,9 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
             final long tRevision = getRevision(tFile);
             
             // Process the contents
-            String tRepositoryPath = "/configurations/" + tFilename;
+            String tLocation = mRepository.getServer() + "/configurations/" + tFilename;
             ConfigurationProcessor tReader = createConfigurationProcessor();
-            Configuration tConfiguration = tReader.process(tFile, tRevision, tRepositoryPath);
+            Configuration tConfiguration = tReader.process(tFile, tRevision, tLocation);
             if (tConfiguration == null) {
                 throw new RepositoryException("found empty configuration file");
             }
@@ -296,13 +296,13 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
     //       somehow make it using the RepositoryEntity interface
     
     private long checkConnections() throws RepositoryException {
-        return getRevision(mSVNLocation + "/connections");
+        return getRevision(mRepository.getServer() + "/connections");
     }
     
     private long getConnections() throws RepositoryException {
         // Get a local checkout and location
         final File tCheckout =  new File(mSVNCheckoutRoot, "connections");
-        final String tLocation = mSVNLocation + "/connections";
+        final String tLocation = mRepository.getServer() + "/connections";
         
         // Check if the repository exists and is valid
         Long tConnectionRevision = null;
@@ -347,9 +347,9 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
             final long tRevision = getRevision(tFile);
             
             // Process the contents
-            String tRepositoryPath = "/connections/" + tFilename;
+            String tLocation = mRepository.getServer() + "/connections/" + tFilename;
             ConnectionProcessor tReader = createConnectionProcessor();
-            Connection tConnection = tReader.process(tFile, tRevision, tRepositoryPath);
+            Connection tConnection = tReader.process(tFile, tRevision, tLocation);
             if (tConnection == null) {
                 throw new RepositoryException("found empty connection file");
             }

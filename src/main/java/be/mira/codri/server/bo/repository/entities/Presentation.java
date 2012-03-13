@@ -19,7 +19,7 @@ public class Presentation extends RepositoryEntity {
     // Construction and destruction
     //
     
-    public Presentation(final Long iRevision, final String iPath) {
-        super(iRevision, iPath);
+    public Presentation(final Long iRevision, final String iLocation) {
+        super(iRevision, iLocation);
     }
 }

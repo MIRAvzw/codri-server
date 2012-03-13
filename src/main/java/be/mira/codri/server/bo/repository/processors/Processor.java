@@ -51,7 +51,7 @@ public abstract class Processor<T> {
     // Public API
     //
     
-    public final T process(final File iFile, final long iRevision, final String iPath) throws RepositoryException {
+    public final T process(final File iFile, final long iRevision, final String iLocation) throws RepositoryException {
         // Create a validator
         try {           
             // Acquire the validator factory
@@ -85,10 +85,10 @@ public abstract class Processor<T> {
             throw new RepositoryException("could not open XML file", tException);
         }
         
-        return parseDocument(iRevision, iPath);
+        return parseDocument(iRevision, iLocation);
     }
     
-    protected abstract T parseDocument(final long iRevision, final String iPath) throws RepositoryException;
+    protected abstract T parseDocument(final long iRevision, final String iLocation) throws RepositoryException;
     
     
     //
