@@ -6,6 +6,7 @@
 
 package be.mira.codri.server.bo.network;
 
+import be.mira.codri.server.bo.network.entities.Kiosk;
 import be.mira.codri.server.bo.Network;
 import be.mira.codri.server.exceptions.NetworkException;
 import be.mira.codri.server.spring.Slf4jLogger;

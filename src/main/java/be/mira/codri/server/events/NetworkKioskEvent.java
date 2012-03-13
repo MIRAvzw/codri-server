@@ -6,7 +6,7 @@
 
 package be.mira.codri.server.events;
 
-import be.mira.codri.server.bo.network.Kiosk;
+import be.mira.codri.server.bo.network.entities.Kiosk;
 import java.util.UUID;
 
 /**

@@ -8,13 +8,11 @@ package be.mira.codri.server.bo.network;
 
 import java.util.Date;
 import javax.xml.bind.annotation.XmlElement;
-import org.springframework.context.annotation.Scope;
 
 /**
  *
  * @author tim
  */
-@Scope("prototype")
 public abstract class NetworkEntity {
     //
     // Member data

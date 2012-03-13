@@ -4,8 +4,9 @@
  * All rights reserved.
  */
 
-package be.mira.codri.server.bo.network;
+package be.mira.codri.server.bo.network.entities;
 
+import be.mira.codri.server.bo.network.NetworkEntity;
 import be.mira.codri.server.exceptions.DeviceException;
 import be.mira.codri.server.bo.repository.entities.Configuration;
 import be.mira.codri.server.bo.repository.entities.Presentation;
@@ -47,7 +48,6 @@ public class Kiosk extends NetworkEntity {
         List<HttpMessageConverter<?>> tList = new ArrayList<HttpMessageConverter<?>>();
         tList.add(new MappingJacksonHttpMessageConverter());
         mRestTemplate.setMessageConverters(tList);
-
     }
     
     

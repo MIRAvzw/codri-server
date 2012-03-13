@@ -10,7 +10,7 @@ import be.mira.codri.server.exceptions.NetworkException;
 import be.mira.codri.server.events.NetworkEvent;
 import be.mira.codri.server.events.NetworkEvent.NetworkEventType;
 import be.mira.codri.server.events.NetworkKioskEvent;
-import be.mira.codri.server.bo.network.Kiosk;
+import be.mira.codri.server.bo.network.entities.Kiosk;
 import be.mira.codri.server.spring.Slf4jLogger;
 import java.util.HashMap;
 import java.util.Map;

@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Scope;
  *
  * @author tim
  */
-@Scope("prototype")
 public abstract class RepositoryEntity {
     //
     // Member data

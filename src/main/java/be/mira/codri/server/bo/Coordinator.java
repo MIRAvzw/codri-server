@@ -13,7 +13,7 @@ import be.mira.codri.server.events.RepositoryEvent;
 import be.mira.codri.server.events.NetworkEvent;
 import be.mira.codri.server.events.RepositoryConfigurationEvent;
 import be.mira.codri.server.exceptions.DeviceException;
-import be.mira.codri.server.bo.network.Kiosk;
+import be.mira.codri.server.bo.network.entities.Kiosk;
 import be.mira.codri.server.bo.repository.entities.Configuration;
 import be.mira.codri.server.bo.repository.entities.Connection;
 import be.mira.codri.server.bo.repository.entities.Presentation;

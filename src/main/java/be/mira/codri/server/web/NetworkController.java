@@ -8,7 +8,7 @@ package be.mira.codri.server.web;
 
 import be.mira.codri.server.bo.Network;
 import be.mira.codri.server.exceptions.NetworkException;
-import be.mira.codri.server.bo.network.Kiosk;
+import be.mira.codri.server.bo.network.entities.Kiosk;
 import be.mira.codri.server.spring.Slf4jLogger;
 import java.io.IOException;
 import java.util.UUID;
