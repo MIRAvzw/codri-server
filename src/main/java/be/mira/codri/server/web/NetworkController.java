@@ -83,7 +83,7 @@ public class NetworkController {
             iKiosk.setAddress(iRequest.getRemoteAddr());
             mNetwork.addKiosk(iId, iKiosk);
             iResponse.setStatus(HttpStatus.CREATED.value());
-            iResponse.setHeader("Location", String.format("/rest/customers/%s", iId));
+            iResponse.setHeader("Location", String.format("/kiosks/%s", iId));
         } catch (NetworkException tException) {
             iResponse.sendError(HttpStatus.CONFLICT.value(), tException.getLocalizedMessage());
         }
