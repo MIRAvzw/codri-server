@@ -84,7 +84,7 @@
         <dependency>
            <groupId>org.springframework</groupId>
            <artifactId>spring-context</artifactId>
-           <version>3.1.0.RELEASE</version>
+           <version>3.1.1.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>cglib</groupId>
@@ -96,12 +96,12 @@
         <dependency>
            <groupId>org.springframework</groupId>
            <artifactId>spring-webmvc</artifactId>
-           <version>3.1.0.RELEASE</version>
+           <version>3.1.1.RELEASE</version>
         </dependency>
         <dependency>
            <groupId>org.springframework</groupId>
            <artifactId>spring-oxm</artifactId>
-           <version>3.1.0.RELEASE</version>
+           <version>3.1.1.RELEASE</version>
         </dependency>
 
         <!-- Servlet APIs (some of which are provided by Tomcat) -->
@@ -127,17 +127,17 @@
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-core-asl</artifactId>
-            <version>1.9.4</version>
+            <version>1.9.5</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
-            <version>1.9.4</version>
+            <version>1.9.5</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-xc</artifactId>
-            <version>1.9.4</version>
+            <version>1.9.5</version>
         </dependency>
     
         <!-- Subversion JavaHL -->
@@ -200,13 +200,13 @@
         <dependency> <!-- Actual logging implementation -->
            <groupId>ch.qos.logback</groupId>
            <artifactId>logback-classic</artifactId>
-           <version>1.0.0</version>
+           <version>1.0.1</version>
            <scope>runtime</scope>
         </dependency>
         <dependency>
            <groupId>ch.qos.logback</groupId>
            <artifactId>logback-core</artifactId>
-           <version>1.0.0</version>
+           <version>1.0.1</version>
            <scope>runtime</scope>
         </dependency>
     
