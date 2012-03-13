@@ -110,9 +110,17 @@
     <!-- Repository --> 
     
     <bean class="be.mira.codri.server.bo.Repository" id="repository" />
+    
+    <bean id="configuration" class="be.mira.codri.server.bo.repository.entities.Configuration" scope="prototype" />
+    <bean id="presentation" class="be.mira.codri.server.bo.repository.entities.Presentation" scope="prototype" />
+    <bean id="connection" class="be.mira.codri.server.bo.repository.entities.Connection" scope="prototype" />
 
-    <bean id="connectionProcessor" class="be.mira.codri.server.bo.repository.processors.ConnectionProcessor" scope="prototype" />
-    <bean id="configurationProcessor" class="be.mira.codri.server.bo.repository.processors.ConfigurationProcessor" scope="prototype" />
+    <bean id="connectionProcessor" class="be.mira.codri.server.bo.repository.processors.ConnectionProcessor" scope="prototype">
+        <property name="validationFilename" value="connection.xsd" />
+    </bean>
+    <bean id="configurationProcessor" class="be.mira.codri.server.bo.repository.processors.ConfigurationProcessor" scope="prototype">
+        <property name="validationFilename" value="configuration.xsd" />
+    </bean>
     
     <bean class="be.mira.codri.server.bo.repository.readers.SVNRepositoryReader" id="repositoryReader">
         <lookup-method name="createConnectionProcessor" bean="connectionProcessor"/>

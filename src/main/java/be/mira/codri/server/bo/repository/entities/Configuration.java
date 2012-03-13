@@ -9,6 +9,7 @@ package be.mira.codri.server.bo.repository.entities;
 import be.mira.codri.server.bo.repository.RepositoryEntity;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.springframework.beans.factory.annotation.Required;
 
 /**
  *
@@ -20,7 +21,8 @@ public class Configuration extends RepositoryEntity {
     // Member data
     //
     
-    private Integer mVolume;
+    private final Integer mVolume;
+    
     
     //
     // Construction and destruction

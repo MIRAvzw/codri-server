@@ -1,6 +1,8 @@
 VERSION 0.9
 -----------
 
+NU: Repository entities bean-ifye. @Required, maar werkt niet met lookup-method. Oplossing: zelf factories maken
+
 * General
   - Unify error handling (exceptions from within subsystems, proper handling at
     controller level)

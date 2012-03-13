@@ -15,12 +15,15 @@ import javax.annotation.PostConstruct;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import org.slf4j.Logger;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 /**
  *
  * @author tim
  */
-public class ConfigurationProcessor extends Processor<Configuration> {
+public class ConfigurationProcessor extends Processor<Configuration> implements ApplicationContextAware {
     //
     // Member data
     //
@@ -28,14 +31,17 @@ public class ConfigurationProcessor extends Processor<Configuration> {
     @Slf4jLogger
     private Logger mLogger;
     
+    private ApplicationContext mApplicationContext;
+    
     
     //
     // Construction and destruction
     //
-    
-    @PostConstruct
-    public void init() throws RepositoryException {
-        setValidationFilename("configuration.xsd");
+
+    // FIXME: can't we instantiate prototype beans without being application context aware?
+    @Override
+    public void setApplicationContext(ApplicationContext iApplicationContext) throws BeansException {
+        mApplicationContext = iApplicationContext;
     }
     
     
@@ -103,11 +109,10 @@ public class ConfigurationProcessor extends Processor<Configuration> {
         }
         
         // Create the object
-        // TODO: null check of soundconfiguration? can it be missing?
-        Configuration tConfiguration = new Configuration(
+        Configuration tConfiguration = (Configuration) mApplicationContext.getBean("configuration", new Object[]{
                 iRevision,
                 iPath,
-                tVolume);
+                tVolume});
         return tConfiguration;
     }
 }

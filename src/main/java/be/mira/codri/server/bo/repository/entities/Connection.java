@@ -10,6 +10,7 @@ import be.mira.codri.server.bo.repository.RepositoryEntity;
 import java.util.UUID;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.springframework.beans.factory.annotation.Required;
 
 /**
  *
@@ -21,9 +22,9 @@ public class Connection extends RepositoryEntity {
     // Member data
     //
     
-    private UUID mKiosk;
-    private String mConfiguration;
-    private String mPresentation;
+    private final UUID mKiosk;
+    private final String mConfiguration;
+    private final String mPresentation;
     
     
     //
@@ -55,6 +56,5 @@ public class Connection extends RepositoryEntity {
     @XmlElement
     public final String getPresentation() {
         return mPresentation;
-    }
-    
+    }    
 }

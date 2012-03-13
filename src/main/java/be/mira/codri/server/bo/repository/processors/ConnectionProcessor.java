@@ -16,12 +16,15 @@ import javax.annotation.PostConstruct;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import org.slf4j.Logger;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 /**
  *
  * @author tim
  */
-public class ConnectionProcessor extends Processor<Connection> {
+public class ConnectionProcessor extends Processor<Connection> implements ApplicationContextAware {
     //
     // Member data
     //
@@ -29,16 +32,17 @@ public class ConnectionProcessor extends Processor<Connection> {
     @Slf4jLogger
     private Logger mLogger;
     
-    
+    private ApplicationContext mApplicationContext;
     
     
     //
     // Construction and destruction
     //
-    
-    @PostConstruct
-    public void init() throws RepositoryException {
-        setValidationFilename("connection.xsd");
+
+    // FIXME: can't we instantiate prototype beans without being application context aware?
+    @Override
+    public void setApplicationContext(ApplicationContext iApplicationContext) throws BeansException {
+        mApplicationContext = iApplicationContext;
     }
     
     
@@ -112,12 +116,12 @@ public class ConnectionProcessor extends Processor<Connection> {
         }
         
         // Create the object
-        Connection tConnection = new Connection(
+        Connection tConnection = (Connection) mApplicationContext.getBean("connection", new Object[]{
                 iRevision,
                 iPath,
                 tKiosk,
                 tConfiguration,
-                tPresentation);
+                tPresentation});
         return tConnection;
     }
 }

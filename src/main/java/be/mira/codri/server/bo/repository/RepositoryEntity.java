@@ -7,11 +7,14 @@
 package be.mira.codri.server.bo.repository;
 
 import javax.xml.bind.annotation.XmlElement;
+import org.springframework.beans.factory.annotation.Required;
+import org.springframework.context.annotation.Scope;
 
 /**
  *
  * @author tim
  */
+@Scope("prototype")
 public abstract class RepositoryEntity {
     //
     // Member data
@@ -32,7 +35,7 @@ public abstract class RepositoryEntity {
     
     
     //
-    // Getters & setters
+    // Basic I/O
     //
     
     @XmlElement

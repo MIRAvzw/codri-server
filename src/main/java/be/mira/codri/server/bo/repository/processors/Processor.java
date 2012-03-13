@@ -18,6 +18,7 @@ import org.codehaus.stax2.XMLInputFactory2;
 import org.codehaus.stax2.XMLStreamReader2;
 import org.codehaus.stax2.validation.XMLValidationSchema;
 import org.codehaus.stax2.validation.XMLValidationSchemaFactory;
+import org.springframework.beans.factory.annotation.Required;
 
 /**
  *
@@ -40,8 +41,7 @@ public abstract class Processor<T> {
     // Construction and destruction
     //
     
-    // TODO: use typical bean construction    
-    //@Required
+    @Required
     public void setValidationFilename(final String iValidationFilename) {
         mValidationFilename = iValidationFilename;
     }

@@ -14,8 +14,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author tim
  */
 @XmlRootElement(name="presentation")
-public class Presentation extends RepositoryEntity {   
-    
+public class Presentation extends RepositoryEntity {
     //
     // Construction and destruction
     //

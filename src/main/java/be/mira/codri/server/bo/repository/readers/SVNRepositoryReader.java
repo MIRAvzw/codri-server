@@ -10,7 +10,6 @@ import be.mira.codri.server.bo.Repository;
 import be.mira.codri.server.bo.repository.processors.ConfigurationProcessor;
 import be.mira.codri.server.exceptions.RepositoryException;
 import be.mira.codri.server.bo.repository.RepositoryEntity;
-import be.mira.codri.server.bo.repository.RepositoryEntity;
 import be.mira.codri.server.bo.repository.RepositoryReader;
 import be.mira.codri.server.bo.repository.entities.Configuration;
 import be.mira.codri.server.bo.repository.entities.Connection;
@@ -24,15 +23,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.Depth;
 import org.tigris.subversion.javahl.Info2;
@@ -44,7 +43,7 @@ import org.tigris.subversion.javahl.SVNClient;
  *
  * @author tim
  */
-public abstract class SVNRepositoryReader extends RepositoryReader {
+public abstract class SVNRepositoryReader extends RepositoryReader implements ApplicationContextAware {
     //
     // Data members
     //
@@ -60,6 +59,8 @@ public abstract class SVNRepositoryReader extends RepositoryReader {
     private long mConnectionsRevision;
     private long mConfigurationsRevision;
     private long mPresentationsRevision;
+    
+    private ApplicationContext mApplicationContext;
 
 
     //
@@ -87,6 +88,12 @@ public abstract class SVNRepositoryReader extends RepositoryReader {
         
         // TODO: remove
         checkout();
+    }
+
+    // FIXME: can't we instantiate prototype beans without being application context aware?
+    @Override
+    public void setApplicationContext(ApplicationContext iApplicationContext) throws BeansException {
+        mApplicationContext = iApplicationContext;
     }
 
 
@@ -174,8 +181,8 @@ public abstract class SVNRepositoryReader extends RepositoryReader {
         Map<String, Long> tPathEntries = getChildrenRevisions(mSVNLocation + "/presentations");
         for (Map.Entry<String, Long> tEntry: tPathEntries.entrySet()) {
             String tPath = "/presentations/" + tEntry.getKey();
-            Presentation tMedia = new Presentation(tEntry.getValue(), tPath);
-            tNewPresentations.put(tEntry.getKey(), tMedia);
+            Presentation tPresentation = (Presentation) mApplicationContext.getBean("presentation", new Object[]{tEntry.getValue(), tPath});
+            tNewPresentations.put(tEntry.getKey(), tPresentation);
         }
         
         // Update

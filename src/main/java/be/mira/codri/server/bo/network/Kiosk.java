@@ -9,13 +9,13 @@ package be.mira.codri.server.bo.network;
 import be.mira.codri.server.exceptions.DeviceException;
 import be.mira.codri.server.bo.repository.entities.Configuration;
 import be.mira.codri.server.bo.repository.entities.Presentation;
+import be.mira.codri.server.spring.Slf4jLogger;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
@@ -30,8 +30,8 @@ public class Kiosk extends NetworkEntity {
     // Member data
     //
     
-    // TODO: use the @Slf4jLogger annotation -- make this a prototype bean?
-    Logger mLogger = LoggerFactory.getLogger(Kiosk.class);
+    @Slf4jLogger
+    private Logger mLogger;
     
     RestTemplate mRestTemplate;
     
@@ -43,7 +43,6 @@ public class Kiosk extends NetworkEntity {
     @JsonCreator
     public Kiosk(final @JsonProperty("vendor") String iVendor, final @JsonProperty("model") String iModel, final @JsonProperty("port") int iPort) {
         super(iVendor, iModel, iPort);
-        
         mRestTemplate = new RestTemplate();
         List<HttpMessageConverter<?>> tList = new ArrayList<HttpMessageConverter<?>>();
         tList.add(new MappingJacksonHttpMessageConverter());

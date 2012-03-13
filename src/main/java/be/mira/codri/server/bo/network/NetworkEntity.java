@@ -6,21 +6,25 @@
 
 package be.mira.codri.server.bo.network;
 
+import be.mira.codri.server.bo.Repository;
 import java.util.Date;
 import javax.xml.bind.annotation.XmlElement;
+import org.springframework.beans.factory.annotation.Required;
+import org.springframework.context.annotation.Scope;
 
 /**
  *
  * @author tim
  */
+@Scope("prototype")
 public abstract class NetworkEntity {
     //
     // Member data
     //
     
     private final String mVendor, mModel;
+    private final int mPort;
     private String mAddress;
-    private int mPort;
     private Date mHeartbeat;
     
     
@@ -34,10 +38,10 @@ public abstract class NetworkEntity {
         mPort = iPort;
         updateHeartbeat();
     }
-    
-    
+
+
     //
-    // Getters and setters
+    // Basic I/O
     //
     
     @XmlElement
