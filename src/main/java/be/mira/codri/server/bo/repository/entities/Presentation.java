@@ -13,7 +13,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author tim
  */
-@XmlRootElement(name="presentation")
+@XmlRootElement(name = "presentation")
 public class Presentation extends RepositoryEntity {
     //
     // Construction and destruction

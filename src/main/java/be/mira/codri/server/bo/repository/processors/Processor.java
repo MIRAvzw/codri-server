@@ -42,7 +42,7 @@ public abstract class Processor<T> {
     //
     
     @Required
-    public void setValidationFilename(final String iValidationFilename) {
+    public final void setValidationFilename(final String iValidationFilename) {
         mValidationFilename = iValidationFilename;
     }
     
@@ -77,7 +77,7 @@ public abstract class Processor<T> {
             // Create a parser
             mParser = (XMLStreamReader2) PARSER_FACTORY.createXMLStreamReader(new FileInputStream(iFile));
             mParser.validateAgainst(mValidator);
-        } catch(FactoryConfigurationError tException) {
+        } catch (FactoryConfigurationError tException) {
             throw new RepositoryException("could not acquire XML parser factory", tException);
         } catch (XMLStreamException tException) {
             throw new RepositoryException("could not create XML parser", tException);
@@ -126,7 +126,7 @@ public abstract class Processor<T> {
     // Auxiliary
     //
     
-    public String getTag() {
+    public final String getTag() {
         return getParser().getName().getLocalPart();
     }
     

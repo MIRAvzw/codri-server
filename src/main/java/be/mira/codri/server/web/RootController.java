@@ -19,13 +19,12 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("/")
 public class RootController {
     @RequestMapping("*")
-    public ModelAndView getIndex() {
+    public final ModelAndView getIndex() {
         ModelAndView tModel = new ModelAndView("/WEB-INF/jsp/index.jsp");
         
         try {
             tModel.addObject("hostname", java.net.InetAddress.getLocalHost().getHostName());
-        }
-        catch (UnknownHostException tException) {
+        } catch (UnknownHostException tException) {
             tModel.addObject("hostname", "unknown");
         }
         

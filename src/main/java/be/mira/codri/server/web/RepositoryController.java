@@ -52,13 +52,13 @@ public class RepositoryController {
     
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
-    public Repository getRepository() {        
+    public final Repository getRepository() {        
         return mRepository;
     }
     
     @RequestMapping(method = RequestMethod.PUT)
     @ResponseBody
-    public void updateRepository() throws RepositoryException {        
+    public final void updateRepository() throws RepositoryException {        
         mRepositoryReader.update();
     }
 }

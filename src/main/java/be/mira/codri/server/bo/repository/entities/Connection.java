@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author tim
  */
-@XmlRootElement(name="connection")
+@XmlRootElement(name = "connection")
 public class Connection extends RepositoryEntity {
     //
     // Member data

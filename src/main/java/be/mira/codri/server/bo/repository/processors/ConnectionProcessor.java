@@ -12,11 +12,9 @@ import be.mira.codri.server.bo.repository.entities.Connection;
 import be.mira.codri.server.spring.Slf4jLogger;
 import java.io.IOException;
 import java.util.UUID;
-import javax.annotation.PostConstruct;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import org.slf4j.Logger;
-import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -41,7 +39,7 @@ public class ConnectionProcessor extends Processor<Connection> implements Applic
 
     // FIXME: can't we instantiate prototype beans without being application context aware?
     @Override
-    public void setApplicationContext(ApplicationContext iApplicationContext) throws BeansException {
+    public final void setApplicationContext(final ApplicationContext iApplicationContext) {
         mApplicationContext = iApplicationContext;
     }
     

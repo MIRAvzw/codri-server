@@ -28,9 +28,8 @@ import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.tigris.subversion.javahl.ClientException;
@@ -52,9 +51,9 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
     @Slf4jLogger
     private Logger mLogger;
     
-    private @Value("${svnrepositoryreader.checkout}") File mSVNCheckoutRoot;
+    private File mCheckout;
     
-    private SVNClient mSVNClient;
+    private SVNClient mClient;
     
     private long mConnectionsRevision;
     private long mConfigurationsRevision;
@@ -71,24 +70,29 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
     public SVNRepositoryReader(final Repository iRepository) {
         super(iRepository);    
     }
+    
+    @Required
+    public final void setCheckout(final File iCheckout) {
+        mCheckout = iCheckout;
+    }
 
     @PostConstruct
     public final void init() throws Exception {
         // Subversion checkout root
-        if (!mSVNCheckoutRoot.exists()) {
-            mSVNCheckoutRoot.mkdirs();
+        if (!mCheckout.exists()) {
+            mCheckout.mkdirs();
         }
-        if (!mSVNCheckoutRoot.exists() || !mSVNCheckoutRoot.canWrite()) {
+        if (!mCheckout.exists() || !mCheckout.canWrite()) {
             throw new Exception("checkout path does not exist or is not writable");
         }
         
         // Subversion location
         Pattern tLocationPattern = Pattern.compile("^(https?|file|svn)://");
-        Matcher tLocationMatcher = tLocationPattern.matcher(mRepository.getServer());
+        Matcher tLocationMatcher = tLocationPattern.matcher(getRepository().getRoot());
         if (!tLocationMatcher.find()) {
-            throw new Exception("repository location '" + mRepository.getServer() + "' is not a valid URL");
+            throw new Exception("repository location '" + getRepository().getRoot() + "' is not a valid URL");
         }
-        mSVNClient = new SVNClient();
+        mClient = new SVNClient();
         
         // TODO: remove
         checkout();
@@ -96,7 +100,7 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
 
     // FIXME: can't we instantiate prototype beans without being application context aware?
     @Override
-    public void setApplicationContext(ApplicationContext iApplicationContext) throws BeansException {
+    public final void setApplicationContext(final ApplicationContext iApplicationContext) {
         mApplicationContext = iApplicationContext;
     }
 
@@ -121,7 +125,7 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
     //
     
     @Override
-    public void checkout() throws RepositoryException {        
+    public final void checkout() throws RepositoryException {        
         // TODO: reduce to get() and mRevision = -1, no processing
         
         // Get the connections
@@ -141,7 +145,7 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
     }
     
     @Override
-    public void update() throws RepositoryException {
+    public final void update() throws RepositoryException {
         // TODO: squash these three cases in something using the 
         //       RepositoryEntity interface
         // Check the connections
@@ -175,16 +179,16 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
     }
     
     private long checkPresentations() throws RepositoryException {
-        return getRevision(mRepository.getServer() + "/presentations");
+        return getRevision(getRepository().getRoot() + "/presentations");
     }
     
     private void processPresentations() throws RepositoryException {        
         // List
         mLogger.debug("Listing presentations");
         Map<String, Presentation> tNewPresentations = new HashMap<String, Presentation>();
-        Map<String, Long> tPathEntries = getChildrenRevisions(mRepository.getServer() + "/presentations");
-        for (Map.Entry<String, Long> tEntry: tPathEntries.entrySet()) {
-            String tLocation = mRepository.getServer() + "/presentations/" + tEntry.getKey();
+        Map<String, Long> tPathEntries = getChildrenRevisions(getRepository().getRoot() + "/presentations");
+        for (Map.Entry<String, Long> tEntry : tPathEntries.entrySet()) {
+            String tLocation = getRepository().getRoot() + "/presentations/" + tEntry.getKey();
             Presentation tPresentation = (Presentation) mApplicationContext.getBean("presentation", new Object[]{
                 tEntry.getValue(),
                 tLocation});
@@ -193,15 +197,15 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
         
         // Update
         mLogger.debug("Updating presentations");
-        Repository tRepository = mRepository;
+        Repository tRepository = getRepository();
         RepositoryChangeset<Presentation> tChangeset = new RepositoryChangeset<Presentation>(tRepository.getPresentations(), tNewPresentations);
-        for (Map.Entry<String, Presentation> tEntry: tChangeset.getRemovals().entrySet()) {
+        for (Map.Entry<String, Presentation> tEntry : tChangeset.getRemovals().entrySet()) {
             tRepository.removePresentation(tEntry.getKey(), tEntry.getValue());
         }
-        for (Map.Entry<String, Presentation> tEntry: tChangeset.getAdditions().entrySet()) {
+        for (Map.Entry<String, Presentation> tEntry : tChangeset.getAdditions().entrySet()) {
             tRepository.addPresentation(tEntry.getKey(), tEntry.getValue());
         }
-        for (Map.Entry<String, Presentation> tEntry: tChangeset.getUpdates().entrySet()) {
+        for (Map.Entry<String, Presentation> tEntry : tChangeset.getUpdates().entrySet()) {
             tRepository.updatePresentation(tEntry.getKey(), tEntry.getValue());
         }
     }
@@ -212,13 +216,13 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
     //
     
     private long checkConfigurations() throws RepositoryException {
-        return getRevision(mRepository.getServer() + "/configurations");
+        return getRevision(getRepository().getRoot() + "/configurations");
     }
     
     private long getConfigurations() throws RepositoryException {
         // Get a local checkout and location
-        final File tCheckout =  new File(mSVNCheckoutRoot, "configurations");
-        final String tLocation = mRepository.getServer() + "/configurations";
+        final File tCheckout =  new File(mCheckout, "configurations");
+        final String tLocation = getRepository().getRoot() + "/configurations";
         
         // Check if the repository exists and is valid
         Long tConfigurationRevision = null;
@@ -253,8 +257,8 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
         // Read
         mLogger.debug("Reading configurations");
         Map<String, Configuration> tNewConfigurations = new HashMap<String, Configuration>();
-        File tDirectory = new File(mSVNCheckoutRoot, "configurations");
-        for (File tFile: tDirectory.listFiles(new XMLFilter())) {
+        File tDirectory = new File(mCheckout, "configurations");
+        for (File tFile : tDirectory.listFiles(new XMLFilter())) {
             // Generate an identifier
             String tFilename = tFile.getName();
             mLogger.trace("Processing '{}'", tFile.getAbsoluteFile());
@@ -263,7 +267,7 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
             final long tRevision = getRevision(tFile);
             
             // Process the contents
-            String tLocation = mRepository.getServer() + "/configurations/" + tFilename;
+            String tLocation = getRepository().getRoot() + "/configurations/" + tFilename;
             ConfigurationProcessor tReader = createConfigurationProcessor();
             Configuration tConfiguration = tReader.process(tFile, tRevision, tLocation);
             if (tConfiguration == null) {
@@ -274,15 +278,15 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
         
         // Save
         mLogger.debug("Saving configurations");
-        Repository tRepository = mRepository;
+        Repository tRepository = getRepository();
         RepositoryChangeset<Configuration> tChangeset = new RepositoryChangeset<Configuration>(tRepository.getConfigurations(), tNewConfigurations);
-        for (Map.Entry<String, Configuration> tEntry: tChangeset.getRemovals().entrySet()) {
+        for (Map.Entry<String, Configuration> tEntry : tChangeset.getRemovals().entrySet()) {
             tRepository.removeConfiguration(tEntry.getKey(), tEntry.getValue());
         }
-        for (Map.Entry<String, Configuration> tEntry: tChangeset.getAdditions().entrySet()) {
+        for (Map.Entry<String, Configuration> tEntry : tChangeset.getAdditions().entrySet()) {
             tRepository.addConfiguration(tEntry.getKey(), tEntry.getValue());
         }
-        for (Map.Entry<String, Configuration> tEntry: tChangeset.getUpdates().entrySet()) {
+        for (Map.Entry<String, Configuration> tEntry : tChangeset.getUpdates().entrySet()) {
             tRepository.addConfiguration(tEntry.getKey(), tEntry.getValue());
         }
     }
@@ -296,13 +300,13 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
     //       somehow make it using the RepositoryEntity interface
     
     private long checkConnections() throws RepositoryException {
-        return getRevision(mRepository.getServer() + "/connections");
+        return getRevision(getRepository().getRoot() + "/connections");
     }
     
     private long getConnections() throws RepositoryException {
         // Get a local checkout and location
-        final File tCheckout =  new File(mSVNCheckoutRoot, "connections");
-        final String tLocation = mRepository.getServer() + "/connections";
+        final File tCheckout =  new File(mCheckout, "connections");
+        final String tLocation = getRepository().getRoot() + "/connections";
         
         // Check if the repository exists and is valid
         Long tConnectionRevision = null;
@@ -337,8 +341,8 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
         // Read
         mLogger.debug("Reading connections");
         Map<String, Connection> tNewConnections = new HashMap<String, Connection>();
-        File tDirectory = new File(mSVNCheckoutRoot, "connections");
-        for (File tFile: tDirectory.listFiles(new XMLFilter())) {
+        File tDirectory = new File(mCheckout, "connections");
+        for (File tFile : tDirectory.listFiles(new XMLFilter())) {
             // Generate an identifier
             String tFilename = tFile.getName();
             mLogger.trace("Processing '{}'", tFile.getAbsoluteFile());
@@ -347,7 +351,7 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
             final long tRevision = getRevision(tFile);
             
             // Process the contents
-            String tLocation = mRepository.getServer() + "/connections/" + tFilename;
+            String tLocation = getRepository().getRoot() + "/connections/" + tFilename;
             ConnectionProcessor tReader = createConnectionProcessor();
             Connection tConnection = tReader.process(tFile, tRevision, tLocation);
             if (tConnection == null) {
@@ -358,15 +362,15 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
         
         // Save
         mLogger.debug("Saving connections");
-        Repository tRepository = mRepository;
+        Repository tRepository = getRepository();
         RepositoryChangeset<Connection> tChangeset = new RepositoryChangeset<Connection>(tRepository.getConnections(), tNewConnections);
-        for (Map.Entry<String, Connection> tEntry: tChangeset.getRemovals().entrySet()) {
+        for (Map.Entry<String, Connection> tEntry : tChangeset.getRemovals().entrySet()) {
             tRepository.removeConnection(tEntry.getKey(), tEntry.getValue());
         }
-        for (Map.Entry<String, Connection> tEntry: tChangeset.getAdditions().entrySet()) {
+        for (Map.Entry<String, Connection> tEntry : tChangeset.getAdditions().entrySet()) {
             tRepository.addConnection(tEntry.getKey(), tEntry.getValue());
         }
-        for (Map.Entry<String, Connection> tEntry: tChangeset.getUpdates().entrySet()) {
+        for (Map.Entry<String, Connection> tEntry : tChangeset.getUpdates().entrySet()) {
             tRepository.addConnection(tEntry.getKey(), tEntry.getValue());
         }
     }
@@ -377,7 +381,7 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
     //
     
     private Long getRevision(final File iFile) throws RepositoryException {
-        if (! iFile.exists()) {
+        if (!iFile.exists()) {
             return null;
         }
         return getRevision(iFile.getAbsolutePath());
@@ -388,7 +392,7 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
     private Long getRevision(final String iPath) throws RepositoryException {
         try {
             final List<Long> tRevisions = new ArrayList<Long>();
-            mSVNClient.info2(
+            mClient.info2(
                     iPath,
                     Revision.HEAD,
                     Revision.HEAD,
@@ -410,7 +414,7 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
     }
     
     private Map<String, Long> getChildrenRevisions(final File iFile) throws RepositoryException {
-        if (! iFile.exists()) {
+        if (!iFile.exists()) {
             return null;
         }
         return getChildrenRevisions(iFile.getAbsoluteFile());
@@ -421,7 +425,7 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
     private Map<String, Long> getChildrenRevisions(final String iPath) throws RepositoryException {
         try {
             final Map<String, Long> tChildren = new HashMap<String, Long>();
-            mSVNClient.info2(
+            mClient.info2(
                     iPath,
                     Revision.HEAD,
                     Revision.HEAD,
@@ -444,7 +448,7 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
 
     private long checkoutRepository(final File iCheckout, final String iLocation) throws RepositoryException {
         try {
-            long tRevision = mSVNClient.checkout(
+            long tRevision = mClient.checkout(
                     iLocation,
                     iCheckout.getAbsolutePath(),
                     Revision.HEAD,
@@ -460,7 +464,7 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
     
     private long updateRepository(final File iCheckout) throws RepositoryException {
         try {
-            long tRevision = mSVNClient.update(
+            long tRevision = mClient.update(
                     iCheckout.getAbsolutePath(),
                     Revision.HEAD,
                     Depth.infinity,
@@ -490,8 +494,8 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
         public RepositoryChangeset(final Map<String, T> iOldEntities, final Map<String, T> iCurrentEntities) {
             // Check for removed entities
             mRemovals = new HashMap<String, T>();
-            for (Map.Entry<String, T> tOldEntry: iOldEntities.entrySet()) {
-                if (! iCurrentEntities.containsKey(tOldEntry.getKey())) {
+            for (Map.Entry<String, T> tOldEntry : iOldEntities.entrySet()) {
+                if (!iCurrentEntities.containsKey(tOldEntry.getKey())) {
                     mLogger.debug("Entity "
                             + tOldEntry.getKey()
                             + " seems to have been deleted (last known rev "
@@ -504,7 +508,7 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
             // Check for new and updated entities      
             mAdditions = new HashMap<String, T>();
             mUpdates = new HashMap<String, T>();
-            for (Map.Entry<String, T> tCurrentEntry: iCurrentEntities.entrySet()) {
+            for (Map.Entry<String, T> tCurrentEntry : iCurrentEntities.entrySet()) {
                 T tOldEntity = iOldEntities.get(tCurrentEntry.getKey());
                 if (tOldEntity == null) {
                     mLogger.debug("Entity "
@@ -513,7 +517,7 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
                             + tCurrentEntry.getValue().getRevision()
                             + "), adding to repository");
                     mAdditions.put(tCurrentEntry.getKey(),  tCurrentEntry.getValue());
-                } else if ( tCurrentEntry.getValue().getRevision() > tOldEntity.getRevision()) {
+                } else if (tCurrentEntry.getValue().getRevision() > tOldEntity.getRevision()) {
                     mLogger.debug("Entity "
                             + tCurrentEntry.getKey()
                             + " is a more recent version (rev "

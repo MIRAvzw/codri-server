@@ -11,11 +11,9 @@ import be.mira.codri.server.exceptions.RepositoryException;
 import be.mira.codri.server.bo.repository.entities.Configuration;
 import be.mira.codri.server.spring.Slf4jLogger;
 import java.io.IOException;
-import javax.annotation.PostConstruct;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import org.slf4j.Logger;
-import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -40,7 +38,7 @@ public class ConfigurationProcessor extends Processor<Configuration> implements 
 
     // FIXME: can't we instantiate prototype beans without being application context aware?
     @Override
-    public void setApplicationContext(ApplicationContext iApplicationContext) throws BeansException {
+    public final void setApplicationContext(final ApplicationContext iApplicationContext) {
         mApplicationContext = iApplicationContext;
     }
     

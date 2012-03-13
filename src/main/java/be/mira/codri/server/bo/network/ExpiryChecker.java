@@ -16,7 +16,6 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
-import org.springframework.beans.factory.annotation.Value;
 
 /**
  *
@@ -32,7 +31,7 @@ public class ExpiryChecker extends TimerTask {
     
     private Network mNetwork;
 
-    private @Value("${network.expiry.threshold}") Long mExpiryThreshold;
+    private Long mThreshold;
     
     
     //
@@ -41,8 +40,13 @@ public class ExpiryChecker extends TimerTask {
     
     @Required
     @Autowired
-    public void setNetwork(Network iNetwork) {
+    public final void setNetwork(final Network iNetwork) {
         mNetwork = iNetwork;
+    }
+    
+    @Required
+    public final void setThreshold(final Long iThreshold) {
+        mThreshold = iThreshold;
     }
     
     
@@ -51,12 +55,12 @@ public class ExpiryChecker extends TimerTask {
     //
     
     @Override
-    public void run() {
+    public final void run() {
         mLogger.trace("Checking for expired network entities");
         
         // Check all kiosks
-        for (Map.Entry<UUID, Kiosk> tEntry: mNetwork.getKiosks().entrySet()) {
-            if (tEntry.getValue().getHeartbeatDelta() > mExpiryThreshold) {
+        for (Map.Entry<UUID, Kiosk> tEntry : mNetwork.getKiosks().entrySet()) {
+            if (tEntry.getValue().getHeartbeatDelta() > mThreshold) {
                 try {
                     mLogger.debug("Trying to expire kiosk {}", tEntry.getKey());
                     mNetwork.expireKiosk(tEntry.getKey());

@@ -106,7 +106,7 @@
     <!-- Repository --> 
     
     <bean class="be.mira.codri.server.bo.Repository" id="repository">
-        <property name="server" value="${repository.location}"/>
+        <property name="root" value="${repository.root}"/>
     </bean>
     
     <bean id="configuration" class="be.mira.codri.server.bo.repository.entities.Configuration" scope="prototype" />
@@ -123,6 +123,7 @@
     <bean class="be.mira.codri.server.bo.repository.readers.SVNRepositoryReader" id="repositoryReader">
         <lookup-method name="createConnectionProcessor" bean="connectionProcessor"/>
         <lookup-method name="createConfigurationProcessor" bean="configurationProcessor"/>
+        <property name="checkout" value="${svnrepositoryreader.checkout}"/>
     </bean>
     
     <!-- Network -->
@@ -135,7 +136,9 @@
         <property name="delay" value="${network.expiry.delay}"/>
         <property name="period" value="${network.expiry.period}"/>
         <property name="timerTask">
-            <bean class="be.mira.codri.server.bo.network.ExpiryChecker" />
+            <bean class="be.mira.codri.server.bo.network.ExpiryChecker">
+                <property name="threshold" value="${network.expiry.threshold}"/>
+            </bean>
         </property>
     </bean>
 			

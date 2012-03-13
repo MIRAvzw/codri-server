@@ -25,7 +25,7 @@ import org.springframework.web.client.RestTemplate;
  *
  * @author tim
  */
-@XmlRootElement(name="kiosk")
+@XmlRootElement(name = "kiosk")
 public class Kiosk extends NetworkEntity {
     //
     // Member data
@@ -34,7 +34,7 @@ public class Kiosk extends NetworkEntity {
     @Slf4jLogger
     private Logger mLogger;
     
-    RestTemplate mRestTemplate;
+    private RestTemplate mRestTemplate;
     
     
     //
@@ -42,7 +42,7 @@ public class Kiosk extends NetworkEntity {
     //
     
     @JsonCreator
-    public Kiosk(final @JsonProperty("vendor") String iVendor, final @JsonProperty("model") String iModel, final @JsonProperty("port") int iPort) {
+    public Kiosk(@JsonProperty("vendor") final String iVendor, @JsonProperty("model") final String iModel, @JsonProperty("port") final int iPort) {
         super(iVendor, iModel, iPort);
         mRestTemplate = new RestTemplate();
         List<HttpMessageConverter<?>> tList = new ArrayList<HttpMessageConverter<?>>();

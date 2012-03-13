@@ -90,7 +90,7 @@ public class Coordinator implements ApplicationListener<ApplicationEvent> {
 
                 // Find the connections this device is a part of
                 Map<String, Connection> tRelevantConnections = new HashMap<String, Connection>();
-                for (Map.Entry<String, Connection> tEntry: mRepository.getConnections().entrySet()) {
+                for (Map.Entry<String, Connection> tEntry : mRepository.getConnections().entrySet()) {
                     if (tEntry.getValue().getKiosk().equals(iEvent.getId())) {
                         tRelevantConnections.put(tEntry.getKey(), tEntry.getValue());
                     }
@@ -121,7 +121,7 @@ public class Coordinator implements ApplicationListener<ApplicationEvent> {
             case REMOVED:
                 mLogger.info("Kiosk {} has been removed", iEvent.getId());
                 
-                break;              
+                break;
         }
     }
     
@@ -166,14 +166,14 @@ public class Coordinator implements ApplicationListener<ApplicationEvent> {
         
         // Find the connections this presentation is a part of
         List<Map.Entry<String, Connection>> tRelevantConnections = new ArrayList<Map.Entry<String, Connection>>();
-        for (Map.Entry<String, Connection> tConnection: mRepository.getConnections().entrySet()) {
+        for (Map.Entry<String, Connection> tConnection : mRepository.getConnections().entrySet()) {
             if (tConnection.getValue().getPresentation().equals(iId)) {
                 tRelevantConnections.add(tConnection);
             }
         }
         
         // Push to the devices
-        for (Map.Entry<String, Connection> tEntry: tRelevantConnections) {
+        for (Map.Entry<String, Connection> tEntry : tRelevantConnections) {
             Kiosk tKiosk = mNetwork.getKiosk(tEntry.getValue().getKiosk());
             // No need to display too many errors here, this should already have
             // have happened when the connection was initially added to the
@@ -227,14 +227,14 @@ public class Coordinator implements ApplicationListener<ApplicationEvent> {
         
         // Find the connections this configuration is a part of
         List<Map.Entry<String, Connection>> tRelevantConnections = new ArrayList<Map.Entry<String, Connection>>();
-        for (Map.Entry<String, Connection> tConnection: mRepository.getConnections().entrySet()) {
+        for (Map.Entry<String, Connection> tConnection : mRepository.getConnections().entrySet()) {
             if (tConnection.getValue().getConfiguration().equals(iId)) {
                 tRelevantConnections.add(tConnection);
             }
         }
         
         // Push to the devices
-        for (Map.Entry<String, Connection> tEntry: tRelevantConnections) {
+        for (Map.Entry<String, Connection> tEntry : tRelevantConnections) {
             Kiosk tKiosk = mNetwork.getKiosk(tEntry.getValue().getKiosk());
             // No need to display too many errors here, this should already have
             // have happened when the connection was initially added to the

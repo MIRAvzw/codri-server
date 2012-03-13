@@ -87,7 +87,7 @@ public abstract class NetworkEntity {
         StringBuilder tEndpointBuilder = new StringBuilder("http://").append(getAddress());
         tEndpointBuilder.append(":").append(getPort());
         tEndpointBuilder.append("/");
-        for (final String tResource: iResources) {
+        for (final String tResource : iResources) {
             tEndpointBuilder.append(tResource).append("/");
         }
         return tEndpointBuilder.toString();

@@ -14,7 +14,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author tim
  */
-@XmlRootElement(name="configuration")
+@XmlRootElement(name = "configuration")
 public class Configuration extends RepositoryEntity {
     //
     // Member data
@@ -38,7 +38,7 @@ public class Configuration extends RepositoryEntity {
     //
     
     @XmlElement
-    public Integer getVolume() {
+    public final Integer getVolume() {
         return mVolume;
     }
 }

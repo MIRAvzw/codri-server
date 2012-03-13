@@ -15,7 +15,6 @@ import be.mira.codri.server.spring.Slf4jLogger;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
@@ -28,7 +27,7 @@ import org.springframework.context.ApplicationEventPublisherAware;
  * 
  * @author tim
  */
-@XmlRootElement(name="network")
+@XmlRootElement(name = "network")
 public final class Network implements ApplicationEventPublisherAware {
     //
     // Member data
@@ -65,8 +64,8 @@ public final class Network implements ApplicationEventPublisherAware {
     // Basic I/O
     //
     
-    @XmlElementWrapper(name="kiosks")
-    @XmlElement(name="kiosk")
+    @XmlElementWrapper(name = "kiosks")
+    @XmlElement(name = "kiosk")
     public Map<UUID, Kiosk> getKiosks() {
         return mKiosks;
     }

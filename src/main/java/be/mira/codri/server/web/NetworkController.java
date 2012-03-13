@@ -15,7 +15,6 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -53,7 +52,7 @@ public class NetworkController implements ApplicationContextAware {
 
     // FIXME: can't we instantiate prototype beans without being application context aware?
     @Override
-    public void setApplicationContext(ApplicationContext iApplicationContext) throws BeansException {
+    public final void setApplicationContext(final ApplicationContext iApplicationContext) {
         mApplicationContext = iApplicationContext;
     }
     
@@ -62,15 +61,15 @@ public class NetworkController implements ApplicationContextAware {
     // REST endpoints
     //
     
-    @RequestMapping(method=RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
-    public Network getNetwork() {        
+    public final Network getNetwork() {        
         return mNetwork;
     }
     
-    @RequestMapping(value="/kiosks/{id}", method=RequestMethod.GET)
+    @RequestMapping(value = "/kiosks/{id}", method = RequestMethod.GET)
     @ResponseBody
-    public Kiosk getKiosk(final @PathVariable("id") UUID iId, final HttpServletResponse iResponse) throws IOException {
+    public final Kiosk getKiosk(@PathVariable("id") final UUID iId, final HttpServletResponse iResponse) throws IOException {
         Kiosk tKiosk = mNetwork.getKiosk(iId);
         if (tKiosk == null) {
             iResponse.sendError(HttpStatus.GONE.value());
@@ -78,8 +77,8 @@ public class NetworkController implements ApplicationContextAware {
         return tKiosk;
     }
     
-    @RequestMapping(value="/kiosks/{id}/heartbeat", method=RequestMethod.PUT)
-    public void refreshKiosk(final @PathVariable("id") UUID iId, final HttpServletRequest iRequest, final HttpServletResponse iResponse) throws IOException {
+    @RequestMapping(value = "/kiosks/{id}/heartbeat", method = RequestMethod.PUT)
+    public final void refreshKiosk(@PathVariable("id") final UUID iId, final HttpServletRequest iRequest, final HttpServletResponse iResponse) throws IOException {
         try {
             mNetwork.refreshKiosk(iId);
         } catch (NetworkException tException) {
@@ -87,8 +86,8 @@ public class NetworkController implements ApplicationContextAware {
         }
     }
     
-    @RequestMapping(value="/kiosks/{id}", method=RequestMethod.POST)
-    public void addKiosk(final @RequestBody Kiosk iKiosk, final @PathVariable("id") UUID iId, final HttpServletRequest iRequest, final HttpServletResponse iResponse) throws IOException {
+    @RequestMapping(value = "/kiosks/{id}", method = RequestMethod.POST)
+    public final void addKiosk(@RequestBody final Kiosk iKiosk, @PathVariable("id") final UUID iId, final HttpServletRequest iRequest, final HttpServletResponse iResponse) throws IOException {
         // FIXME: the parsed Kiosk seems to be a raw unitialized bean, can't we
         //        fix this instead of configuring the bean manually?
         mApplicationContext.getAutowireCapableBeanFactory().configureBean(iKiosk, "kiosk");
@@ -103,9 +102,9 @@ public class NetworkController implements ApplicationContextAware {
         }
     }
     
-    @RequestMapping(value="/kiosks/{id}", method=RequestMethod.DELETE)
+    @RequestMapping(value = "/kiosks/{id}", method = RequestMethod.DELETE)
     @ResponseBody
-    public void removeKiosk(final @PathVariable("id") UUID iId, final HttpServletResponse iResponse) throws IOException {
+    public final void removeKiosk(@PathVariable("id") final UUID iId, final HttpServletResponse iResponse) throws IOException {
         try {
             mNetwork.removeKiosk(iId);
         } catch (NetworkException tException) {

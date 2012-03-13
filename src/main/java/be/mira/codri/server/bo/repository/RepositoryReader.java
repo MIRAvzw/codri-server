@@ -19,7 +19,7 @@ public abstract class RepositoryReader {
     // Member data
     //
     
-    protected final Repository mRepository;
+    private final Repository mRepository;
     
     
     //
@@ -29,6 +29,15 @@ public abstract class RepositoryReader {
     @Autowired
     public RepositoryReader(final Repository iRepository) {
         mRepository = iRepository;        
+    }
+    
+    
+    //
+    // Basic I/O
+    //
+    
+    final protected Repository getRepository() {
+        return mRepository;
     }
     
     

@@ -24,7 +24,7 @@ public class LoggingExceptionResolver extends DefaultHandlerExceptionResolver {
     //
 
     @Override
-    protected ModelAndView doResolveException(HttpServletRequest iRequest, HttpServletResponse iResponse, Object iHandler, Exception iException) {
+    protected final ModelAndView doResolveException(final HttpServletRequest iRequest, final HttpServletResponse iResponse, final Object iHandler, final Exception iException) {
         mLogger.error("Error handling {}", iRequest.getRequestURL().toString(), iException);
         return super.doResolveException(iRequest, iResponse, iHandler, iException);
     }
