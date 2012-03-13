@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 
@@ -40,23 +39,17 @@ public class Coordinator implements ApplicationListener<ApplicationEvent> {
     @Slf4jLogger
     private Logger mLogger;
     
-    private Network mNetwork;
-    private Repository mRepository;
+    private final Network mNetwork;
+    private final Repository mRepository;
     
     
     //
     // Construction and destruction
-    //    
+    //
     
-    @Required
     @Autowired
-    public void setNetwork(Network iNetwork) {
+    public Coordinator(final Network iNetwork, final Repository iRepository) {
         mNetwork = iNetwork;
-    }
-    
-    @Required
-    @Autowired
-    public void setRepository(Repository iRepository) {
         mRepository = iRepository;
     }
     

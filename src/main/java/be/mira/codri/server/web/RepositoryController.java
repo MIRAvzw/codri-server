@@ -13,8 +13,6 @@ import be.mira.codri.server.spring.Slf4jLogger;
 import org.perf4j.aop.Profiled;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -34,24 +32,17 @@ public class RepositoryController {
     @Slf4jLogger
     private Logger mLogger;
     
-    // TODO: can we make this final, despite the property injection?
-    private Repository mRepository;
-    private RepositoryReader mRepositoryReader;
+    private final Repository mRepository;
+    private final RepositoryReader mRepositoryReader;
     
     
     //
     // Construction and destruction
     //
     
-    @Required
     @Autowired
-    public void setRepository(final Repository iRepository) {
+    public RepositoryController(final Repository iRepository, final RepositoryReader iRepositoryReader) {
         mRepository = iRepository;
-    }
-    
-    @Required
-    @Autowired
-    public void setRepositoryReader(final RepositoryReader iRepositoryReader) {
         mRepositoryReader = iRepositoryReader;
     }
     

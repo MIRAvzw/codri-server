@@ -7,7 +7,6 @@
 package be.mira.codri.server.bo.repository;
 
 import javax.xml.bind.annotation.XmlElement;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.annotation.Scope;
 
 /**

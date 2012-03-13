@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.perf4j.aop.Profiled;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -36,18 +35,17 @@ public class NetworkController {
     @Slf4jLogger
     private Logger mLogger;
     
-    // TODO: can we make this final, despite the property injection?
-    private Network mNetwork;
+    
+    private final Network mNetwork;
     
     
     //
     // Construction and destruction
     //
     
-    @Required
     @Autowired
-    public void setNetwork(final Network iNetwork) {
-        mNetwork = iNetwork;
+    public NetworkController(final Network iNetwork) {
+        mNetwork = iNetwork;        
     }
     
     

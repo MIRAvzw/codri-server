@@ -29,6 +29,7 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -66,6 +67,11 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
     //
     // Construction and destruction
     //
+    
+    @Autowired
+    public SVNRepositoryReader(final Repository iRepository) {
+        super(iRepository);    
+    }
 
     @PostConstruct
     public final void init() throws Exception {

@@ -9,7 +9,6 @@ package be.mira.codri.server.bo.network;
 import be.mira.codri.server.bo.Network;
 import be.mira.codri.server.exceptions.NetworkException;
 import be.mira.codri.server.spring.Slf4jLogger;
-import java.io.File;
 import java.util.Map;
 import java.util.TimerTask;
 import java.util.UUID;

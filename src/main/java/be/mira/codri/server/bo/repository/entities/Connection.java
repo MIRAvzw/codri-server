@@ -10,7 +10,6 @@ import be.mira.codri.server.bo.repository.RepositoryEntity;
 import java.util.UUID;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  *
