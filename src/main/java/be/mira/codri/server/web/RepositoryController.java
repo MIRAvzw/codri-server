@@ -10,7 +10,6 @@ import be.mira.codri.server.bo.Repository;
 import be.mira.codri.server.bo.repository.RepositoryReader;
 import be.mira.codri.server.exceptions.RepositoryException;
 import be.mira.codri.server.spring.Slf4jLogger;
-import org.perf4j.aop.Profiled;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -51,14 +50,12 @@ public class RepositoryController {
     // REST endpoints
     //
     
-    @Profiled(tag="api/repository.GET")
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
     public Repository getRepository() {        
         return mRepository;
     }
     
-    @Profiled(tag="api/repository.PUT")
     @RequestMapping(method = RequestMethod.PUT)
     @ResponseBody
     public void updateRepository() throws RepositoryException {        

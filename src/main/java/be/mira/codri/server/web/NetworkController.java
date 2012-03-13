@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.perf4j.aop.Profiled;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -53,14 +52,12 @@ public class NetworkController {
     // REST endpoints
     //
     
-    @Profiled(tag="api/network.GET")
     @RequestMapping(method=RequestMethod.GET)
     @ResponseBody
     public Network getNetwork() {        
         return mNetwork;
     }
     
-    @Profiled(tag="api/network/kiosks/$id.GET")
     @RequestMapping(value="/kiosks/{id}", method=RequestMethod.GET)
     @ResponseBody
     public Kiosk getKiosk(final @PathVariable("id") UUID iId, final HttpServletResponse iResponse) throws IOException {
@@ -71,7 +68,6 @@ public class NetworkController {
         return tKiosk;
     }
     
-    @Profiled(tag="api/network/kiosks/$id/heartbeat.PUT")
     @RequestMapping(value="/kiosks/{id}/heartbeat", method=RequestMethod.PUT)
     public void refreshKiosk(final @PathVariable("id") UUID iId, final HttpServletRequest iRequest, final HttpServletResponse iResponse) throws IOException {
         try {
@@ -81,7 +77,6 @@ public class NetworkController {
         }
     }
     
-    @Profiled(tag="api/network/kiosks/$id.POST")
     @RequestMapping(value="/kiosks/{id}", method=RequestMethod.POST)
     public void addKiosk(final @RequestBody Kiosk iKiosk, final @PathVariable("id") UUID iId, final HttpServletRequest iRequest, final HttpServletResponse iResponse) throws IOException {
         try {
@@ -94,7 +89,6 @@ public class NetworkController {
         }
     }
     
-    @Profiled(tag="api/network/kiosks/$id.DELETE")
     @RequestMapping(value="/kiosks/{id}", method=RequestMethod.DELETE)
     @ResponseBody
     public void removeKiosk(final @PathVariable("id") UUID iId, final HttpServletResponse iResponse) throws IOException {
