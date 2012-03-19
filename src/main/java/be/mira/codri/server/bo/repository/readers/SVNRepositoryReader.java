@@ -287,7 +287,7 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
             tRepository.addConfiguration(tEntry.getKey(), tEntry.getValue());
         }
         for (Map.Entry<String, Configuration> tEntry : tChangeset.getUpdates().entrySet()) {
-            tRepository.addConfiguration(tEntry.getKey(), tEntry.getValue());
+            tRepository.updateConfiguration(tEntry.getKey(), tEntry.getValue());
         }
     }
     
@@ -371,7 +371,7 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
             tRepository.addConnection(tEntry.getKey(), tEntry.getValue());
         }
         for (Map.Entry<String, Connection> tEntry : tChangeset.getUpdates().entrySet()) {
-            tRepository.addConnection(tEntry.getKey(), tEntry.getValue());
+            tRepository.updateConnection(tEntry.getKey(), tEntry.getValue());
         }
     }
 
