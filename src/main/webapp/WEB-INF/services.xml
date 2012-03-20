@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (C) 2012 Tim Besard <tim.besard@gmail.com>
+    Copyright (C) 2011-2012 Tim Besard <tim.besard@gmail.com>
 
     All rights reserved.
 
 -->
-
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:mvc="http://www.springframework.org/schema/mvc"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

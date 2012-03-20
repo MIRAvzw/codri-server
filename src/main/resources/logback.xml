@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (C) 2012 Tim Besard <tim.besard@gmail.com>
+    Copyright (C) 2011-2012 Tim Besard <tim.besard@gmail.com>
 
     All rights reserved.
 
 -->
-
 <configuration>
     
     <property name="LOG_FOLDER" value="/var/log/codri" />
