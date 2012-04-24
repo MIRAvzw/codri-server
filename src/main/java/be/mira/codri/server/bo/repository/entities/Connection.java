@@ -6,7 +6,6 @@
 package be.mira.codri.server.bo.repository.entities;
 
 import be.mira.codri.server.bo.repository.RepositoryEntity;
-import java.util.UUID;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -20,7 +19,7 @@ public class Connection extends RepositoryEntity {
     // Member data
     //
     
-    private final UUID mKiosk;
+    private final String mKiosk;
     private final String mConfiguration;
     private final String mPresentation;
     
@@ -29,7 +28,7 @@ public class Connection extends RepositoryEntity {
     // Construction and destruction
     //
     
-    public Connection(final Long iRevision, final String iLocation, final UUID iKiosk, final String iConfiguration, final String iPresentation) {
+    public Connection(final Long iRevision, final String iLocation, final String iKiosk, final String iConfiguration, final String iPresentation) {
         super(iRevision, iLocation);
         mKiosk = iKiosk;
         mConfiguration = iConfiguration;
@@ -42,7 +41,7 @@ public class Connection extends RepositoryEntity {
     //
     
     @XmlElement
-    public final UUID getKiosk() {
+    public final String getKiosk() {
         return mKiosk;
     }
     

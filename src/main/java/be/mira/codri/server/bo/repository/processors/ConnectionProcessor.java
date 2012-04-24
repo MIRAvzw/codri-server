@@ -10,7 +10,6 @@ import be.mira.codri.server.exceptions.RepositoryException;
 import be.mira.codri.server.bo.repository.entities.Connection;
 import be.mira.codri.server.spring.Slf4jLogger;
 import java.io.IOException;
-import java.util.UUID;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import org.slf4j.Logger;
@@ -87,7 +86,7 @@ public class ConnectionProcessor extends Processor<Connection> implements Applic
     
     private Connection parseConnection(final long iRevision, final String iLocation) throws RepositoryException, XMLStreamException, IOException {       
         // Process the tags
-        UUID tKiosk = null;
+        String tKiosk = null;
         String tConfiguration = null;
         String tPresentation = null;
         getParser().next();
@@ -98,7 +97,7 @@ public class ConnectionProcessor extends Processor<Connection> implements Applic
                     break loop;
                 case (XMLStreamConstants.START_ELEMENT):
                     if (getTag().equals("kiosk")) {
-                        tKiosk = UUID.fromString(parseTextElement());
+                        tKiosk = parseTextElement();
                     } else if (getTag().equals("configuration")) {
                         tConfiguration = parseTextElement();
                     } else if (getTag().equals("presentation")) {

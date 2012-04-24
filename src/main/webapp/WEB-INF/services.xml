@@ -47,9 +47,6 @@
 
     <!-- Bean postprocessors -->
     <bean class="be.mira.codri.server.spring.LoggerPostProcessor" />
-
-    <!-- Field converters -->
-    <bean class="be.mira.codri.server.spring.UUIDConverter" />
     
     <!-- Timers -->
     <bean class="org.springframework.scheduling.timer.TimerFactoryBean">

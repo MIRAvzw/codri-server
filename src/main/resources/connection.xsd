@@ -19,15 +19,9 @@
     
     <xsd:complexType name="connectionType">
         <xsd:sequence>
-            <xsd:element name="kiosk" type="UuidType" />
+            <xsd:element name="kiosk" type="xsd:string" />
             <xsd:element name="configuration" type="xsd:string" />
             <xsd:element name="presentation" type="xsd:string" />
         </xsd:sequence>
     </xsd:complexType>
-    
-    <xsd:simpleType name="UuidType">
-        <xsd:restriction base="xsd:string">
-            <xsd:pattern value="[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}" />
-        </xsd:restriction>
-    </xsd:simpleType>
 </xsd:schema>

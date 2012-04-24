@@ -6,7 +6,6 @@
 package be.mira.codri.server.events;
 
 import be.mira.codri.server.bo.network.entities.Kiosk;
-import java.util.UUID;
 
 /**
  *
@@ -17,11 +16,11 @@ public class NetworkKioskEvent extends NetworkEvent {
     // Construction and destruction
     //
     
-    public NetworkKioskEvent(final Object iSource, final NetworkEvent.NetworkEventType iType, final UUID iId, final Kiosk iKiosk) {
+    public NetworkKioskEvent(final Object iSource, final NetworkEvent.NetworkEventType iType, final String iId, final Kiosk iKiosk) {
         super(iSource, iType, iId, iKiosk);
     }
     
-    public NetworkKioskEvent(final Object iSource, final NetworkEvent.NetworkEventType iType, final UUID iId, final Kiosk iKiosk, final Kiosk iOldKiosk) {
+    public NetworkKioskEvent(final Object iSource, final NetworkEvent.NetworkEventType iType, final String iId, final Kiosk iKiosk, final Kiosk iOldKiosk) {
         super(iSource, iType, iId, iKiosk, iOldKiosk);
     }
     

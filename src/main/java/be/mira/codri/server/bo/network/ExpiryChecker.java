@@ -11,7 +11,6 @@ import be.mira.codri.server.exceptions.NetworkException;
 import be.mira.codri.server.spring.Slf4jLogger;
 import java.util.Map;
 import java.util.TimerTask;
-import java.util.UUID;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
@@ -58,7 +57,7 @@ public class ExpiryChecker extends TimerTask {
         mLogger.trace("Checking for expired network entities");
         
         // Check all kiosks
-        for (Map.Entry<UUID, Kiosk> tEntry : mNetwork.getKiosks().entrySet()) {
+        for (Map.Entry<String, Kiosk> tEntry : mNetwork.getKiosks().entrySet()) {
             if (tEntry.getValue().getHeartbeatDelta() > mThreshold) {
                 try {
                     mLogger.debug("Trying to expire kiosk {}", tEntry.getKey());

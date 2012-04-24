@@ -13,7 +13,6 @@ import be.mira.codri.server.bo.network.entities.Kiosk;
 import be.mira.codri.server.spring.Slf4jLogger;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import javax.annotation.PreDestroy;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
@@ -37,7 +36,7 @@ public final class Network implements ApplicationEventPublisherAware {
     
     private ApplicationEventPublisher mPublisher;
     
-    private final Map<UUID, Kiosk> mKiosks;
+    private final Map<String, Kiosk> mKiosks;
 
 
     //
@@ -45,7 +44,7 @@ public final class Network implements ApplicationEventPublisherAware {
     //
 
     public Network() {
-        mKiosks = new HashMap<UUID, Kiosk>();
+        mKiosks = new HashMap<String, Kiosk>();
     }
     
     @Override
@@ -65,17 +64,17 @@ public final class Network implements ApplicationEventPublisherAware {
     
     @XmlElementWrapper(name = "kiosks")
     @XmlElement(name = "kiosk")
-    public Map<UUID, Kiosk> getKiosks() {
+    public Map<String, Kiosk> getKiosks() {
         return mKiosks;
     }
     
-    public Kiosk getKiosk(final UUID iUuid) {
+    public Kiosk getKiosk(final String iId) {
         synchronized (mKiosks) {
-            return mKiosks.get(iUuid);
+            return mKiosks.get(iId);
         }
     }
     
-    public void addKiosk(final UUID iId, final Kiosk iKiosk) throws NetworkException {
+    public void addKiosk(final String iId, final Kiosk iKiosk) throws NetworkException {
         mLogger.info("Adding kiosk {}", iId);
         
         synchronized (mKiosks) {
@@ -89,7 +88,7 @@ public final class Network implements ApplicationEventPublisherAware {
         mPublisher.publishEvent(tEvent);
     }
     
-    public void refreshKiosk(final UUID iId) throws NetworkException {
+    public void refreshKiosk(final String iId) throws NetworkException {
         mLogger.info("Refreshing kiosk {}", iId);
         
         Kiosk tKiosk = null;
@@ -104,7 +103,7 @@ public final class Network implements ApplicationEventPublisherAware {
         mPublisher.publishEvent(tEvent);        
     }
     
-    public void expireKiosk(final UUID iId) throws NetworkException {
+    public void expireKiosk(final String iId) throws NetworkException {
         mLogger.info("Expiring kiosk {}", iId);
         
         Kiosk tKiosk = null;
@@ -119,7 +118,7 @@ public final class Network implements ApplicationEventPublisherAware {
         mPublisher.publishEvent(tEvent);
     }
     
-    public void removeKiosk(final UUID iId) throws NetworkException {
+    public void removeKiosk(final String iId) throws NetworkException {
         mLogger.info("Removing kiosk {}", iId);
         
         Kiosk tKiosk = null;

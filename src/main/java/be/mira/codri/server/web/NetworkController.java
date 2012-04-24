@@ -10,7 +10,6 @@ import be.mira.codri.server.exceptions.NetworkException;
 import be.mira.codri.server.bo.network.entities.Kiosk;
 import be.mira.codri.server.spring.Slf4jLogger;
 import java.io.IOException;
-import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -68,7 +67,7 @@ public class NetworkController implements ApplicationContextAware {
     
     @RequestMapping(value = "/kiosks/{id}", method = RequestMethod.GET)
     @ResponseBody
-    public final Kiosk getKiosk(@PathVariable("id") final UUID iId, final HttpServletResponse iResponse) throws IOException {
+    public final Kiosk getKiosk(@PathVariable("id") final String iId, final HttpServletResponse iResponse) throws IOException {
         Kiosk tKiosk = mNetwork.getKiosk(iId);
         if (tKiosk == null) {
             iResponse.sendError(HttpStatus.GONE.value());
@@ -77,7 +76,7 @@ public class NetworkController implements ApplicationContextAware {
     }
     
     @RequestMapping(value = "/kiosks/{id}/heartbeat", method = RequestMethod.PUT)
-    public final void refreshKiosk(@PathVariable("id") final UUID iId, final HttpServletRequest iRequest, final HttpServletResponse iResponse) throws IOException {
+    public final void refreshKiosk(@PathVariable("id") final String iId, final HttpServletRequest iRequest, final HttpServletResponse iResponse) throws IOException {
         try {
             mNetwork.refreshKiosk(iId);
         } catch (NetworkException tException) {
@@ -86,7 +85,7 @@ public class NetworkController implements ApplicationContextAware {
     }
     
     @RequestMapping(value = "/kiosks/{id}", method = RequestMethod.POST)
-    public final void addKiosk(@RequestBody final Kiosk iKiosk, @PathVariable("id") final UUID iId, final HttpServletRequest iRequest, final HttpServletResponse iResponse) throws IOException {
+    public final void addKiosk(@RequestBody final Kiosk iKiosk, @PathVariable("id") final String iId, final HttpServletRequest iRequest, final HttpServletResponse iResponse) throws IOException {
         // FIXME: the parsed Kiosk seems to be a raw unitialized bean, can't we
         //        fix this instead of configuring the bean manually?
         mApplicationContext.getAutowireCapableBeanFactory().configureBean(iKiosk, "kiosk");
@@ -103,7 +102,7 @@ public class NetworkController implements ApplicationContextAware {
     
     @RequestMapping(value = "/kiosks/{id}", method = RequestMethod.DELETE)
     @ResponseBody
-    public final void removeKiosk(@PathVariable("id") final UUID iId, final HttpServletResponse iResponse) throws IOException {
+    public final void removeKiosk(@PathVariable("id") final String iId, final HttpServletResponse iResponse) throws IOException {
         try {
             mNetwork.removeKiosk(iId);
         } catch (NetworkException tException) {

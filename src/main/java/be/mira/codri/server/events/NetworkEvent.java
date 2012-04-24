@@ -6,7 +6,6 @@
 package be.mira.codri.server.events;
 
 import be.mira.codri.server.bo.network.NetworkEntity;
-import java.util.UUID;
 import org.springframework.context.ApplicationEvent;
 
 /**
@@ -31,7 +30,7 @@ public abstract class NetworkEvent extends ApplicationEvent {
     //
     
     private final NetworkEventType mType;
-    private final UUID mId;
+    private final String mId;
     private final NetworkEntity mEntity, mOldEntity;
     
     
@@ -39,11 +38,11 @@ public abstract class NetworkEvent extends ApplicationEvent {
     // Construction and destruction
     //
     
-    public NetworkEvent(final Object iSource, final NetworkEventType iType, final UUID iId, final NetworkEntity iEntity) {
+    public NetworkEvent(final Object iSource, final NetworkEventType iType, final String iId, final NetworkEntity iEntity) {
         this(iSource, iType, iId, iEntity, null);
     }
     
-    public NetworkEvent(final Object iSource, final NetworkEventType iType, final UUID iId, final NetworkEntity iEntity, final NetworkEntity iOldEntity) {
+    public NetworkEvent(final Object iSource, final NetworkEventType iType, final String iId, final NetworkEntity iEntity, final NetworkEntity iOldEntity) {
         super(iSource);
         mType = iType;
         mId = iId;
@@ -56,7 +55,7 @@ public abstract class NetworkEvent extends ApplicationEvent {
     // Basic I/O
     //
     
-    public final UUID getId() {
+    public final String getId() {
         return mId;
     }
     
