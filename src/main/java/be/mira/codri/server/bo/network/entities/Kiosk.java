@@ -54,17 +54,32 @@ public class Kiosk extends NetworkEntity {
     // Functionality
     //
     
-    public final void setConfiguration(final Configuration iConfiguration) throws DeviceException {
-        String tEndpoint = getEndpoint(new String[]{"configuration"});
+    public final void setConfiguration(final String iId, final Configuration iConfiguration) throws DeviceException {
+        String tEndpoint = getEndpoint(iId, new String[]{"configuration"});
         mLogger.debug("Setting a configuration on endpoint {}", tEndpoint);
         
         mRestTemplate.put(tEndpoint, iConfiguration);
     }
     
-    public final void setPresentation(final Presentation iPresentation) throws DeviceException {
-        String tEndpoint = getEndpoint(new String[]{"presentation"});
+    public final void setPresentation(final String iId, final Presentation iPresentation) throws DeviceException {
+        String tEndpoint = getEndpoint(iId, new String[]{"presentation"});
         mLogger.debug("Setting a presentation on endpoint {}", tEndpoint);
         
         mRestTemplate.put(tEndpoint, iPresentation);
+    }
+    
+    
+    //
+    // Auxiliary
+    //    
+    
+    public final String getEndpoint(final String iId, final String[] iResources) {
+        StringBuilder tEndpointBuilder = new StringBuilder("http://").append(iId).append(".codri.local");
+        tEndpointBuilder.append(":").append(getPort());
+        tEndpointBuilder.append("/");
+        for (final String tResource : iResources) {
+            tEndpointBuilder.append(tResource).append("/");
+        }
+        return tEndpointBuilder.toString();
     }
 }

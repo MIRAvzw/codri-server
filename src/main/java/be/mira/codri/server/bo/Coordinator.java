@@ -180,7 +180,7 @@ public class Coordinator implements ApplicationListener<ApplicationEvent> {
             if (tKiosk != null) {
                 mLogger.debug("Pushing presentation {} to kiosk {} (part of connection {})", new Object[] {iId, tEntry.getValue().getKiosk(), tEntry});
                 try {
-                    tKiosk.setPresentation(iPresentation);
+                    tKiosk.setPresentation(iId, iPresentation);
                 } catch (DeviceException tException) {
                     mLogger.error("Could not push presentation {} to kiosk {}", new Object[] {iId, tEntry.getValue().getKiosk()}, tException);
                 }
@@ -241,7 +241,7 @@ public class Coordinator implements ApplicationListener<ApplicationEvent> {
             if (tKiosk != null) {
                 mLogger.debug("Pushing configuration {} to kiosk {} (part of connection {})", new Object[] {iId, tEntry.getValue().getKiosk(), tEntry});
                 try {
-                    tKiosk.setConfiguration(iConfiguration);
+                    tKiosk.setConfiguration(iId, iConfiguration);
                 } catch (DeviceException tException) {
                     mLogger.error("Could not push configuration {} to kiosk {}", new Object[] {iId, tEntry.getValue().getKiosk()}, tException);
                 }
@@ -295,7 +295,7 @@ public class Coordinator implements ApplicationListener<ApplicationEvent> {
         Configuration tConfiguration = mRepository.getConfiguration(iConnection.getConfiguration());
         if (tConfiguration != null) {
             try {
-                tKiosk.setConfiguration(tConfiguration);
+                tKiosk.setConfiguration(iId, tConfiguration);
             } catch (DeviceException tException) {
                 mLogger.error("Could not upload configuration {} ", iId, tException);
             }
@@ -307,7 +307,7 @@ public class Coordinator implements ApplicationListener<ApplicationEvent> {
         Presentation tPresentation = mRepository.getPresentation(iConnection.getPresentation());
         if (tPresentation != null) {
             try {
-                tKiosk.setPresentation(tPresentation);
+                tKiosk.setPresentation(iId, tPresentation);
             } catch (DeviceException tException) {
                 mLogger.error("Could not upload presentation {}", iId, tException);
             }

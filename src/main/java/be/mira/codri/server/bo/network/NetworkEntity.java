@@ -19,7 +19,6 @@ public abstract class NetworkEntity {
     
     private final String mVendor, mModel;
     private final int mPort;
-    private String mAddress;
     private Date mHeartbeat;
     
     
@@ -50,15 +49,6 @@ public abstract class NetworkEntity {
     }
     
     @XmlElement
-    public final String getAddress() {
-        return mAddress;
-    }
-    
-    public final void setAddress(final String iAddress) {
-        mAddress = iAddress;
-    }
-    
-    @XmlElement
     public final int getPort() {
         return mPort;
     }
@@ -75,20 +65,5 @@ public abstract class NetworkEntity {
     @XmlElement
     public final long getHeartbeatDelta() {
         return (new Date().getTime()) - mHeartbeat.getTime();
-    }
-    
-    
-    //
-    // Auxiliary
-    //
-    
-    protected final String getEndpoint(final String[] iResources) {
-        StringBuilder tEndpointBuilder = new StringBuilder("http://").append(getAddress());
-        tEndpointBuilder.append(":").append(getPort());
-        tEndpointBuilder.append("/");
-        for (final String tResource : iResources) {
-            tEndpointBuilder.append(tResource).append("/");
-        }
-        return tEndpointBuilder.toString();
     }
 }
