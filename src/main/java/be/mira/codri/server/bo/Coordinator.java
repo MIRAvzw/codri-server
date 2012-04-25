@@ -180,7 +180,8 @@ public class Coordinator implements ApplicationListener<ApplicationEvent> {
             if (tKiosk != null) {
                 mLogger.debug("Pushing presentation {} to kiosk {} (part of connection {})", new Object[] {iId, tEntry.getValue().getKiosk(), tEntry});
                 try {
-                    tKiosk.setPresentation(iId, iPresentation);
+                    // FIXME: this is nasty, the kiosk shouldn't get passed its own id
+                    tKiosk.setPresentation(tEntry.getValue().getKiosk(), iPresentation);
                 } catch (DeviceException tException) {
                     mLogger.error("Could not push presentation {} to kiosk {}", new Object[] {iId, tEntry.getValue().getKiosk()}, tException);
                 }
@@ -241,7 +242,8 @@ public class Coordinator implements ApplicationListener<ApplicationEvent> {
             if (tKiosk != null) {
                 mLogger.debug("Pushing configuration {} to kiosk {} (part of connection {})", new Object[] {iId, tEntry.getValue().getKiosk(), tEntry});
                 try {
-                    tKiosk.setConfiguration(iId, iConfiguration);
+                    // FIXME: this is nasty, the kiosk shouldn't get passed its own id
+                    tKiosk.setConfiguration(tEntry.getValue().getKiosk(), iConfiguration);
                 } catch (DeviceException tException) {
                     mLogger.error("Could not push configuration {} to kiosk {}", new Object[] {iId, tEntry.getValue().getKiosk()}, tException);
                 }
@@ -295,7 +297,8 @@ public class Coordinator implements ApplicationListener<ApplicationEvent> {
         Configuration tConfiguration = mRepository.getConfiguration(iConnection.getConfiguration());
         if (tConfiguration != null) {
             try {
-                tKiosk.setConfiguration(iId, tConfiguration);
+                // FIXME: this is nasty, the kiosk shouldn't get passed its own id
+                tKiosk.setConfiguration(iConnection.getKiosk(), tConfiguration);
             } catch (DeviceException tException) {
                 mLogger.error("Could not upload configuration {} ", iId, tException);
             }
@@ -307,7 +310,8 @@ public class Coordinator implements ApplicationListener<ApplicationEvent> {
         Presentation tPresentation = mRepository.getPresentation(iConnection.getPresentation());
         if (tPresentation != null) {
             try {
-                tKiosk.setPresentation(iId, tPresentation);
+                // FIXME: this is nasty, the kiosk shouldn't get passed its own id
+                tKiosk.setPresentation(iConnection.getKiosk(), tPresentation);
             } catch (DeviceException tException) {
                 mLogger.error("Could not upload presentation {}", iId, tException);
             }
