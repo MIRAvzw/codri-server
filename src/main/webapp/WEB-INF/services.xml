@@ -81,6 +81,8 @@
     <bean id="jaxbAnnotationIntrospector" class="org.codehaus.jackson.xc.JaxbAnnotationIntrospector" />
     <bean id="jacksonAnnotationIntrospector" class="org.codehaus.jackson.map.introspect.JacksonAnnotationIntrospector" />
     <bean id="jacksonObjectMapper" class="org.codehaus.jackson.map.ObjectMapper">
+        <property name="serializationConfig.annotationIntrospector" ref="jaxbAnnotationIntrospector" />
+        
         <!--
             We need the Jackson annotator since JAXB doesn't provide a way to construct immutable
             objects and hence we need to use the Jackson-specific @JsonCreator annotation.
@@ -88,7 +90,6 @@
             TODO: completely Bean-ify Kiosk.java so we don't need these annotators
         -->
         <property name="deserializationConfig.annotationIntrospector" ref="jacksonAnnotationIntrospector" />
-        <property name="serializationConfig.annotationIntrospector" ref="jaxbAnnotationIntrospector" />
         
         <!--
             TODO: Only include non-null fields

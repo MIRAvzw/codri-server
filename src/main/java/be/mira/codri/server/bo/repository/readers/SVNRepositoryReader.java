@@ -195,7 +195,7 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
         for (Map.Entry<String, Long> tEntry : tPathEntries.entrySet()) {;
             Presentation tPresentation = (Presentation) mApplicationContext.getBean("presentation", new Object[]{
                 tEntry.getValue(),
-                tEntry.getKey()});
+                "/presentations/" + tEntry.getKey()});
             tNewPresentations.put(tEntry.getKey(), tPresentation);
         }
         
