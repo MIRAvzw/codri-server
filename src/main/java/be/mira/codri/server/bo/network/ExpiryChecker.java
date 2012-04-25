@@ -59,6 +59,12 @@ public class ExpiryChecker extends TimerTask {
         // Check all kiosks
         for (Map.Entry<String, Kiosk> tEntry : mNetwork.getKiosks().entrySet()) {
             if (tEntry.getValue().getHeartbeatDelta() > mThreshold) {
+            mLogger.trace("Kiosk {}'s last heartbeat was at {} (delta {}), and thus exceeds the threshold value of {}",
+                    new Object[] {
+                        tEntry.getKey(),
+                        tEntry.getValue().getHeartbeat(),
+                        tEntry.getValue().getHeartbeatDelta(),
+                        mThreshold });
                 try {
                     mLogger.debug("Trying to expire kiosk {}", tEntry.getKey());
                     mNetwork.expireKiosk(tEntry.getKey());

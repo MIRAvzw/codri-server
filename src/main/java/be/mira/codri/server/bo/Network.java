@@ -98,6 +98,7 @@ public final class Network implements ApplicationEventPublisherAware {
             }
             tKiosk = mKiosks.get(iId);
         }
+        tKiosk.updateHeartbeat();
         
         NetworkEvent tEvent = new NetworkKioskEvent(this, NetworkEventType.REFRESHED, iId, tKiosk);
         mPublisher.publishEvent(tEvent);        
