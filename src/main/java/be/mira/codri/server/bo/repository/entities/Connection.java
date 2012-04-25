@@ -28,8 +28,8 @@ public class Connection extends RepositoryEntity {
     // Construction and destruction
     //
     
-    public Connection(final Long iRevision, final String iLocation, final String iKiosk, final String iConfiguration, final String iPresentation) {
-        super(iRevision, iLocation);
+    public Connection(final Long iRevision, final String iPath, final String iKiosk, final String iConfiguration, final String iPresentation) {
+        super(iRevision, iPath);
         mKiosk = iKiosk;
         mConfiguration = iConfiguration;
         mPresentation = iPresentation;

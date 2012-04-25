@@ -45,7 +45,7 @@ public final class Repository implements ApplicationEventPublisherAware {
     private final Map<String, Configuration> mConfigurations;
     private final Map<String, Presentation> mPresentations;
     private final Map<String, Connection> mConnections;
-    private String mRoot;
+    private String mServer;
 
 
     //
@@ -83,14 +83,13 @@ public final class Repository implements ApplicationEventPublisherAware {
     // TODO: Remove the quite identical Connection/Configuration/Presentation setters
     //       somehow make it using the RepositoryEntity interface
     
-    @XmlElement
-    public String getRoot() {
-        return mRoot;
+    public String getServer() {
+        return mServer;
     }
     
     @Required
-    public void setRoot(final String iRoot) {        
-        mRoot = iRoot;
+    public void setServer(final String iServer) {        
+        mServer = iServer;
     }
      
     @XmlElementWrapper(name = "presentations")

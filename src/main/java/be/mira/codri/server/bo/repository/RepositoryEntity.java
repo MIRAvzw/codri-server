@@ -17,16 +17,16 @@ public abstract class RepositoryEntity {
     //
     
     private final Long mRevision;
-    private final String mLocation;
+    private final String mPath;
     
     
     //
     // Construction and destruction
     //
     
-    public RepositoryEntity(final Long iRevision, final String iLocation) {
+    public RepositoryEntity(final Long iRevision, final String iPath) {
         mRevision = iRevision;
-        mLocation = iLocation;
+        mPath = iPath;
     }
     
     
@@ -40,7 +40,7 @@ public abstract class RepositoryEntity {
     }
     
     @XmlElement
-    public final String getLocation() {
-        return mLocation;
+    public final String getPath() {
+        return mPath;
     }
 }

@@ -47,7 +47,7 @@ public class ConfigurationProcessor extends Processor<Configuration> implements 
     //
     
     @Override
-    public final Configuration parseDocument(final long iRevision, final String iLocation) throws RepositoryException {
+    public final Configuration parseDocument(final long iRevision, final String iPath) throws RepositoryException {
         try {
             Configuration tConfiguration = null;
             
@@ -66,7 +66,7 @@ public class ConfigurationProcessor extends Processor<Configuration> implements 
                         break loop;
                     case (XMLStreamConstants.START_ELEMENT):
                         if (getTag().equals("configuration")) {
-                            tConfiguration = parseConfiguration(iRevision, iLocation);
+                            tConfiguration = parseConfiguration(iRevision, iPath);
                         } else {
                             throw new InvalidStateException("inconsistency detected between validator and processor (unknown tag '" + getParser().getName() + "')");
                         }
@@ -84,7 +84,7 @@ public class ConfigurationProcessor extends Processor<Configuration> implements 
         }
     }
     
-    private Configuration parseConfiguration(final long iRevision, final String iLocation) throws RepositoryException, XMLStreamException, IOException {        
+    private Configuration parseConfiguration(final long iRevision, final String iPath) throws RepositoryException, XMLStreamException, IOException {        
         // Process the tags
         Integer tVolume = null;
         getParser().next();
@@ -108,7 +108,7 @@ public class ConfigurationProcessor extends Processor<Configuration> implements 
         // Create the object
         Configuration tConfiguration = (Configuration) mApplicationContext.getBean("configuration", new Object[]{
                 iRevision,
-                iLocation,
+                iPath,
                 tVolume});
         return tConfiguration;
     }

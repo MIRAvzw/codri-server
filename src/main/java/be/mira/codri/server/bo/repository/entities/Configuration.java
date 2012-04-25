@@ -26,8 +26,8 @@ public class Configuration extends RepositoryEntity {
     // Construction and destruction
     //
     
-    public Configuration(final Long iRevision, final String iLocation, final Integer iVolume) {
-        super(iRevision, iLocation);
+    public Configuration(final Long iRevision, final String iPath, final Integer iVolume) {
+        super(iRevision, iPath);
         mVolume = iVolume;
     }
     

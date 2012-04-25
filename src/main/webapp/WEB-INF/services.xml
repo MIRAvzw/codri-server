@@ -102,7 +102,7 @@
     <!-- Repository --> 
     
     <bean class="be.mira.codri.server.bo.Repository" id="repository">
-        <property name="root" value="${repository.root}"/>
+        <property name="server" value="${repository.server}"/>
     </bean>
     
     <bean id="configuration" class="be.mira.codri.server.bo.repository.entities.Configuration" scope="prototype" />
@@ -119,7 +119,8 @@
     <bean class="be.mira.codri.server.bo.repository.readers.SVNRepositoryReader" id="repositoryReader">
         <lookup-method name="createConnectionProcessor" bean="connectionProcessor"/>
         <lookup-method name="createConfigurationProcessor" bean="configurationProcessor"/>
-        <property name="checkout" value="${svnrepositoryreader.checkout}"/>
+        <property name="checkout" value="${repositoryreader.svn.checkout}"/>
+        <property name="protocol" value="${repositoryreader.svn.protocol}"/>
     </bean>
     
     <!-- Network -->

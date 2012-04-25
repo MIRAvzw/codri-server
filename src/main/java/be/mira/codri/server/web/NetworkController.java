@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @Controller
 @RequestMapping("/network")
-public class NetworkController {
+public class NetworkController implements ApplicationContextAware {
     //
     // Member data
     //
@@ -34,6 +36,8 @@ public class NetworkController {
     
     private final Network mNetwork;
     
+    private ApplicationContext mApplicationContext;
+    
     
     //
     // Construction and destruction
@@ -42,6 +46,12 @@ public class NetworkController {
     @Autowired
     public NetworkController(final Network iNetwork) {
         mNetwork = iNetwork;        
+    }
+    
+    // FIXME: can't we instantiate prototype beans without being application context aware?
+    @Override
+    public final void setApplicationContext(final ApplicationContext iApplicationContext) {
+        mApplicationContext = iApplicationContext;
     }
     
     
@@ -76,6 +86,10 @@ public class NetworkController {
     
     @RequestMapping(value = "/kiosks/{id}", method = RequestMethod.POST)
     public final void addKiosk(@RequestBody final Kiosk iKiosk, @PathVariable("id") final String iId, final HttpServletRequest iRequest, final HttpServletResponse iResponse) throws IOException {        
+        // FIXME: the parsed Kiosk seems to be a raw unitialized bean, can't we
+        // fix this instead of configuring the bean manually?
+        mApplicationContext.getAutowireCapableBeanFactory().configureBean(iKiosk, "kiosk");
+        
         try {
             mNetwork.addKiosk(iId, iKiosk);
             iResponse.setStatus(HttpStatus.CREATED.value());

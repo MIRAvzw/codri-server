@@ -51,6 +51,7 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
     private Logger mLogger;
     
     private File mCheckout;
+    private String mProtocol;
     
     private SVNClient mClient;
     
@@ -74,6 +75,11 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
     public final void setCheckout(final File iCheckout) {
         mCheckout = iCheckout;
     }
+    
+    @Required
+    public final void setProtocol(final String iProtocol) {
+        mProtocol = iProtocol;
+    }
 
     @PostConstruct
     public final void init() throws Exception {
@@ -85,11 +91,11 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
             throw new Exception("checkout path does not exist or is not writable");
         }
         
-        // Subversion location
-        Pattern tLocationPattern = Pattern.compile("^(https?|file|svn)://");
-        Matcher tLocationMatcher = tLocationPattern.matcher(getRepository().getRoot());
-        if (!tLocationMatcher.find()) {
-            throw new Exception("repository location '" + getRepository().getRoot() + "' is not a valid URL");
+        // Subversion protocol
+        Pattern tProtocolPattern = Pattern.compile("^(https?|file|svn)$");
+        Matcher tProtocolMatcher = tProtocolPattern.matcher(mProtocol);
+        if (!tProtocolMatcher.find()) {
+            throw new Exception("invalid svn repository protocol '" + mProtocol + "'");
         }
         mClient = new SVNClient();
         
@@ -178,19 +184,18 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
     }
     
     private long checkPresentations() throws RepositoryException {
-        return getRevision(getRepository().getRoot() + "/presentations");
+        return getRevision(getLocation("/presentations"));
     }
     
     private void processPresentations() throws RepositoryException {        
         // List
         mLogger.debug("Listing presentations");
         Map<String, Presentation> tNewPresentations = new HashMap<String, Presentation>();
-        Map<String, Long> tPathEntries = getChildrenRevisions(getRepository().getRoot() + "/presentations");
-        for (Map.Entry<String, Long> tEntry : tPathEntries.entrySet()) {
-            String tLocation = getRepository().getRoot() + "/presentations/" + tEntry.getKey();
+        Map<String, Long> tPathEntries = getChildrenRevisions(getLocation("/presentations"));
+        for (Map.Entry<String, Long> tEntry : tPathEntries.entrySet()) {;
             Presentation tPresentation = (Presentation) mApplicationContext.getBean("presentation", new Object[]{
                 tEntry.getValue(),
-                tLocation});
+                tEntry.getKey()});
             tNewPresentations.put(tEntry.getKey(), tPresentation);
         }
         
@@ -215,15 +220,12 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
     //
     
     private long checkConfigurations() throws RepositoryException {
-        return getRevision(getRepository().getRoot() + "/configurations");
+        return getRevision(getLocation("/configurations"));
     }
     
-    private long getConfigurations() throws RepositoryException {
-        // Get a local checkout and location
-        final File tCheckout =  new File(mCheckout, "configurations");
-        final String tLocation = getRepository().getRoot() + "/configurations";
-        
+    private long getConfigurations() throws RepositoryException {        
         // Check if the repository exists and is valid
+        final File tCheckout =  new File(mCheckout, "configurations");
         Long tConfigurationRevision = null;
         try {
             tConfigurationRevision = getRevision(tCheckout);
@@ -238,7 +240,7 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
                 if (tCheckout.exists()) {
                     FileUtils.cleanDirectory(tCheckout);
                 }
-                tConfigurationRevision = checkoutRepository(tCheckout, tLocation);            
+                tConfigurationRevision = checkoutRepository(tCheckout, getLocation("/configurations"));
             } else {
                 mLogger.trace("Updating configurations");
                 tConfigurationRevision = updateRepository(tCheckout);              
@@ -266,9 +268,8 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
             final long tRevision = getRevision(tFile);
             
             // Process the contents
-            String tLocation = getRepository().getRoot() + "/configurations/" + tFilename;
-            ConfigurationProcessor tReader = createConfigurationProcessor();
-            Configuration tConfiguration = tReader.process(tFile, tRevision, tLocation);
+            ConfigurationProcessor tProcessor = createConfigurationProcessor();
+            Configuration tConfiguration = tProcessor.process(tFile, tRevision, "/configurations/" + tFilename);
             if (tConfiguration == null) {
                 throw new RepositoryException("found empty configuration file");
             }
@@ -299,15 +300,12 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
     //       somehow make it using the RepositoryEntity interface
     
     private long checkConnections() throws RepositoryException {
-        return getRevision(getRepository().getRoot() + "/connections");
+        return getRevision(getLocation("/connections"));
     }
     
-    private long getConnections() throws RepositoryException {
-        // Get a local checkout and location
-        final File tCheckout =  new File(mCheckout, "connections");
-        final String tLocation = getRepository().getRoot() + "/connections";
-        
+    private long getConnections() throws RepositoryException {        
         // Check if the repository exists and is valid
+        final File tCheckout =  new File(mCheckout, "connections");
         Long tConnectionRevision = null;
         try {
             tConnectionRevision = getRevision(tCheckout);
@@ -322,7 +320,7 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
                 if (tCheckout.exists()) {
                     FileUtils.cleanDirectory(tCheckout);
                 }
-                tConnectionRevision = checkoutRepository(tCheckout, tLocation);            
+                tConnectionRevision = checkoutRepository(tCheckout, getLocation("/connections"));
             } else {
                 mLogger.trace("Updating connections");
                 tConnectionRevision = updateRepository(tCheckout);              
@@ -350,9 +348,8 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
             final long tRevision = getRevision(tFile);
             
             // Process the contents
-            String tLocation = getRepository().getRoot() + "/connections/" + tFilename;
-            ConnectionProcessor tReader = createConnectionProcessor();
-            Connection tConnection = tReader.process(tFile, tRevision, tLocation);
+            ConnectionProcessor tProcessor = createConnectionProcessor();
+            Connection tConnection = tProcessor.process(tFile, tRevision, "/connections/" + tFilename);
             if (tConnection == null) {
                 throw new RepositoryException("found empty connection file");
             }
@@ -379,6 +376,11 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
     // Auxiliary
     //
     
+    // TODO: return a URL
+    private String getLocation(final String iPath) {
+        return mProtocol + "://" + getRepository().getServer() + iPath;
+    }
+    
     private Long getRevision(final File iFile) throws RepositoryException {
         if (!iFile.exists()) {
             return null;
@@ -386,13 +388,12 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
         return getRevision(iFile.getAbsolutePath());
     }
     
-    // TODO: case for an URL
-    
-    private Long getRevision(final String iPath) throws RepositoryException {
+    // TODO: convert location to an URL
+    private Long getRevision(final String iLocation) throws RepositoryException {
         try {
             final List<Long> tRevisions = new ArrayList<Long>();
             mClient.info2(
-                    iPath,
+                    iLocation,
                     Revision.HEAD,
                     Revision.HEAD,
                     Depth.empty,
@@ -419,13 +420,12 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
         return getChildrenRevisions(iFile.getAbsoluteFile());
     }
     
-    // TODO: case for an URL
-    
-    private Map<String, Long> getChildrenRevisions(final String iPath) throws RepositoryException {
+    // TODO: convert location to an URL
+    private Map<String, Long> getChildrenRevisions(final String iLocation) throws RepositoryException {
         try {
             final Map<String, Long> tChildren = new HashMap<String, Long>();
             mClient.info2(
-                    iPath,
+                    iLocation,
                     Revision.HEAD,
                     Revision.HEAD,
                     Depth.immediates,
@@ -433,7 +433,7 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
                     new InfoCallback() {
                         @Override
                         public void singleInfo(final Info2 iInfo) {
-                            if (iInfo.getPath().equals(iPath)) {
+                            if (iInfo.getPath().equals(iLocation)) {
                                 return;
                             }
                             tChildren.put(iInfo.getPath(), iInfo.getLastChangedRev());
@@ -445,6 +445,7 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
         }
     }
 
+    // TODO: convert location to an URL
     private long checkoutRepository(final File iCheckout, final String iLocation) throws RepositoryException {
         try {
             long tRevision = mClient.checkout(

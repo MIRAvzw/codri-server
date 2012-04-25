@@ -47,7 +47,7 @@ public class ConnectionProcessor extends Processor<Connection> implements Applic
     //
     
     @Override
-    protected final Connection parseDocument(final long iRevision, final String iLocation) throws RepositoryException {
+    protected final Connection parseDocument(final long iRevision, final String iPath) throws RepositoryException {
         try {    
             Connection tConnection = null;
             
@@ -66,7 +66,7 @@ public class ConnectionProcessor extends Processor<Connection> implements Applic
                         break loop;
                     case (XMLStreamConstants.START_ELEMENT):
                         if (getTag().equals("connection")) {
-                            tConnection = parseConnection(iRevision, iLocation);
+                            tConnection = parseConnection(iRevision, iPath);
                         } else {
                             throw new InvalidStateException("inconsistency detected between validator and processor (unknown tag '" + getParser().getName() + "')");
                         }
@@ -84,7 +84,7 @@ public class ConnectionProcessor extends Processor<Connection> implements Applic
         }
     }
     
-    private Connection parseConnection(final long iRevision, final String iLocation) throws RepositoryException, XMLStreamException, IOException {       
+    private Connection parseConnection(final long iRevision, final String iPath) throws RepositoryException, XMLStreamException, IOException {       
         // Process the tags
         String tKiosk = null;
         String tConfiguration = null;
@@ -114,7 +114,7 @@ public class ConnectionProcessor extends Processor<Connection> implements Applic
         // Create the object
         Connection tConnection = (Connection) mApplicationContext.getBean("connection", new Object[]{
                 iRevision,
-                iLocation,
+                iPath,
                 tKiosk,
                 tConfiguration,
                 tPresentation});
