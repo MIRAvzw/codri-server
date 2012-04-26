@@ -433,7 +433,7 @@ public abstract class SVNRepositoryReader extends RepositoryReader implements Ap
                     new InfoCallback() {
                         @Override
                         public void singleInfo(final Info2 iInfo) {
-                            if (iInfo.getPath().equals(iLocation)) {
+                            if (iInfo.getUrl().equals(iLocation)) {
                                 return;
                             }
                             tChildren.put(iInfo.getPath(), iInfo.getLastChangedRev());
