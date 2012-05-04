@@ -37,8 +37,8 @@ Codri does not monitor the repository, but expects you to notify in case of chan
 To do that, create a post-commit hook sending a HTTP PUT request on the repository
 endpoint of the REST API:
 > $ cat post-commit  
-> # #!/bin/sh  
-> # curl --silent -X PUT http://localhost:8080/codri/repository  
+> \# \#!/bin/sh  
+> \# curl --silent -X PUT http://localhost:8080/codri/repository  
 
 
 Subversion JavaHL
