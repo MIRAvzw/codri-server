@@ -1,14 +1,20 @@
-Ad-Astra 3
-==========
+Codri
+=====
 
-This application is part of Ad-Astra 3, a content management system developed for the Belgian astronomy museum MIRA (NPO). Its task is to manager storage and distribution of multimedia presentations which are to be displayed on kiosks throughout the museum, while simplifying administrative tasks to manage kiosks and presentations.
+This application is part of Codri, a content management system developed for
+the Belgian astronomy museum MIRA (an NPO). Its task is to manager storage and
+distribution of multimedia presentations which are to be displayed on kiosks
+throughout the museum, while simplifying administrative tasks to manage kiosks
+and presentations.
 
 
 Terminology
 -----------
 
-* Server: the (thick) system responsible for storage, distribution and management of the presentations
-* Kiosk: the (thin) system which is to display the presentations, as well as process any user input
+* Server: the (thick) system responsible for storage, distribution and
+  management of the presentations
+* Kiosk: the (thin) system which is to display the presentations, as well as
+  process any user input
 * Presentation: a collection of files to be displayed at one or more kiosks
 
 
@@ -21,14 +27,22 @@ The main objectives of the system are:
 * Robustness
 * Future-proof technologies
 
-To keep the kiosk code (which is run on a very lightweight client) fast and lean, we opted to put as much logic as possible in the server application. Concretely, this means that when a kiosk comes on-line, it'll advertise its presence and functionality on the local network, after which all will be managed by the server: the configuration will be loaded from storage, the kiosk will get configured using an RPC mechanism, and the location of the relevant presentation files will be pushed as well. For more details, see the descriptions below.
+To keep the kiosk code (which is run on a very lightweight client) fast and
+lean, we opted to put as much logic as possible in the server application. In
+practice, this means that when a kiosk comes on-line, it'll advertise its
+presence and functionality on the local network, after which all will be
+managed by the server: the configuration will be loaded from storage, the
+kiosk will get configured using an RPC mechanism, and the location of the
+relevant presentation files will be pushed as well. For more details, see the
+descriptions below.
 
 
 ### Presentation format
 
 HTML5 + Javascript
 
-TODO: clarify (future proof, easy to render client-side, compact, compatible with a SCM, compatible with current format)
+TODO: clarify (future proof, easy to render client-side, compact, compatible
+with a SCM, compatible with current format)
 
 
 ### Storage
@@ -40,26 +54,53 @@ TODO: clarify (allows versioning, easy-to-use as it's file based)
 
 ### Network communication
 
-We chose to use UPnP, as it takes care of several tedious aspects:
+We use a variety of lightweight protocols, each taking care of one specific aspect of the network communication.
 
-* Identification: each kiosk has to have a unique ID
-* Configuration: discovery enables the server to _discover_ the kiosks, which means that the kiosks itself won't need any local configuration
-* Eventing: allowing the server to respond to network (device entering, leaving, updating its status, ...) and custom events
-* RPC: through actions, the server is able to execute methods on each of the kiosks
+#### Discovery
+
+Each of the Codri servers are discovered through mDNS, at the following static
+hostnames:
+* control.codri.local: control endpoint, service the REST interface (see below)
+* data.codri.local: where the data is to be fetched
+* mail.codri.local: SMTP server
+* log.codri.local: UDP Syslog server
+* www.codri.local: human-friendly webinterface
+
+After registering itself with the control server, each kiosk is reachable at
+an .codri.local endpoint as well. The exact endpoint (composed of the hostname
+and aforementioned .codri.local suffix) is to be chosen freely, but should
+obviously be unique. Current client software generates something like
+"efikamx-$uid.codri.local", with the $uid composed of the 3 machine-specific
+bytes from the MAC address.
+
+
+#### Control
+
+Server as well as kiosk provide a REST-interface, allowing to acquire and
+configure several parameters of the system.
+
+TODO: document the interface.
+
+
+#### Data distribution
+
+As we use Subversion, the SVN protocol (served by svnserve) is used to push
+data.
+
 
 
 ### Administrative interface
 
-Web interface
-
-TODO: clarify (user-friendly, easy to access)
+WIP
 
 
 
 History
 -------
 
-The Ad-Astra 3 project originates in the master's dissertation of Tim Besard (2011, Hogeschool Gent), replacing the then DVD-based content format used within the MIRA museum.
+The Codri project originates in the master's dissertation of Tim Besard
+(2011, Hogeschool Gent), replacing the then DVD-based content format used
+within the MIRA museum.
 
 
 
@@ -73,13 +114,12 @@ Libraries
 Libraries used to implement the essential technologies used within the system:
 
 * Subversion: official JavaHL bindings
-* UPnP: Cling
-* Web interface: JWt
+* Enterprise framework: Spring
 
 Auxiliary libraries:
 
-* Servlet engine: Jetty
-* Logging: log4j (+ slj4j for Jetty)
-* Testing: TestNG
+* Logging: log4j & logback
 * XML parsing: XPP
 * Configuration library from Apache Commons
+* Building: Maven
+* Servlet engine: Tomcat
